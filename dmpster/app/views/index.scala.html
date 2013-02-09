@@ -1,0 +1,41 @@
+@(buckets: List[Bucket], bucketForm: Form[(String, String)]) 
+@import helper._ 
+@import helper.twitterBootstrap._ 
+@main("dmpster") {
+
+	<h1>View DMPs</h1>
+	<div class="row">
+		<div class="span8">
+			<ul>
+				@buckets.map { bucket =>
+				<li><a href="buckets/@bucket.id/details">@bucket.name</a></li> 
+				}
+			</ul>
+		</div>
+	
+		<div class="span6">
+		<div class="group">
+			<h2>Upload a DMP</h2>
+			@form(action = routes.Application.upload, 
+				'enctype -> "multipart/form-data", 
+				'class -> "form-inline") {
+    
+    <input type="file" name="dmp">
+    
+        <input type="submit">
+    </div><div class=group>
+			}
+		<h2>Testing: Manually add a DMP</h2>
+			@form(action = routes.Application.newBucket, 
+				'class -> "form-horizontal") {
+				<div class="control-group">
+			  @helper.inputText(bucketForm("name"))
+			  </div><div class="control-group">
+			  @helper.textarea(bucketForm("content"))
+			  </div>
+			  <input type="submit">
+			}
+		</div>
+		</div>
+	</div>
+}

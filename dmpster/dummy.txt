@@ -1,0 +1,633 @@
+Microsoft (R) Windows Debugger Version 6.2.9200.16384 X86
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+
+Loading Dump File [C:\Users\alexanderfl\Dropbox\stuff\dumpster\public\dmps\user.dmp]
+Comment: 'Dr. Watson generated MiniDump'
+User Mini Dump File: Only registers, stack and portions of memory are available
+
+Symbol search path is: cache*s:\temp\symbolcache;srv*http://lnz-jenny/symbolstore;srv*http://lnz-jenny/symbolstore-release;srv*http://msdl.microsoft.com/download/symbols;srv*http://chromium-browser-symsrv.commondatastorage.googleapis.com;srv*http://symbols.mozilla.org/firefox;srv*http://symbols.mozilla.org/xulrunner
+Executable search path is: srv*http://msdl.microsoft.com/download/symbols
+Windows XP Version 2600 (Service Pack 3) MP (2 procs) Free x86 compatible
+Product: WinNt, suite: SingleUserTS
+Machine Name:
+Debug session time: Wed Jan 30 11:59:57.000 2013 (UTC + 1:00)
+System Uptime: not available
+Process Uptime: 0 days 0:00:14.000
+................................................................
+................................................................
+........
+This dump file has an exception of interest stored in it.
+The stored exception information can be accessed via .ecxr.
+(1110.1e08): Access violation - code c0000005 (first/second chance not available)
+Unable to load image C:\WINDOWS\system32\jscript.dll, Win32 error 0n2
+*** WARNING: Unable to verify timestamp for jscript.dll
+eax=00000000 ebx=0421fd38 ecx=001dd528 edx=001dd528 esi=003aa3c8 edi=00000005
+eip=6fa01a00 esp=0421fc80 ebp=0421fcac iopl=0         nv up ei pl nz na po nc
+cs=001b  ss=0023  ds=0023  es=0023  fs=003b  gs=0000             efl=00000202
+syncSourceDll_x86!CScriptSiteProxy::OnStateChange+0x40:
+6fa01a00 8b481c          mov     ecx,dword ptr [eax+1Ch] ds:0023:0000001c=????????
+0:027> cdb: Reading initial command '!analyze -v;~*kb;.detach'
+*******************************************************************************
+*                                                                             *
+*                        Exception Analysis                                   *
+*                                                                             *
+*******************************************************************************
+
+*** WARNING: Unable to verify timestamp for avgdecider.dll
+*** ERROR: Module load completed but symbols could not be loaded for avgdecider.dll
+*** WARNING: Unable to verify timestamp for avgkrnlapix.dll
+*** ERROR: Module load completed but symbols could not be loaded for avgkrnlapix.dll
+*** WARNING: Unable to verify timestamp for avgsysx.dll
+*** ERROR: Module load completed but symbols could not be loaded for avgsysx.dll
+Unable to load image C:\WINDOWS\system32\ieframe.dll, Win32 error 0n2
+*** WARNING: Unable to verify timestamp for ieframe.dll
+*** WARNING: Unable to verify timestamp for mfc100u.dll
+*** WARNING: Unable to verify timestamp for avgui.exe
+*** ERROR: Module load completed but symbols could not be loaded for avgui.exe
+Unable to load image C:\WINDOWS\system32\mshtml.dll, Win32 error 0n2
+*** WARNING: Unable to verify timestamp for mshtml.dll
+*** WARNING: Unable to verify timestamp for avglogx.dll
+*** ERROR: Module load completed but symbols could not be loaded for avglogx.dll
+*** WARNING: Unable to verify timestamp for avgcommx.dll
+*** ERROR: Module load completed but symbols could not be loaded for avgcommx.dll
+*** WARNING: Unable to verify timestamp for avgidpmx.dll
+*** ERROR: Module load completed but symbols could not be loaded for avgidpmx.dll
+*** WARNING: Unable to verify timestamp for avgclitx.dll
+*** ERROR: Module load completed but symbols could not be loaded for avgclitx.dll
+*** WARNING: Unable to verify timestamp for msvcr100.dll
+Unable to load image C:\Program Files\Common Files\Microsoft Shared\VS7DEBUG\pdm.dll, Win32 error 0n2
+*** WARNING: Unable to verify timestamp for pdm.dll
+
+FAULTING_IP: 
+syncSourceDll_x86!CScriptSiteProxy::OnStateChange+40
+6fa01a00 8b481c          mov     ecx,dword ptr [eax+1Ch]
+
+EXCEPTION_RECORD:  ffffffff -- (.exr 0xffffffffffffffff)
+ExceptionAddress: 6fa01a00 (syncSourceDll_x86!CScriptSiteProxy::OnStateChange+0x00000040)
+   ExceptionCode: c0000005 (Access violation)
+  ExceptionFlags: 00000000
+NumberParameters: 2
+   Parameter[0]: 00000000
+   Parameter[1]: 0000001c
+Attempt to read from address 0000001c
+
+PROCESS_NAME:  avgui.exe
+
+ERROR_CODE: (NTSTATUS) 0xc0000005 - The instruction at 0x%08lx referenced memory at 0x%08lx. The memory could not be %s.
+
+EXCEPTION_CODE: (NTSTATUS) 0xc0000005 - The instruction at 0x%08lx referenced memory at 0x%08lx. The memory could not be %s.
+
+EXCEPTION_PARAMETER1:  00000000
+
+EXCEPTION_PARAMETER2:  0000001c
+
+READ_ADDRESS:  0000001c 
+
+FOLLOWUP_IP: 
+syncSourceDll_x86!CScriptSiteProxy::OnStateChange+40
+6fa01a00 8b481c          mov     ecx,dword ptr [eax+1Ch]
+
+APP:  avgui.exe
+
+FAULTING_THREAD:  00001e08
+
+BUGCHECK_STR:  APPLICATION_FAULT_NULL_CLASS_PTR_READ_INVALID_POINTER_READ_NULL_POINTER_READ_CALL
+
+PRIMARY_PROBLEM_CLASS:  NULL_CLASS_PTR_READ_CALL
+
+DEFAULT_BUCKET_ID:  NULL_CLASS_PTR_READ_CALL
+
+LAST_CONTROL_TRANSFER:  from 3d7b5a20 to 6fa01a00
+
+STACK_TEXT:  
+0421fcac 3d7b5a20 03a537f0 00000005 00000000 syncSourceDll_x86!CScriptSiteProxy::OnStateChange+0x40
+0421fcc8 585a51f3 003aa3cc 00230498 0025df54 jscript!COleScript::ChangeScriptState+0x37
+0421fd1c 585a5395 0025dfac 0421fd38 00230560 msscript!CScriptControl::CreateEngine+0x21a
+0421fd48 6b9471e3 00230560 0025dfac 90c10bdd msscript!CScriptControl::put_Language+0xe2
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0421fd70 6b94775b 03a80f60 90c108a9 012b5270 avgdecider+0x171e3
+0421fe04 6b935e5e 012b5270 0022c974 00030d40 avgdecider+0x1775b
+0421fe2c 6b935b35 012b5270 012851b4 00000000 avgdecider+0x5e5e
+0421fe5c 6b934d99 90c108c5 00000000 012851b4 avgdecider+0x5b35
+0421ff7c 6c0fb420 ef866aa7 00000005 012851b4 avgdecider+0x4d99
+0421ffbc 6d742f49 0175db50 00000005 00000004 avgkrnlapix+0xfb420
+0421fff4 00000000 012851b4 00000000 00000000 avgsysx+0x32f49
+
+
+FAULTING_SOURCE_LINE:  s:\silktest\trunk\openagent\srccpp\common\syncsourcedll\scriptsiteproxy.h
+
+FAULTING_SOURCE_FILE:  s:\silktest\trunk\openagent\srccpp\common\syncsourcedll\scriptsiteproxy.h
+
+FAULTING_SOURCE_LINE_NUMBER:  51
+
+SYMBOL_STACK_INDEX:  0
+
+SYMBOL_NAME:  syncsourcedll_x86!CScriptSiteProxy::OnStateChange+40
+
+FOLLOWUP_NAME:  MachineOwner
+
+MODULE_NAME: syncSourceDll_x86
+
+IMAGE_NAME:  syncSourceDll_x86.dll
+
+DEBUG_FLR_IMAGE_TIMESTAMP:  506094b5
+
+STACK_COMMAND:  ~27s; .ecxr ; kb
+
+FAILURE_BUCKET_ID:  NULL_CLASS_PTR_READ_CALL_c0000005_syncSourceDll_x86.dll!CScriptSiteProxy::OnStateChange
+
+BUCKET_ID:  APPLICATION_FAULT_NULL_CLASS_PTR_READ_INVALID_POINTER_READ_NULL_POINTER_READ_CALL_syncsourcedll_x86!CScriptSiteProxy::OnStateChange+40
+
+WATSON_STAGEONE_URL:  http://watson.microsoft.com/StageOne/avgui_exe/13_0_0_2883/50c689c4/syncSourceDll_x86_dll/13_5_0_6117/506094b5/c0000005/00001a00.htm?Retriage=1
+
+Followup: MachineOwner
+---------
+
+
+   0  Id: 1110.198c Suspend: -1 Teb: 7ffdf000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0012f9f4 7e4191be 7e4191f1 0016a970 00000000 ntdll!KiUserCallbackDispatcher
+0012fa14 6fa1db15 0016a970 00000000 00000000 user32!NtUserGetMessage+0xc
+0012feac 788217db 0016a970 00000000 00000000 syncSourceDll_x86!MessagingHooks::CHookGetMessageBase<MessagingHooks::CHookGetMessageW,wchar_t>::HookingCode<MessagingHooks::getMessageW>+0x1e5
+0012fec8 78821e89 006a30f8 006a30f8 ffffffff mfc100u!AfxInternalPumpMessage+0x1a
+0012fee8 00461178 1f3418c4 006a30f8 006a30f8 mfc100u!CWinThread::Run+0x5b
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0012ff18 7884778d 006a967c 00000001 00000000 avgui+0x61178
+0012ff2c 005cf57f 00400000 00000000 00021118 mfc100u!AfxWinMain+0x6a
+0012ffc0 7c81776f 2bd7e188 00000000 7ffda000 avgui+0x1cf57f
+0012fff0 00000000 005cf6b2 00000000 00000000 kernel32!BaseProcessStart+0x23
+
+   1  Id: 1110.394 Suspend: -1 Teb: 7ffde000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0111fd30 7c90df4a 6c41d896 00000003 0111fd8c ntdll!KiFastSystemCallRet
+0111fd34 6c41d896 00000003 0111fd8c 00000001 ntdll!NtWaitForMultipleObjects+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0111fd58 6c41df35 00000003 0111fd8c 00000001 avglogx+0x2d896
+0111feac 6c405445 00000001 ffffffff 0111ff9c avglogx+0x2df35
+0111ffbc 6d742f49 0445db50 00000005 00000004 avglogx+0x15445
+0111fff4 00000000 00170b7c 00000000 00000000 avgsysx+0x32f49
+
+   2  Id: 1110.1a8c Suspend: -1 Teb: 7ffdd000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0121fd30 7c90df4a 6c41d896 00000003 0121fd8c ntdll!KiFastSystemCallRet
+0121fd34 6c41d896 00000003 0121fd8c 00000001 ntdll!NtWaitForMultipleObjects+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0121fd58 6c41df35 00000003 0121fd8c 00000001 avglogx+0x2d896
+0121feac 6c405445 00000001 ffffffff 0121ff9c avglogx+0x2df35
+0121ffbc 6d742f49 0475db50 00000005 00000004 avglogx+0x15445
+0121fff4 00000000 00170ddc 00000000 00000000 avgsysx+0x32f49
+
+   3  Id: 1110.19f0 Suspend: -1 Teb: 7ffdc000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0144fd70 7c90df4a 6b754866 0000000a 00187068 ntdll!KiFastSystemCallRet
+0144fd74 6b754866 0000000a 00187068 00000001 ntdll!NtWaitForMultipleObjects+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0144fd98 6b754e80 0000000a 00187068 00000001 avgcommx+0x44866
+0144ff4c 6b75564e 0000000a 00187068 001728d8 avgcommx+0x44e80
+0144ff84 6b715465 00000001 ffffffff 00171248 avgcommx+0x4564e
+0144ffbc 6d742f49 0410db50 00000005 00000004 avgcommx+0x5465
+0144fff4 00000000 001874d4 00000000 00000000 avgsysx+0x32f49
+
+   4  Id: 1110.1f78 Suspend: -1 Teb: 7ffdb000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0155fc40 7c90df4a 7c809590 00000002 0155fc6c ntdll!KiFastSystemCallRet
+0155fc44 7c809590 00000002 0155fc6c 00000001 ntdll!NtWaitForMultipleObjects+0xc
+0155fce0 6be0e646 00000002 0155fd2c 00000000 kernel32!WaitForMultipleObjectsEx+0x12c
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0155fcfc 6be0e780 00000002 0155fd2c 00000001 avgidpmx+0xe646
+0155fe50 6be05f8c 0155fea4 e0b63ee7 00000005 avgidpmx+0xe780
+0155ffbc 6d742f49 0401db50 00000005 00000004 avgidpmx+0x5f8c
+0155fff4 00000000 0125cbb4 00000000 00000000 avgsysx+0x32f49
+
+   5  Id: 1110.1c14 Suspend: -1 Teb: 7ffd9000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0165fee4 7c90d3aa 7c831e7e 000001d4 00000000 ntdll!KiFastSystemCallRet
+0165fee8 7c831e7e 000001d4 00000000 00000000 ntdll!NtFsControlFile+0xc
+0165ff2c 6be13318 000001d4 00000000 e0863fc7 kernel32!ConnectNamedPipe+0x52
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0165ff78 6be05c59 0165ffa8 0165ffa4 e0863f3b avgidpmx+0x13318
+0165ffbc 6d742f49 0431db50 00000005 00000004 avgidpmx+0x5c59
+0165fff4 00000000 0125ca30 00000000 00000000 avgsysx+0x32f49
+
+   6  Id: 1110.a28 Suspend: -1 Teb: 7ffd8000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0176ff64 7c90df5a 6d74381d 00000104 00000000 ntdll!KiFastSystemCallRet
+0176ff68 6d74381d 00000104 00000000 00000000 ntdll!ZwWaitForSingleObject+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0176ff8c 6b721372 0016fa08 ffffffff 7fbb5765 avgsysx+0x3381d
+0176ffbc 6d742f49 0422db50 00000005 00000004 avgcommx+0x11372
+0176fff4 00000000 0016f9c4 00000000 00000000 avgsysx+0x32f49
+
+   7  Id: 1110.1d08 Suspend: -1 Teb: 7ffd7000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+01a9fcd0 7c90df4a 6b4fb7a6 00000002 01a9fd2c ntdll!KiFastSystemCallRet
+01a9fcd4 6b4fb7a6 00000002 01a9fd2c 00000001 ntdll!NtWaitForMultipleObjects+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+01a9fcf8 6b4fbf25 00000002 01a9fd2c 00000001 avgclitx+0x2b7a6
+01a9fe4c 6b4f49a5 00000001 ffffffff 01a9fee4 avgclitx+0x2bf25
+01a9fef4 6b4f3c43 001c5f1c 01a9ff68 69099ae1 avgclitx+0x249a5
+01a9ffbc 6d742f49 04fddb50 00000005 00000004 avgclitx+0x23c43
+01a9fff4 00000000 001c5f08 00000000 00000000 avgsysx+0x32f49
+
+   8  Id: 1110.10d0 Suspend: -1 Teb: 7ffd6000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0273fe70 7e4191be 7e4191f1 0019a560 00000000 ntdll!KiUserCallbackDispatcher
+0273fe90 788217db 0019a560 00000000 00000000 user32!NtUserGetMessage+0xc
+0273fe9c 00000000 00000000 00000000 01283908 mfc100u!AfxInternalPumpMessage+0x1a
+
+   9  Id: 1110.1aa0 Suspend: -1 Teb: 7ffd5000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0283fe70 7e4191be 7e4191f1 001dc978 00000000 ntdll!KiUserCallbackDispatcher
+0283fe90 788217db 001dc978 00000000 00000000 user32!NtUserGetMessage+0xc
+0283fe9c 00000000 00000000 00000000 0124b360 mfc100u!AfxInternalPumpMessage+0x1a
+
+  10  Id: 1110.1dc4 Suspend: -1 Teb: 7ffd4000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0293fe70 7e4191be 7e4191f1 001d7838 00000000 ntdll!KiUserCallbackDispatcher
+0293fe90 788217db 001d7838 00000000 00000000 user32!NtUserGetMessage+0xc
+0293fe9c 00000000 00000000 00000000 01293080 mfc100u!AfxInternalPumpMessage+0x1a
+
+  11  Id: 1110.14a0 Suspend: -1 Teb: 7ffaf000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+02a3fe70 7e4191be 7e4191f1 001e6078 00000000 ntdll!KiUserCallbackDispatcher
+02a3fe90 788217db 001e6078 00000000 00000000 user32!NtUserGetMessage+0xc
+02a3fe9c 00000000 00000000 00000000 01293188 mfc100u!AfxInternalPumpMessage+0x1a
+
+  12  Id: 1110.17b0 Suspend: -1 Teb: 7ffae000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+02b3f83c 7c90d21a 7c8023f1 00000000 02b3f870 ntdll!KiFastSystemCallRet
+02b3f840 7c8023f1 00000000 02b3f870 01294248 ntdll!ZwDelayExecution+0xc
+02b3f898 7c802455 00002710 00000000 02b3fbd4 kernel32!SleepEx+0x61
+02b3f8a8 00456a3e 00002710 1d951f64 012941a0 kernel32!Sleep+0xf
+WARNING: Stack unwind information not available. Following frames may be wrong.
+02b3fbd4 78834e68 00000000 00000000 19e3aab1 avgui+0x56a3e
+02b3fc8c 78869b9b 00000000 02b3fcb8 78834b4c mfc100u!CWnd::OnWndMsg+0x2f5
+02b3fd24 78858fd7 00000000 02b3fd54 788331f7 mfc100u!__sse2_available_init+0x148fb
+02b3fd8c 7885abf0 00000000 02b3fdc4 7e418734 mfc100u!__sse2_available_init+0x3d37
+02b3fe2c 7e4189cd 0016cf20 78729f59 000502b2 mfc100u!__sse2_available_init+0x5950
+02b3fe7c 7e44048e 7e4189f0 ffffffff 02b3fe9c user32!DispatchMessageWorker+0x306
+02b3ff64 7885f48d 00000000 02b3ffa8 78afc556 user32!_aulldvrm+0x7c
+02b3ff98 78b2b659 60cdb355 00000000 02b3ffb4 mfc100u!__sse2_available_init+0xa1ed
+02b3ffdc 7c839aaf 7c80b730 00000000 00000000 msvcr100!`string'+0x19
+02b3ffe0 7c80b72f 00000000 00000000 00000000 kernel32!_SEH_epilog+0x18
+02b3ffe4 00000000 00000000 00000000 78afc59c kernel32!BaseThreadStart+0x3d
+
+  13  Id: 1110.180 Suspend: -1 Teb: 7ffad000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+02c3fe70 7e4191be 7e4191f1 001de108 00000000 ntdll!KiUserCallbackDispatcher
+02c3fe90 788217db 001de108 00000000 00000000 user32!NtUserGetMessage+0xc
+02c3fe9c 00000000 00000000 00000000 01288008 mfc100u!AfxInternalPumpMessage+0x1a
+
+  14  Id: 1110.1974 Suspend: -1 Teb: 7ffac000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+02d3faa8 7c90df4a 7c809590 00000003 02d3fad4 ntdll!KiFastSystemCallRet
+02d3faac 7c809590 00000003 02d3fad4 00000001 ntdll!NtWaitForMultipleObjects+0xc
+02d3fb48 6fa211b6 00000003 02d3fd5c 00000000 kernel32!WaitForMultipleObjectsEx+0x12c
+02d3fd08 6c17b996 00000003 02d3fd5c 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForMultipleObjectsEx::HookingCode<ThreadingHooks::waitForMultipleObjectsExKernel32>+0x2a6
+WARNING: Stack unwind information not available. Following frames may be wrong.
+02d3fd24 6c17c0cf 00000003 02d3fd5c 00000001 avgkrnlapix+0x17b996
+02d3fe80 6c0c6491 02d3fd68 00001392 02d3fec8 avgkrnlapix+0x17c0cf
+02d3ffbc 6d742f49 0787db50 00000005 00000004 avgkrnlapix+0xc6491
+02d3fff4 00000000 01294d4c 00000000 00000000 avgsysx+0x32f49
+
+  15  Id: 1110.1fe8 Suspend: -1 Teb: 7ffab000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+02e3feec 7c90df5a 6d74381d 0000040c 00000000 ntdll!KiFastSystemCallRet
+02e3fef0 6d74381d 0000040c 00000000 02e3ff0c ntdll!ZwWaitForSingleObject+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+02e3ff14 6c0c6ec9 01294e40 000003e8 e9446a33 avgsysx+0x3381d
+02e3ffbc 6d742f49 07b7db50 00000005 00000004 avgkrnlapix+0xc6ec9
+02e3fff4 00000000 01294e40 00000000 00000000 avgsysx+0x32f49
+
+  16  Id: 1110.33c Suspend: -1 Teb: 7ffaa000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+02f3f9d8 7e4191be 7e4191f1 001eb028 00000000 ntdll!KiUserCallbackDispatcher
+02f3f9f8 6fa1db15 001eb028 00000000 00000000 user32!NtUserGetMessage+0xc
+02f3fe90 788217db 001eb028 00000000 00000000 syncSourceDll_x86!MessagingHooks::CHookGetMessageBase<MessagingHooks::CHookGetMessageW,wchar_t>::HookingCode<MessagingHooks::getMessageW>+0x1e5
+02f3feac 78821e89 000003d0 012957b0 0012ad9c mfc100u!AfxInternalPumpMessage+0x1a
+02f3fecc 78821772 19a3ae29 0012aa04 00160001 mfc100u!CWinThread::Run+0x5b
+02f3ff70 78afc556 0012ad9c 1a91897d 0012aa04 mfc100u!_AfxThreadEntry+0x11b
+02f3ffa8 78afc600 00160001 02f3ffec 7c80b729 msvcr100!_endthreadex+0x3f
+02f3ffb4 7c80b729 01295d68 0012aa04 00160001 msvcr100!_endthreadex+0xce
+02f3ffec 00000000 78afc59c 01295d68 00000000 kernel32!BaseThreadStart+0x37
+
+  17  Id: 1110.1de8 Suspend: -1 Teb: 7ffa7000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+032aff54 7c90df5a 6d74381d 000004b8 00000000 ntdll!KiFastSystemCallRet
+032aff58 6d74381d 000004b8 00000000 00000000 ntdll!ZwWaitForSingleObject+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+032aff7c 6c196998 01306fb8 ffffffff e88d6a8b avgsysx+0x3381d
+032affbc 6d742f49 067edb50 00000005 00000004 avgkrnlapix+0x196998
+032afff4 00000000 01306f80 00000000 00000000 avgsysx+0x32f49
+
+  18  Id: 1110.19b4 Suspend: -1 Teb: 7ffa8000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+034af8ec 7c90df4a 7c809590 00000002 034af918 ntdll!KiFastSystemCallRet
+034af8f0 7c809590 00000002 034af918 00000001 ntdll!NtWaitForMultipleObjects+0xc
+034af98c 6fa20fb3 00000002 034afb74 00000000 kernel32!WaitForMultipleObjectsEx+0x12c
+034afb4c 7e4195f9 00000002 034afb74 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForMultipleObjectsEx::HookingCode<ThreadingHooks::waitForMultipleObjectsExKernel32>+0xa3
+034afba8 6fa21e24 00000001 6fffe4c8 00000064 user32!RealMsgWaitForMultipleObjectsEx+0x13e
+034afbdc 7e4196a8 00000001 6fffe4c8 00000064 syncSourceDll_x86!MessagingHooks::CHookMsgWaitForMultipleObjectsEx::HookingCode<MessagingHooks::msgWaitForMultipleObjectsEx>+0x84
+034afbf8 6ff881e3 00000001 6fffe4c8 00000000 user32!MsgWaitForMultipleObjects+0x1f
+034afda0 6ffa5e6e e5fd434a 0012f864 00225ff8 OsHookDll_x86!Win32Messaging::CAutMessagingServer::RunMessageLoop+0x53
+034aff38 6ffc15d3 e5fd4302 0012f864 7c915ed5 OsHookDll_x86!Win32Messaging::CWin32MessagingServer::ThreadFunction+0xce
+034aff70 78afc556 00225ff8 1b28897d 0012f864 OsHookDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+034affa8 78afc600 7c915ed5 034affec 7c80b729 msvcr100!_endthreadex+0x3f
+034affb4 7c80b729 012b59f0 0012f864 7c915ed5 msvcr100!_endthreadex+0xce
+034affec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  19  Id: 1110.116c Suspend: -1 Teb: 7ffa9000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+035af8cc 7c90df5a 7c8025db 00000524 00000000 ntdll!KiFastSystemCallRet
+035af8d0 7c8025db 00000524 00000000 035af904 ntdll!ZwWaitForSingleObject+0xc
+035af934 6fa20573 00000524 00002710 00000000 kernel32!WaitForSingleObjectEx+0xa8
+035afe24 7c802542 00000524 00002710 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x63
+035afe38 6fa31776 00000524 00002710 035afef8 kernel32!WaitForSingleObject+0x12
+035afe48 6fa3bb02 00002710 b1fa31da 00000000 syncSourceDll_x86!SilkTest::CEvent::Wait+0x26
+035afef8 6fa3bd96 b1fa301a 00224778 012b59f0 syncSourceDll_x86!CWorkItemThread::Run+0x2b2
+035aff38 6fa460e3 b1fa3052 00000000 6fa00000 syncSourceDll_x86!`anonymous namespace'::<lambda1>::operator()+0x86
+035aff70 78afc556 00224778 1b38897d 00000000 syncSourceDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+035affa8 78afc600 6fa00000 035affec 7c80b729 msvcr100!_endthreadex+0x3f
+035affb4 7c80b729 012b59f0 00000000 6fa00000 msvcr100!_endthreadex+0xce
+035affec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  20  Id: 1110.984 Suspend: -1 Teb: 7ffa6000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+038cfc8c 7c90df5a 71a5402b 000005ac 00000001 ntdll!KiFastSystemCallRet
+038cfc90 71a5402b 000005ac 00000001 038cfcb8 ntdll!ZwWaitForSingleObject+0xc
+038cfccc 71a557c9 000005ac 00000570 00000000 mswsock!SockWaitForSingleObject+0x1a0
+038cfd44 71ab4d16 00000570 038cfe08 00000001 mswsock!WSPRecv+0x1dd
+038cfd80 0364d53c 00000570 038cfe08 00000001 ws2_32!WSARecv+0x77
+038cfdb8 0364dc3d 00000570 038cfe08 00000001 win32HookDll_x86!boost::asio::detail::socket_ops::recv+0x3c
+038cfde0 0364dd1b 00000570 00000010 038cfe08 win32HookDll_x86!boost::asio::detail::socket_ops::sync_recv+0x5d
+038cfe20 0364df91 012bd740 03aedcc0 03aedcc0 win32HookDll_x86!Communicator::CSocketTransportChannel::ReceiveMessageLength+0x4b
+038cfe4c 0362f521 03aedcc0 b000c282 71a916a3 win32HookDll_x86!Communicator::CSocketTransportChannel::ReceiveSerializedMsg+0x21
+038cfeb0 0362f717 b000c2d6 71a916a3 0131fbb0 win32HookDll_x86!Communicator::CCommunicatorImpl::Run+0xd1
+038cfee4 0362f795 0131fbb0 0379053c b000c32a win32HookDll_x86!CExceptionHandler<0,1>::HandleSignals<Communicator::`anonymous namespace'::<lambda1>,A0xf4835d39::<lambda0> >+0x47
+038cff18 0362f955 0131fbb0 0379053c 002290c0 win32HookDll_x86!CExceptionHandler<0,1>::operator()<Communicator::`anonymous namespace'::<lambda1>,A0xf4835d39::<lambda0> >+0x45
+038cff2c 03303ce8 0031fbb0 002290c0 033078f3 win32HookDll_x86!CThreadLibrary::ExecFunction<CDumpOnException<Communicator::`anonymous namespace'::<lambda1>,0> >+0x15
+038cff38 033078f3 8f628064 71a916a3 0012f5a8 threadDll_x86!boost::detail::thread_data<CBoostThread::CThreadName<`anonymous namespace'::<lambda0> > >::run+0x18
+038cff70 78afc556 002290c0 1bee897d 71a916a3 threadDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+038cffa8 78afc600 0012f5a8 038cffec 7c80b729 msvcr100!_endthreadex+0x3f
+038cffb4 7c80b729 012b59f0 71a916a3 0012f5a8 msvcr100!_endthreadex+0xce
+038cffec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  21  Id: 1110.1dd4 Suspend: -1 Teb: 7ffa5000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+039cf8a0 7c90df5a 7c8025db 00000538 00000000 ntdll!KiFastSystemCallRet
+039cf8a4 7c8025db 00000538 00000000 039cf8d8 ntdll!ZwWaitForSingleObject+0xc
+039cf908 6fa20a9b 00000538 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+039cfdf8 7c802542 00000538 ffffffff 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+039cfe0c 03624e56 00000538 ffffffff 039cfe84 kernel32!WaitForSingleObject+0x12
+039cfe1c 0363299e ffffffff b010c2b6 00000005 win32HookDll_x86!SilkTest::CEvent::Wait+0x26
+039cfe84 03632eb0 b010c282 01321370 01320bc0 win32HookDll_x86!Communicator::CMessageDispatchQueue::RunImpl+0x10e
+039cfeb0 03632f37 b010c2d6 00000005 01321370 win32HookDll_x86!Communicator::CMessageDispatchQueue::Run+0x70
+039cfee4 03633515 01321370 0379053d b010c32a win32HookDll_x86!CExceptionHandler<0,1>::HandleSignals<Communicator::`anonymous namespace'::<lambda4>,A0xbdf2fbdd::<lambda0> >+0x47
+039cff18 03633565 01321370 0379053d 001cd508 win32HookDll_x86!CExceptionHandler<0,1>::operator()<Communicator::`anonymous namespace'::<lambda4>,A0xbdf2fbdd::<lambda0> >+0x45
+039cff2c 03303ce8 00321370 001cd508 033078f3 win32HookDll_x86!CThreadLibrary::ExecFunction<CDumpOnException<Communicator::`anonymous namespace'::<lambda4>,0> >+0x15
+039cff38 033078f3 8f728064 00000005 003f0778 threadDll_x86!boost::detail::thread_data<CBoostThread::CThreadName<`anonymous namespace'::<lambda0> > >::run+0x18
+039cff70 78afc556 001cd508 1bfe897d 00000005 threadDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+039cffa8 78afc600 003f0778 039cffec 7c80b729 msvcr100!_endthreadex+0x3f
+039cffb4 7c80b729 012b59f0 00000005 003f0778 msvcr100!_endthreadex+0xce
+039cffec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  22  Id: 1110.990 Suspend: -1 Teb: 7ffa4000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+03ccf944 7c90df5a 7c8025db 000005bc 00000000 ntdll!KiFastSystemCallRet
+03ccf948 7c8025db 000005bc 00000000 03ccf97c ntdll!ZwWaitForSingleObject+0xc
+03ccf9ac 6fa20a9b 000005bc 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+03ccfe9c 7c802542 000005bc 00004074 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+03ccfeb0 6fd1de06 000005bc 00004074 03ccff38 kernel32!WaitForSingleObject+0x12
+03ccfec0 6fd0cca1 00004074 b2a80867 03a2daf8 syncExecDll_x86!SilkTest::CEvent::Wait+0x26
+03ccff38 6fd2a623 b2a8082f 03a2daf8 038cf8ec syncExecDll_x86!CExecThread::Run+0x71
+03ccff70 78afc556 0022db10 1bae897d 03a2daf8 syncExecDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+03ccffa8 78afc600 038cf8ec 03ccffec 7c80b729 msvcr100!_endthreadex+0x3f
+03ccffb4 7c80b729 012b59f0 03a2daf8 038cf8ec msvcr100!_endthreadex+0xce
+03ccffec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  23  Id: 1110.16ec Suspend: -1 Teb: 7ffa3000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+03dcfdb4 6fa2a23e b17c32f6 6fa2a125 0000007e syncSourceDll_x86!CThreadLocalStorage<ThreadLocal::CPerThreadData>::Get+0x14
+03dcfdd4 6fa13869 0125f3f0 03dcfdec 6fa26f7e syncSourceDll_x86!ThreadLocal::GetPerThreadData+0x3e
+03dcfde0 6fa26f7e 00000001 03dcfdf4 6fa26688 syncSourceDll_x86!RecursionScope::CRecursionScope::IsInRecursion+0x9
+03dcfdec 6fa26688 03dcfe00 6fa266a5 000003e8 syncSourceDll_x86!CRecursionScopeProvider<CIndividualRecursionIdProvider<CIdleListenerDispatcher> >::IsRecursive+0xe
+03dcfdf4 6fa266a5 000003e8 03dcfe50 6fa1fdad syncSourceDll_x86!CCallGate<CIndividualRecursionScopeProvider<CIdleListenerDispatcher> >::IsBlocked+0x8
+03dcfe00 6fa1fdad b17c3172 00000000 000003e8 syncSourceDll_x86!CCompoundCallGate<CCallGate<CRecursionScopeProvider<CRecursionIdProviderByCategoryName<&TimeWarpHooks::TIME_WARP_RECURSION_SCOPE> > >,CCallGate<CIndividualRecursionScopeProvider<CIdleListenerDispatcher> > >::IsBlocked+0x15
+03dcfe50 6ffbb6cb e56b428a 003f0000 0021f230 syncSourceDll_x86!TimeWarpHooks::CHookGetTickCount::HookingCode<TimeWarpHooks::getTickCountKernel32>+0x2d
+03dcfef8 6ffbb916 e56b434a 0021f210 012b59f0 OsHookDll_x86!CObserverThread::Run+0x20b
+03dcff38 6ffc15d3 e56b4302 003f0000 00000000 OsHookDll_x86!`anonymous namespace'::<lambda0>::operator()+0x86
+03dcff70 78afc556 0021f210 1bbe897d 003f0000 OsHookDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+03dcffa8 78afc600 00000000 03dcffec 7c80b729 msvcr100!_endthreadex+0x3f
+03dcffb4 7c80b729 012b59f0 003f0000 00000000 msvcr100!_endthreadex+0xce
+03dcffec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  24  Id: 1110.b70 Suspend: -1 Teb: 7ffa1000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+04f0fc8c 7c90df5a 71a5402b 000006c8 00000001 ntdll!KiFastSystemCallRet
+04f0fc90 71a5402b 000006c8 00000001 04f0fcb8 ntdll!ZwWaitForSingleObject+0xc
+04f0fccc 71a557c9 000006c8 000005ec 00000000 mswsock!SockWaitForSingleObject+0x1a0
+04f0fd44 71ab4d16 000005ec 04f0fe08 00000001 mswsock!WSPRecv+0x1dd
+04f0fd80 04d02bfc 000005ec 04f0fe08 00000001 ws2_32!WSARecv+0x77
+04f0fdb8 04d032fd 000005ec 04f0fe08 00000001 browserHookDll_x86!boost::asio::detail::socket_ops::recv+0x3c
+04f0fde0 04d033db 000005ec 00000010 04f0fe08 browserHookDll_x86!boost::asio::detail::socket_ops::sync_recv+0x5d
+04f0fe20 04d03651 012bdd50 03af0458 03af0458 browserHookDll_x86!Communicator::CSocketTransportChannel::ReceiveMessageLength+0x4b
+04f0fe4c 04cdf321 03af0458 87c0d966 71a916a3 browserHookDll_x86!Communicator::CSocketTransportChannel::ReceiveSerializedMsg+0x21
+04f0feb0 04cdf517 87c0d932 71a916a3 03a1c420 browserHookDll_x86!Communicator::CCommunicatorImpl::Run+0xd1
+04f0fee4 04cdf595 03a1c420 04dd67d4 87c0d8ce browserHookDll_x86!CExceptionHandler<0,1>::HandleSignals<Communicator::`anonymous namespace'::<lambda1>,A0xf4835d39::<lambda0> >+0x47
+04f0ff18 04cdf755 03a1c420 04dd67d4 0021c848 browserHookDll_x86!CExceptionHandler<0,1>::operator()<Communicator::`anonymous namespace'::<lambda1>,A0xf4835d39::<lambda0> >+0x45
+04f0ff2c 03303ce8 00a1c420 0021c848 033078f3 browserHookDll_x86!CThreadLibrary::ExecFunction<CDumpOnException<Communicator::`anonymous namespace'::<lambda1>,0> >+0x15
+04f0ff38 033078f3 881e8064 71a916a3 039cf048 threadDll_x86!boost::detail::thread_data<CBoostThread::CThreadName<`anonymous namespace'::<lambda0> > >::run+0x18
+04f0ff70 78afc556 0021c848 1c92897d 71a916a3 threadDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+04f0ffa8 78afc600 039cf048 04f0ffec 7c80b729 msvcr100!_endthreadex+0x3f
+04f0ffb4 7c80b729 012b59f0 71a916a3 039cf048 msvcr100!_endthreadex+0xce
+04f0ffec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  25  Id: 1110.6b4 Suspend: -1 Teb: 7ffa0000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0500f8a0 7c90df5a 7c8025db 00000668 00000000 ntdll!KiFastSystemCallRet
+0500f8a4 7c8025db 00000668 00000000 0500f8d8 ntdll!ZwWaitForSingleObject+0xc
+0500f908 6fa20a9b 00000668 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+0500fdf8 7c802542 00000668 ffffffff 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+0500fe0c 04cd0776 00000668 ffffffff 0500fe84 kernel32!WaitForSingleObject+0x12
+0500fe1c 04ce2c7e ffffffff 8630d952 00000005 browserHookDll_x86!SilkTest::CEvent::Wait+0x26
+0500fe84 04ce3190 8630d966 03a1c8f0 03a1b370 browserHookDll_x86!Communicator::CMessageDispatchQueue::RunImpl+0x10e
+0500feb0 04ce3217 8630d932 00000005 03a1c8f0 browserHookDll_x86!Communicator::CMessageDispatchQueue::Run+0x70
+0500fee4 04ce37f5 03a1c8f0 04dd67d5 8630d8ce browserHookDll_x86!CExceptionHandler<0,1>::HandleSignals<Communicator::`anonymous namespace'::<lambda4>,A0xbdf2fbdd::<lambda0> >+0x47
+0500ff18 04ce3845 03a1c8f0 04dd67d5 001e6b70 browserHookDll_x86!CExceptionHandler<0,1>::operator()<Communicator::`anonymous namespace'::<lambda4>,A0xbdf2fbdd::<lambda0> >+0x45
+0500ff2c 03303ce8 00a1c8f0 001e6b70 033078f3 browserHookDll_x86!CThreadLibrary::ExecFunction<CDumpOnException<Communicator::`anonymous namespace'::<lambda4>,0> >+0x15
+0500ff38 033078f3 89ee8064 00000005 003f0778 threadDll_x86!boost::detail::thread_data<CBoostThread::CThreadName<`anonymous namespace'::<lambda0> > >::run+0x18
+0500ff70 78afc556 001e6b70 1d62897d 00000005 threadDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+0500ffa8 78afc600 003f0778 0500ffec 7c80b729 msvcr100!_endthreadex+0x3f
+0500ffb4 7c80b729 012b59f0 00000005 003f0778 msvcr100!_endthreadex+0xce
+0500ffec 00000000 78afc59c 012b59f0 00000000 kernel32!BaseThreadStart+0x37
+
+  26  Id: 1110.18c0 Suspend: -1 Teb: 7ffa2000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+03fcfce4 7c90df4a 7c809590 00000002 03fcfd10 ntdll!KiFastSystemCallRet
+03fcfce8 7c809590 00000002 03fcfd10 00000001 ntdll!NtWaitForMultipleObjects+0xc
+03fcfd84 6fa2121a 00000002 03fcff6c 00000000 kernel32!WaitForMultipleObjectsEx+0x12c
+03fcff44 77df8631 00000002 03fcff6c 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForMultipleObjectsEx::HookingCode<ThreadingHooks::waitForMultipleObjectsExKernel32>+0x30a
+03fcffb4 7c80b729 00000000 00000000 77df8ae4 advapi32!WmipEventPump+0x230
+03fcffec 00000000 77df848a 00000000 00000000 kernel32!BaseThreadStart+0x37
+
+# 27  Id: 1110.1e08 Suspend: -1 Teb: 7ff9f000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0421fcac 3d7b5a20 03a537f0 00000005 00000000 syncSourceDll_x86!CScriptSiteProxy::OnStateChange+0x40
+0421fcc8 585a51f3 003aa3cc 00230498 0025df54 jscript!COleScript::ChangeScriptState+0x37
+0421fd1c 585a5395 0025dfac 0421fd38 00230560 msscript!CScriptControl::CreateEngine+0x21a
+0421fd48 6b9471e3 00230560 0025dfac 90c10bdd msscript!CScriptControl::put_Language+0xe2
+WARNING: Stack unwind information not available. Following frames may be wrong.
+0421fd70 6b94775b 03a80f60 90c108a9 012b5270 avgdecider+0x171e3
+0421fe04 6b935e5e 012b5270 0022c974 00030d40 avgdecider+0x1775b
+0421fe2c 6b935b35 012b5270 012851b4 00000000 avgdecider+0x5e5e
+0421fe5c 6b934d99 90c108c5 00000000 012851b4 avgdecider+0x5b35
+0421ff7c 6c0fb420 ef866aa7 00000005 012851b4 avgdecider+0x4d99
+0421ffbc 6d742f49 0175db50 00000005 00000004 avgkrnlapix+0xfb420
+0421fff4 00000000 012851b4 00000000 00000000 avgsysx+0x32f49
+
+  28  Id: 1110.1e98 Suspend: -1 Teb: 7ff9e000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0459fa7c 7e4191be 7e42776b 0459ff60 00000000 ntdll!KiUserCallbackDispatcher
+0459faa4 6fa1d635 0459ff60 00000000 00000000 user32!NtUserGetMessage+0xc
+0459ff3c 585a881f 0459ff60 00000000 00000000 syncSourceDll_x86!MessagingHooks::CHookGetMessageBase<MessagingHooks::CHookGetMessageA,char>::HookingCode<MessagingHooks::getMessageA>+0x1e5
+0459ff80 77c3a3b0 00000000 585b2070 042777d8 msscript!CTimeoutObject::Pop+0x328
+0459ffb4 7c80b729 003aa338 585b2070 042777d8 msvcrt!_endthreadex+0xa9
+0459ffec 00000000 77c3a341 003aa338 00000000 kernel32!BaseThreadStart+0x37
+
+  29  Id: 1110.1b2c Suspend: -1 Teb: 7ff9d000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0469ff98 7c90d21a 7c927dca 00000001 0469ffac ntdll!KiFastSystemCallRet
+0469ff9c 7c927dca 00000001 0469ffac 00000000 ntdll!ZwDelayExecution+0xc
+0469ffb4 7c80b729 00000000 00000000 00000000 ntdll!RtlpTimerThread+0x47
+0469ffec 00000000 7c927d83 00000000 00000000 kernel32!BaseThreadStart+0x37
+
+  30  Id: 1110.15c4 Suspend: -1 Teb: 7ff9c000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+0479ff6c 7c90da4a 7c91028d 000008d4 0479ffac ntdll!KiFastSystemCallRet
+0479ff70 7c91028d 000008d4 0479ffac 0479ffb0 ntdll!ZwRemoveIoCompletion+0xc
+0479ffb4 7c80b729 00000000 042797c8 00000000 ntdll!RtlpWorkerThread+0x3d
+0479ffec 00000000 7c910250 00000000 00000000 kernel32!BaseThreadStart+0x37
+
+  31  Id: 1110.137c Suspend: -1 Teb: 7ff9b000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+061efb90 7c90df4a 7c809590 00000003 061efbbc ntdll!KiFastSystemCallRet
+061efb94 7c809590 00000003 061efbbc 00000001 ntdll!NtWaitForMultipleObjects+0xc
+061efc30 6fa211b6 00000003 061efe18 00000000 kernel32!WaitForMultipleObjectsEx+0x12c
+061efdf0 7e4195f9 00000003 061efe18 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForMultipleObjectsEx::HookingCode<ThreadingHooks::waitForMultipleObjectsExKernel32>+0x2a6
+061efe4c 6fa21e24 00000002 061efec4 000001f4 user32!RealMsgWaitForMultipleObjectsEx+0x13e
+061efe80 7e4196a8 00000002 061efec4 000001f4 syncSourceDll_x86!MessagingHooks::CHookMsgWaitForMultipleObjectsEx::HookingCode<MessagingHooks::msgWaitForMultipleObjectsEx>+0x84
+061efe9c 3b24137d 00000002 061efec4 00000000 user32!MsgWaitForMultipleObjects+0x1f
+061eff80 3b257a96 00000001 061effa0 000001f4 pdm!CDebuggerThread::CallableWaitForMultiple+0x94
+061effa8 3b257a27 00000000 061effec 7c80b729 pdm!CDebuggerThread::ThreadEntry+0x6e
+061effb4 7c80b729 044920b0 7c912228 00000000 pdm!DebuggerThreadEntry+0xe
+061effec 00000000 3b257a19 044920b0 00000000 kernel32!BaseThreadStart+0x37
+
+  32  Id: 1110.1a78 Suspend: -1 Teb: 7ff9a000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+065bfe14 7c90daaa 77e765e3 00000a24 065bff74 ntdll!KiFastSystemCallRet
+065bfe18 77e765e3 00000a24 065bff74 00000000 ntdll!ZwReplyWaitReceivePortEx+0xc
+065bff80 77e76caf 065bffa8 77e76ad1 0484b958 rpcrt4!LRPC_ADDRESS::ReceiveLotsaCalls+0x12a
+065bff88 77e76ad1 0484b958 0435e7c8 061efad4 rpcrt4!RecvLotsaCallsWrapper+0xd
+065bffa8 77e76c97 001982d8 065bffec 7c80b729 rpcrt4!BaseCachedThreadRoutine+0x79
+065bffb4 7c80b729 04348730 0435e7c8 061efad4 rpcrt4!ThreadStartRoutine+0x1a
+065bffec 00000000 77e76c7d 04348730 00000000 kernel32!BaseThreadStart+0x37
+
+  33  Id: 1110.115c Suspend: -1 Teb: 7ff99000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+066bff1c 7c90d21a 7c8023f1 00000000 066bff50 ntdll!KiFastSystemCallRet
+066bff20 7c8023f1 00000000 066bff50 7c802550 ntdll!ZwDelayExecution+0xc
+066bff78 7c802455 0000ea60 00000000 066bffb4 kernel32!SleepEx+0x61
+066bff88 774fe3e3 0000ea60 047c8b00 774fe4a2 kernel32!Sleep+0xf
+066bff94 774fe4a2 00000000 7c910435 047c8b00 ole32!CROIDTable::WorkerThreadLoop+0x14
+066bffa8 774fe50a 002261f8 066bffec 7c80b729 ole32!CRpcThread::WorkerLoop+0x1e
+066bffb4 7c80b729 047c8b00 7c910435 002261f8 ole32!CRpcThreadCache::RpcWorkerThreadEntry+0x1b
+066bffec 00000000 774fe4ef 047c8b00 00000000 kernel32!BaseThreadStart+0x37
+
+  34  Id: 1110.a34 Suspend: -1 Teb: 7ff98000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+067dfe14 7c90daaa 77e765e3 00000a24 067dff74 ntdll!KiFastSystemCallRet
+067dfe18 77e765e3 00000a24 067dff74 00000000 ntdll!ZwReplyWaitReceivePortEx+0xc
+067dff80 77e76caf 067dffa8 77e76ad1 0484b958 rpcrt4!LRPC_ADDRESS::ReceiveLotsaCalls+0x12a
+067dff88 77e76ad1 0484b958 7c917c51 1609b9ac rpcrt4!RecvLotsaCallsWrapper+0xd
+067dffa8 77e76c97 001982d8 067dffec 7c80b729 rpcrt4!BaseCachedThreadRoutine+0x79
+067dffb4 7c80b729 04348970 7c917c51 1609b9ac rpcrt4!ThreadStartRoutine+0x1a
+067dffec 00000000 77e76c7d 04348970 00000000 kernel32!BaseThreadStart+0x37
+
+  35  Id: 1110.1c18 Suspend: -1 Teb: 7ff97000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+069dfa14 7c90df5a 7c8025db 00000a04 00000000 ntdll!KiFastSystemCallRet
+069dfa18 7c8025db 00000a04 00000000 069dfa4c ntdll!ZwWaitForSingleObject+0xc
+069dfa7c 6fa20a9b 00000a04 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+069dff6c 7c802542 00000a04 000927c0 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+069dff80 3cf4aa39 00000a04 000927c0 3cea0000 kernel32!WaitForSingleObject+0x12
+069dffa0 3ceb07a8 04277128 3ceb086b 04877d90 mshtml!CDwnTaskExec::ThreadExec+0x244
+069dffb4 7c80b729 047c74d8 04277128 04877d90 mshtml!CExecFT::ThreadProc+0x39
+069dffe0 7c80b72f 00000000 00000000 00000000 kernel32!BaseThreadStart+0x37
+069dffe4 00000000 00000000 00000000 3ceb085d kernel32!BaseThreadStart+0x3d
+
+  36  Id: 1110.1914 Suspend: -1 Teb: 7ff96000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+06adf8f4 7c90df5a 7c8025db 000009d0 00000000 ntdll!KiFastSystemCallRet
+06adf8f8 7c8025db 000009d0 00000000 06adf92c ntdll!ZwWaitForSingleObject+0xc
+06adf95c 6fa20a9b 000009d0 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+06adfe4c 7c802542 000009d0 ffffffff 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+06adfe60 6fb22a96 000009d0 ffffffff 06adfec0 kernel32!WaitForSingleObject+0x12
+06adfe70 6fb35f9f ffffffff b5c8ff80 00000000 synchronizationDll_x86!SilkTest::CEvent::Wait+0x26
+06adfec0 6fb376a2 b5c8fe78 0435f670 03a86c00 synchronizationDll_x86!CAbstractWaitCondition::WorkerThread+0x4f
+06adff38 6fb3d3b3 b5c8fe30 00000000 02f3edc4 synchronizationDll_x86!`anonymous namespace'::<lambda0>::operator()+0xf2
+06adff70 78afc556 0435f670 1ecf897d 00000000 synchronizationDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+06adffa8 78afc600 02f3edc4 06adffec 7c80b729 msvcr100!_endthreadex+0x3f
+06adffb4 7c80b729 03a86c00 00000000 02f3edc4 msvcr100!_endthreadex+0xce
+06adffec 00000000 78afc59c 03a86c00 00000000 kernel32!BaseThreadStart+0x37
+
+  37  Id: 1110.b58 Suspend: -1 Teb: 7ff95000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+06e7fa14 7c90df5a 7c8025db 00000b40 00000000 ntdll!KiFastSystemCallRet
+06e7fa18 7c8025db 00000b40 00000000 06e7fa4c ntdll!ZwWaitForSingleObject+0xc
+06e7fa7c 6fa20a9b 00000b40 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+06e7ff6c 7c802542 00000b40 000927c0 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+06e7ff80 3cf4aa39 00000b40 000927c0 3cea0000 kernel32!WaitForSingleObject+0x12
+06e7ffa0 3ceb07a8 048f0b00 3ceb086b 78134e28 mshtml!CDwnTaskExec::ThreadExec+0x244
+06e7ffb4 7c80b729 0435b260 048f0b00 78134e28 mshtml!CExecFT::ThreadProc+0x39
+06e7ffe0 7c80b72f 00000000 00000000 00000000 kernel32!BaseThreadStart+0x37
+06e7ffe4 00000000 00000000 00000000 3ceb085d kernel32!BaseThreadStart+0x3d
+
+  38  Id: 1110.189c Suspend: -1 Teb: 7ff94000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+071af8f4 7c90df5a 7c8025db 00000b34 00000000 ntdll!KiFastSystemCallRet
+071af8f8 7c8025db 00000b34 00000000 071af92c ntdll!ZwWaitForSingleObject+0xc
+071af95c 6fa20a9b 00000b34 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+071afe4c 7c802542 00000b34 ffffffff 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+071afe60 04cd0776 00000b34 ffffffff 071afec0 kernel32!WaitForSingleObject+0x12
+071afe70 04c457af ffffffff 842ad916 047b4ccc browserHookDll_x86!SilkTest::CEvent::Wait+0x26
+071afec0 04c46df2 842ad8ee 04912d50 03aeda20 browserHookDll_x86!CAbstractWaitCondition::WorkerThread+0x4f
+071aff38 04ccc3a3 842ad8a6 047b4ccc 7c800000 browserHookDll_x86!`anonymous namespace'::<lambda0>::operator()+0xf2
+071aff70 78afc556 04912d50 1f78897d 047b4ccc browserHookDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+071affa8 78afc600 7c800000 071affec 7c80b729 msvcr100!_endthreadex+0x3f
+071affb4 7c80b729 03aeda20 047b4ccc 7c800000 msvcr100!_endthreadex+0xce
+071affec 00000000 78afc59c 03aeda20 00000000 kernel32!BaseThreadStart+0x37
+
+  39  Id: 1110.1798 Suspend: -1 Teb: 7ff93000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+072af944 7c90df5a 7c8025db 00000b98 00000000 ntdll!KiFastSystemCallRet
+072af948 7c8025db 00000b98 00000000 072af97c ntdll!ZwWaitForSingleObject+0xc
+072af9ac 6fa20a9b 00000b98 00001388 00000000 kernel32!WaitForSingleObjectEx+0xa8
+072afe9c 7c802542 00000b98 00004074 00000000 syncSourceDll_x86!ThreadingHooks::CHookWaitForSingleObjectEx::HookingCode<ThreadingHooks::waitForSingleObjectExKernel32>+0x58b
+072afeb0 6fd1de06 00000b98 00004074 072aff38 kernel32!WaitForSingleObject+0x12
+072afec0 6fd0cca1 00004074 b64e0867 00000000 syncExecDll_x86!SilkTest::CEvent::Wait+0x26
+072aff38 6fd2a623 b64e082f 00000000 7c800000 syncExecDll_x86!CExecThread::Run+0x71
+072aff70 78afc556 04911150 1f48897d 00000000 syncExecDll_x86!boost::`anonymous namespace'::thread_start_function+0x63
+072affa8 78afc600 7c800000 072affec 7c80b729 msvcr100!_endthreadex+0x3f
+072affb4 7c80b729 03aeda20 00000000 7c800000 msvcr100!_endthreadex+0xce
+072affec 00000000 78afc59c 03aeda20 00000000 kernel32!BaseThreadStart+0x37
+
+  40  Id: 1110.1ed4 Suspend: -1 Teb: 7ff91000 Unfrozen
+ChildEBP RetAddr  Args to Child              
+074aff54 7c90df5a 6d74381d 00000bb4 00000000 ntdll!KiFastSystemCallRet
+074aff58 6d74381d 00000bb4 00000000 00000000 ntdll!ZwWaitForSingleObject+0xc
+WARNING: Stack unwind information not available. Following frames may be wrong.
+074aff7c 6c196998 03aee860 ffffffff eced6a8b avgsysx+0x3381d
+074affbc 6d742f49 021edb50 00000005 00000004 avgkrnlapix+0x196998
+074afff4 00000000 03aee828 00000000 00000000 avgsysx+0x32f49
+Detached

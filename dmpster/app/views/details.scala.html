@@ -1,0 +1,15 @@
+@(bucket: Bucket) 
+@import helper._ 
+@import helper.twitterBootstrap._ 
+@main("dmpstr") {
+
+	<h1>@bucket.name</h1>
+	<div class="row">
+		<div class="span14">
+		<pre>
+@bucket.content
+		</pre>
+		</div>
+	
+	</div>
+}
