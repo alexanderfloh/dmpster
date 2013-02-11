@@ -2,7 +2,7 @@ html, body {
     background-color: #eee;
 }
 body {
-    padding-top: 40px; /* 40px to make the container go all the way to the bottom of the topbar */
+    /*padding-top: 40px;*/ /* 40px to make the container go all the way to the bottom of the topbar */
 }
 .container > footer p {
     text-align: center; /* center align it with the container */
@@ -48,14 +48,6 @@ body {
 }
 */
 
-.topbar .btn {
-    border: 0;
-}
-
-.topbar p {
-    color: #888;
-}
-
 .group {
 	padding: 5px;
 	margin: 10px;
@@ -66,3 +58,10 @@ body {
   	-moz-border-radius: 4px;
   	border-radius: 4px;
 }
+
+#holder { border: 1px dashed #ccc; width: 300px; min-height: 30px; margin: 5px auto;}
+#holder.hover { border: 10px dashed #0c0; }
+progress { width: 100%; }
+progress:after { content: '%'; }
+.fail { background: #c00; padding: 2px; color: #fff; }
+.hidden { display: none !important;}

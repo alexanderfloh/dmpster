@@ -13,18 +13,19 @@
 			</ul>
 		</div>
 	
-		<div class="span6">
-		<div class="group">
+		<div class="span4">
 			<h2>Upload a DMP</h2>
 			@form(action = routes.Application.upload, 
 				'enctype -> "multipart/form-data", 
 				'class -> "form-inline") {
     
-    <input type="file" name="dmp">
-    
+    <input type="file" name="dmp" id="upload-button">
+    <div class="progress">
+    	<div class="bar" id="bootstrap-progress-bar" ></div>
+    </div>
         <input type="submit">
-    </div><div class=group>
-			}
+    }</div>
+			
 		<h2>Testing: Manually add a DMP</h2>
 			@form(action = routes.Application.newBucket, 
 				'class -> "form-horizontal") {
@@ -36,6 +37,4 @@
 			  <input type="submit">
 			}
 		</div>
-		</div>
-	</div>
 }

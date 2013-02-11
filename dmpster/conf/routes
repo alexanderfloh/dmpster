@@ -12,4 +12,5 @@ GET		/buckets					controllers.Application.buckets
 GET		/buckets/:id/details		controllers.Application.viewDetails(id: Long)
 POST	/buckets					controllers.Application.newBucket
 POST	/							controllers.Application.upload
+POST	/upload						controllers.Application.uploadAjax
 POST	/buckets/:id/delete			controllers.Application.deleteBucket(id: Long)
