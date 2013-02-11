@@ -12,7 +12,6 @@ dist
 /.classpath
 /.project
 /RUNNING_PID
-/project
 /.settings
 /.target
 /bin
