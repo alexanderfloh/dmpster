@@ -25,7 +25,8 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
 	      "-i",
 	      "srv*http://msdl.microsoft.com/download/symbols",
 	      "-c",
-	      "!analyze -v;~*kb;.detach",
+	      //"!analyze -v;~*kb;.detach",
+	      "!analyze -v;.detach",
 	      "-z",
 	      file.getAbsolutePath())
 	      
