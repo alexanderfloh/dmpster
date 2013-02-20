@@ -10,7 +10,9 @@
 			<li>@category._1</li>
 			<ul>
 				@category._2.map { bucket =>
-				<li><a href="buckets/@bucket.id/details">@bucket.filename</a></li>
+				<li><a href="buckets/@bucket.id/details">@bucket.filename</a>
+				@if(bucket.isNew) {<span class="label label-inverse">new</span> }
+				</li>
 				}
 			</ul> 
 			}
