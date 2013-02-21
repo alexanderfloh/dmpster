@@ -19,11 +19,11 @@ object Application extends Controller {
   }
 
   def buckets = Action {
-    Ok(views.html.index(Bucket.all(), bucketForm))
+    Ok(views.html.index(Bucket.all, bucketForm))
   }
 
   def viewDetails(id: Long) = Action {
-    Bucket.all().find(_.id == id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
+    Bucket.all.find(_.id == id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
   }
 
   def uploadAjax = Action(parse.multipartFormData) { 

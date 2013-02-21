@@ -25,7 +25,7 @@ case class Bucket(
 }
 
 object Bucket {
-  def all(): List[Bucket] = DB.withConnection { implicit c =>
+  def all: List[Bucket] = DB.withConnection { implicit c =>
     SQL("select * from bucket").as(bucket *)
   }
 
