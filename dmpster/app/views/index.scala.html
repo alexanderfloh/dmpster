@@ -1,4 +1,4 @@
-@(buckets: List[Bucket], bucketForm: Form[(String, String)]) 
+@(buckets: List[(Bucket, Seq[Tag])], bucketForm: Form[(String, String)]) 
 @import helper._ 
 @import helper.twitterBootstrap._ 
 @main("View DMPs") {
@@ -6,13 +6,16 @@
 <div class="row">
 	<div class="span8">
 		<ul>
-			@buckets.groupBy(_.name).map { category =>
+			@buckets.groupBy(_._1.name).map { category =>
 			<li>@category._1</li>
 			<ul>
 				@category._2.map { bucket =>
-				<li><a href="buckets/@bucket.id/details">@bucket.filename</a>
-				@if(bucket.isNew) {<span class="label label-inverse">new</span> }
-				<form action="buckets/@bucket.id/addTag/asdf" method="post"><input type="submit"></input></form>
+				<li><a href="buckets/@bucket._1.id/details">@bucket._1.filename</a>
+				@for(t <- bucket._2) {
+					<span class="label label-info">@t.name</span>
+				}
+				@if(bucket._1.isNew) {<span class="label label-inverse">new</span> }
+				<form action="buckets/@bucket._1.id/addTag/asdf" method="post"><input type="submit"></input></form>
 				</li>
 				}
 			</ul> 

@@ -14,23 +14,27 @@ object Tag {
     implicit c =>
       SQL("select * from tag").as(tag *)
   }
+  
+  def tagsForBucket(bucket: Bucket) = DB.withConnection { implicit c => {
+    SQL("select * from bucketToTag btt inner join tag t on t.id = btt.tagId where btt.bucketId = {bucketId}").on('bucketId -> bucket.id).as(tag *)
+  }}
 
   def create(name: String) = {
     DB.withConnection {
       implicit c =>
-        SQL("insert into tag (name) values ({name})").on(
-          'name -> name).executeUpdate
+        SQL("insert into tag (name) values ({name})")
+          .on('name -> name).executeUpdate
     }
   }
-  
+
   def findByName(name: String) = {
     DB.withConnection {
       implicit c =>
-        SQL("select * from tag where name = {name}").on(
-          'name -> name).as(tag.singleOpt)
+        SQL("select * from tag where name = {name}")
+          .on('name -> name).as(tag.singleOpt)
     }
   }
-  
+
   def tag = {
     get[Long]("id") ~
       get[String]("name") map {
