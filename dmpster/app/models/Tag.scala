@@ -22,7 +22,15 @@ object Tag {
           'name -> name).executeUpdate
     }
   }
-
+  
+  def findByName(name: String) = {
+    DB.withConnection {
+      implicit c =>
+        SQL("select * from tag where name = {name}").on(
+          'name -> name).as(tag.singleOpt)
+    }
+  }
+  
   def tag = {
     get[Long]("id") ~
       get[String]("name") map {

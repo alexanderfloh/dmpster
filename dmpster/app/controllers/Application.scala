@@ -11,6 +11,7 @@ import play.api.libs.concurrent._
 import play.api.Play.current
 import utils.DmpParser
 import play.Logger
+import models.Tag
 
 object Application extends Controller {
 
@@ -51,6 +52,15 @@ object Application extends Controller {
       Redirect(routes.Application.index).flashing(
         "error" -> "Missing file")
     }
+  }
+  
+  def addTag(id: Long, tagName: String) = Action {
+    val tag = Tag.findByName(tagName).getOrElse({
+     Tag.create(tagName)
+     Tag.findByName(tagName).get
+    })
+    Bucket.all.find(_.id == id).map(Bucket.addTag(_, tag))
+    Ok("added: "+ tagName)
   }
   
   def deleteBucket(id: Long) = TODO

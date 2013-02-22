@@ -14,7 +14,7 @@ case class Bucket(
   filename: String,
   content: String,
   timestamp: Date) {
-  
+
   def isNew = {
     val tsCal = new GregorianCalendar()
     tsCal.setTime(timestamp)
@@ -39,6 +39,12 @@ object Bucket {
         'timestamp -> new Date()).executeUpdate
     }
   }
+
+  def addTag(bucket: Bucket, tag: Tag) =
+    DB.withConnection { implicit c =>
+      SQL("insert into bucketToTag (bucketId, tagId) values ({bucketId}, {tagId})")
+        .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
+    }
 
   def delete(id: Long) = {
     DB.withConnection { implicit c =>
