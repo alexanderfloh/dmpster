@@ -20,11 +20,11 @@ object Application extends Controller {
   }
 
   def buckets = Action {
-    Ok(views.html.index(Bucket.all.map(b => (b, Tag.tagsForBucket(b))), bucketForm))
+    Ok(views.html.index(Bucket.all.map(b => (b, Tag.tagsForBucket(b))), Tag.all))
   }
 
   def viewDetails(id: Long) = Action {
-    Bucket.all.find(_.id == id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
+    Bucket.byId(id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
   }
 
   def uploadAjax = Action(parse.multipartFormData) {
@@ -60,16 +60,21 @@ object Application extends Controller {
       Tag.findByName(tagName).get
     })
 
-    Bucket.all.find(_.id == id).map(b =>
+    Bucket.byId(id).map(b =>
       if (Tag.tagsForBucket(b).exists(_.name == tagName)) Ok("tag already there")
       else {
         Bucket.addTag(b, tag)
         Ok("added: " + tagName)
       }).getOrElse(BadRequest("Invalid bucket id"))
   }
+  
+  def removeTag(id: Long, tagName: String) = Action {
+    Tag.findByName(tagName).map (tag => {
+       Bucket.byId(id).map(b => Bucket.removeTag(b, tag))
+       Ok("")
+    }).getOrElse(BadRequest("Invalid bucket id or tag"))
+  }
 
   def deleteBucket(id: Long) = TODO
-
-  val bucketForm = Form(tuple("name" -> nonEmptyText, "content" -> nonEmptyText))
 
 }

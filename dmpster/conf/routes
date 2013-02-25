@@ -13,3 +13,4 @@ GET		/buckets/:id/details		controllers.Application.viewDetails(id: Long)
 POST	/upload						controllers.Application.uploadAjax
 POST	/buckets/:id/delete			controllers.Application.deleteBucket(id: Long)
 POST    /buckets/:id/addTag/:tagName controllers.Application.addTag(id: Long, tagName: String)
+POST    /buckets/:id/removeTag/:tagName controllers.Application.removeTag(id: Long, tagName: String)

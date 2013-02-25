@@ -29,6 +29,10 @@ object Bucket {
     SQL("select * from bucket").as(bucket *)
   }
 
+  def byId(id: Long) = DB.withConnection { implicit c =>
+    SQL("select * from bucket where id = {id}").on('id -> id).as(bucket.singleOpt)
+  }
+
   def create(name: String, filename: String, content: String) = {
     DB.withConnection { implicit c =>
       SQL("insert into bucket (name, filename, content, timestamp) " +
@@ -43,6 +47,12 @@ object Bucket {
   def addTag(bucket: Bucket, tag: Tag) =
     DB.withConnection { implicit c =>
       SQL("insert into bucketToTag (bucketId, tagId) values ({bucketId}, {tagId})")
+        .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
+    }
+
+  def removeTag(bucket: Bucket, tag: Tag) =
+    DB.withConnection { implicit c =>
+      SQL("delete from bucketToTag where bucketId = {bucketId} and tagId = {tagId}")
         .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
     }
 

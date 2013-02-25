@@ -99,3 +99,23 @@ progress:after {
 .hidden {
 	display: none !important;
 }
+
+.form-delbutton {
+	display: inline;
+	padding: 0px;
+	margin: 0px;
+}
+
+.removetag {
+	cursor: pointer;
+	text-shadow: 0 1px 0 white;
+	opacity: 0.2;
+	filter: alpha(opacity=20);
+	background: transparent;
+	border: none;
+	-webkit-appearance: none;
+	line-height: 14px;
+	font-size: 11px;
+	font-weight: bold;
+	padding: 0px;
+}

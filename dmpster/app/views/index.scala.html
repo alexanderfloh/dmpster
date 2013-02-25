@@ -1,8 +1,27 @@
-@(buckets: List[(Bucket, Seq[Tag])], bucketForm: Form[(String, String)]) 
+@(buckets: List[(Bucket, Seq[Tag])], tags: Seq[Tag]) 
 @import helper._ 
 @import helper.twitterBootstrap._ 
 @main("View DMPs") {
 
+<datalist id="tags">
+  @for(t <- tags) {
+    <option>@t.name</option>
+  }
+</datalist>
+<script>
+function handleKey(source, event) {
+	if(event.keyCode == 13 || event.which == 13) {
+		var tagName = source.value;
+		source.value = '';
+		$.ajax({
+			type: 'POST',
+			url: source.getAttribute('baseurl') + tagName
+		});
+		$(source.parentElement).find('#tags').append('<span class="label label-info">' + tagName + '</span>');
+		$('datalist#tags').append('<option>' + tagName + '<option>');
+	}
+}
+</script>
 <div class="row">
 	<div class="span8">
 		<ul>
@@ -11,11 +30,21 @@
 			<ul>
 				@category._2.map { bucket =>
 				<li><a href="buckets/@bucket._1.id/details">@bucket._1.filename</a>
-				@for(t <- bucket._2) {
-					<span class="label label-info">@t.name</span>
-				}
+				
 				@if(bucket._1.isNew) {<span class="label label-inverse">new</span> }
-				<form action="buckets/@bucket._1.id/addTag/asdf" method="post"><input type="submit"></input></form>
+				
+				<span id="tags">
+				@for(t <- bucket._2) {
+					<form action="buckets/@bucket._1.id/removeTag/@t.name" method="post" class="form-delbutton">
+					<span class="label label-info">@t.name
+							<button class="removetag">&times;</button>
+					</span>
+						</form>
+				}
+				</span>
+				<input type="text" baseurl="buckets/@bucket._1.id/addTag/" list="tags" onkeypress="return handleKey(this, event)">
+				</input>
+									
 				</li>
 				}
 			</ul> 
