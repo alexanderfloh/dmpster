@@ -5,7 +5,8 @@
 @for(t <- tags) {
 
 	<span class="label label-info">@t.name
-			<button class="removetag" onclick="return removeTag(this, 'buckets/@bucket.id/removeTag/@t.name')">&times;</button>
+			<button class="removetag" 
+				onclick="return removeTag(this, 'buckets/@bucket.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</button>
 	</span>
 }
 </span>

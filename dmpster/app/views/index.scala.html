@@ -15,7 +15,7 @@ function handleKey(source, event) {
 		source.value = '';
 		$.ajax({
 			type: 'POST',
-			url: source.getAttribute('baseurl') + tagName
+			url: source.getAttribute('baseurl') + encodeURIComponent(tagName)
 			
 		}).done(function(data) {
 			$(source.parentElement).find('#tags').replaceWith(data);		
@@ -47,7 +47,8 @@ function removeTag(source, url) {
 				<span id="tags">
 				@for(t <- bucket._2) {
 					<span class="label label-info">@t.name
-							<button class="removetag" onclick="return removeTag(this, 'buckets/@bucket._1.id/removeTag/@t.name')">&times;</button>
+						<button class="removetag" 
+							onclick="return removeTag(this, 'buckets/@bucket._1.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</button>
 					</span>
 				}
 				</span>
