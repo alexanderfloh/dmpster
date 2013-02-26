@@ -8,7 +8,7 @@ import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Calendar
 
-case class Bucket(
+case class Dump(
   id: Long,
   name: String,
   filename: String,
@@ -24,18 +24,18 @@ case class Bucket(
   }
 }
 
-object Bucket {
-  def all: List[Bucket] = DB.withConnection { implicit c =>
-    SQL("select * from bucket").as(bucket *)
+object Dump {
+  def all: List[Dump] = DB.withConnection { implicit c =>
+    SQL("select * from dump").as(dump *)
   }
 
   def byId(id: Long) = DB.withConnection { implicit c =>
-    SQL("select * from bucket where id = {id}").on('id -> id).as(bucket.singleOpt)
+    SQL("select * from dump where id = {id}").on('id -> id).as(dump.singleOpt)
   }
 
   def create(name: String, filename: String, content: String) = {
     DB.withConnection { implicit c =>
-      SQL("insert into bucket (name, filename, content, timestamp) " +
+      SQL("insert into dump (name, filename, content, timestamp) " +
         "values ({name}, {filename}, {content}, {timestamp})").on(
         'name -> name,
         'filename -> filename,
@@ -44,32 +44,32 @@ object Bucket {
     }
   }
 
-  def addTag(bucket: Bucket, tag: Tag) =
+  def addTag(dump: Dump, tag: Tag) =
     DB.withConnection { implicit c =>
-      SQL("insert into bucketToTag (bucketId, tagId) values ({bucketId}, {tagId})")
-        .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
+      SQL("insert into dumpToTag (dumpId, tagId) values ({dumpId}, {tagId})")
+        .on('dumpId -> dump.id, 'tagId -> tag.id).executeUpdate
     }
 
-  def removeTag(bucket: Bucket, tag: Tag) =
+  def removeTag(dump: Dump, tag: Tag) =
     DB.withConnection { implicit c =>
-      SQL("delete from bucketToTag where bucketId = {bucketId} and tagId = {tagId}")
-        .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
+      SQL("delete from dumpToTag where dumpId = {dumpId} and tagId = {tagId}")
+        .on('dumpId -> dump.id, 'tagId -> tag.id).executeUpdate
     }
 
   def delete(id: Long) = {
     DB.withConnection { implicit c =>
-      SQL("delete from bucket where id = {id}").on('id -> id).executeUpdate
+      SQL("delete from dump where id = {id}").on('id -> id).executeUpdate
     }
   }
 
-  val bucket = {
+  val dump = {
     get[Long]("id") ~
       get[String]("name") ~
       get[String]("filename") ~
       get[String]("content") ~
       get[Date]("timestamp") map {
         case id ~ name ~ filename ~ content ~ timestamp =>
-          Bucket(id, name, filename, content, timestamp)
+          Dump(id, name, filename, content, timestamp)
       }
   }
 }

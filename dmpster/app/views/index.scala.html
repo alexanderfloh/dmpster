@@ -1,4 +1,4 @@
-@(buckets: List[(Bucket, Seq[Tag])], tags: Seq[Tag]) 
+@(dumps: List[(Dump, Seq[Tag])], tags: Seq[Tag]) 
 @import helper._ 
 @import helper.twitterBootstrap._ 
 @main("View DMPs") {
@@ -36,24 +36,24 @@ function removeTag(source, url) {
 <div class="row">
 	<div class="span8">
 		<ul>
-			@buckets.groupBy(_._1.name).map { category =>
+			@dumps.groupBy(_._1.name).map { category =>
 			<li>@category._1</li>
 			<ul>
-				@category._2.map { bucket =>
-				<li><a href="buckets/@bucket._1.id/details">@bucket._1.filename</a>
+				@category._2.map { dump =>
+				<li><a href="dmpster/@dump._1.id/details">@dump._1.filename</a>
 				
-				@if(bucket._1.isNew) {<span class="label label-inverse">new</span> }
+				@if(dump._1.isNew) {<span class="label label-inverse">new</span> }
 				
 				<span id="tags">
-				@for(t <- bucket._2) {
+				@for(t <- dump._2) {
 					<span class="label label-info">@t.name
 						<button class="removetag" 
-							onclick="return removeTag(this, 'buckets/@bucket._1.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</button>
+							onclick="return removeTag(this, 'dmpster/@dump._1.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</button>
 					</span>
 				}
 				</span>
 				<input type="text" 
-					baseurl="buckets/@bucket._1.id/addTag/" 
+					baseurl="dmpster/@dump._1.id/addTag/" 
 					list="tags" 
 					onkeypress="return handleKey(this, event)" 
 					placeholder="add a Tag">

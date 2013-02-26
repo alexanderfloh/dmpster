@@ -44,7 +44,7 @@ function readfiles(files) {
 		xhr.open('POST', '/upload');
 		xhr.onload = function() {
 			progress.value = progress.innerHTML = 100;
-			window.location.href = 'buckets'
+			window.location.href = 'dmpster'
 		};
 
 		if (tests.progress) {

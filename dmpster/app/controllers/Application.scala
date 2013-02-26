@@ -5,7 +5,7 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.Json._
-import models.Bucket
+import models.Dump
 import scala.io.Source
 import play.api.libs.concurrent._
 import play.api.Play.current
@@ -16,15 +16,15 @@ import models.Tag
 object Application extends Controller {
 
   def index = Action {
-    Redirect(routes.Application.buckets)
+    Redirect(routes.Application.dmpster)
   }
 
-  def buckets = Action {
-    Ok(views.html.index(Bucket.all.map(b => (b, Tag.tagsForBucket(b))), Tag.all))
+  def dmpster = Action {
+    Ok(views.html.index(Dump.all.map(dump => (dump, Tag.tagsForDump(dump))), Tag.all))
   }
 
   def viewDetails(id: Long) = Action {
-    Bucket.byId(id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
+    Dump.byId(id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
   }
 
   def uploadAjax = Action(parse.multipartFormData) {
@@ -43,7 +43,7 @@ object Application extends Controller {
       val futureResult = Akka.future { DmpParser(newFile).parse }
       Async {
         futureResult.map(p => {
-          Bucket.create(p._1, filename, p._2)
+          Dump.create(p._1, filename, p._2)
           Ok(toJson(Map("status" -> "OK")))
         })
       }
@@ -60,22 +60,22 @@ object Application extends Controller {
       Tag.findByName(tagName).get
     })
 
-    Bucket.byId(id).map(b =>
-      if (Tag.tagsForBucket(b).exists(_.name == tagName))
-        Ok(views.html.tags(b, Tag.tagsForBucket(b)))
+    Dump.byId(id).map(dump =>
+      if (Tag.tagsForDump(dump).exists(_.name == tagName))
+        Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
       else {
-        Bucket.addTag(b, tag)
-        Ok(views.html.tags(b, Tag.tagsForBucket(b)))
-      }).getOrElse(BadRequest("Invalid bucket id"))
+        Dump.addTag(dump, tag)
+        Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
+      }).getOrElse(BadRequest("Invalid dump id"))
   }
 
   def removeTag(id: Long, tagName: String) = Action {
     Tag.findByName(tagName).flatMap(tag => {
-      Bucket.byId(id).map(bucket => {
-        Bucket.removeTag(bucket, tag)
-        Ok(views.html.tags(bucket, Tag.tagsForBucket(bucket)))
+      Dump.byId(id).map(dump => {
+        Dump.removeTag(dump, tag)
+        Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
       })
-    }).getOrElse(BadRequest("Invalid bucket id or tag"))
+    }).getOrElse(BadRequest("Invalid dump id or tag"))
   }
 
   def deleteBucket(id: Long) = TODO

@@ -14,10 +14,13 @@ object Tag {
     implicit c =>
       SQL("select * from tag").as(tag *)
   }
-  
-  def tagsForBucket(bucket: Bucket) = DB.withConnection { implicit c => {
-    SQL("select * from bucketToTag btt inner join tag t on t.id = btt.tagId where btt.bucketId = {bucketId}").on('bucketId -> bucket.id).as(tag *)
-  }}
+
+  def tagsForDump(dump: Dump) = DB.withConnection { implicit c =>
+    {
+      SQL("select * from dumpToTag dtt inner join tag t on t.id = dtt.tagId where dtt.dumpId = {dumpId}")
+        .on('dumpId -> dump.id).as(tag *)
+    }
+  }
 
   def create(name: String) = {
     DB.withConnection {
