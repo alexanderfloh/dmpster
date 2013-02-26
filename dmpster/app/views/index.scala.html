@@ -16,8 +16,10 @@ function handleKey(source, event) {
 		$.ajax({
 			type: 'POST',
 			url: source.getAttribute('baseurl') + tagName
+			
+		}).done(function(data) {
+			$(source.parentElement).find('#tags').replaceWith(data);		
 		});
-		$(source.parentElement).find('#tags').append('<span class="label label-info">' + tagName + '</span>');
 		$('datalist#tags').append('<option>' + tagName + '<option>');
 	}
 }

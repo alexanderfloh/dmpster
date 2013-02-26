@@ -1,0 +1,13 @@
+@(bucket: Bucket, tags: Seq[Tag]) 
+@import helper._ 
+@import helper.twitterBootstrap._ 
+<span id="tags">
+@for(t <- tags) {
+
+	<form action="buckets/@bucket.id/removeTag/@t.name" method="post" class="form-delbutton">
+	<span class="label label-info">@t.name
+			<button class="removetag">&times;</button>
+	</span>
+	</form>
+}
+</span>
