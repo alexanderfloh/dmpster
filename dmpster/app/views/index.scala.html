@@ -23,6 +23,15 @@ function handleKey(source, event) {
 		$('datalist#tags').append('<option>' + tagName + '<option>');
 	}
 }
+
+function removeTag(source, url) {
+	$.ajax({
+		type: 'POST',
+		url: url
+	}).done(function(data) {
+		$(source.parentElement.parentElement).replaceWith(data);
+	});
+}
 </script>
 <div class="row">
 	<div class="span8">
@@ -37,14 +46,16 @@ function handleKey(source, event) {
 				
 				<span id="tags">
 				@for(t <- bucket._2) {
-					<form action="buckets/@bucket._1.id/removeTag/@t.name" method="post" class="form-delbutton">
 					<span class="label label-info">@t.name
-							<button class="removetag">&times;</button>
+							<button class="removetag" onclick="return removeTag(this, 'buckets/@bucket._1.id/removeTag/@t.name')">&times;</button>
 					</span>
-						</form>
 				}
 				</span>
-				<input type="text" baseurl="buckets/@bucket._1.id/addTag/" list="tags" onkeypress="return handleKey(this, event)">
+				<input type="text" 
+					baseurl="buckets/@bucket._1.id/addTag/" 
+					list="tags" 
+					onkeypress="return handleKey(this, event)" 
+					placeholder="add a Tag">
 				</input>
 									
 				</li>

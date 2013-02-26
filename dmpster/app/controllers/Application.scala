@@ -61,20 +61,20 @@ object Application extends Controller {
     })
 
     Bucket.byId(id).map(b =>
-      if (Tag.tagsForBucket(b).exists(_.name == tagName)) Ok("tag already there")
+      if (Tag.tagsForBucket(b).exists(_.name == tagName))
+        Ok(views.html.tags(b, Tag.tagsForBucket(b)))
       else {
         Bucket.addTag(b, tag)
         Ok(views.html.tags(b, Tag.tagsForBucket(b)))
       }).getOrElse(BadRequest("Invalid bucket id"))
   }
-  
+
   def removeTag(id: Long, tagName: String) = Action {
-    Tag.findByName(tagName).map (tag => {
-       Bucket.byId(id).map(b => {
-        Bucket.removeTag(b, tag)
-        //Ok(views.html.tags(Tag.tagsForBucket(b)))
-       })
-       Ok("")
+    Tag.findByName(tagName).flatMap(tag => {
+      Bucket.byId(id).map(bucket => {
+        Bucket.removeTag(bucket, tag)
+        Ok(views.html.tags(bucket, Tag.tagsForBucket(bucket)))
+      })
     }).getOrElse(BadRequest("Invalid bucket id or tag"))
   }
 

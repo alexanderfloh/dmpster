@@ -4,10 +4,8 @@
 <span id="tags">
 @for(t <- tags) {
 
-	<form action="buckets/@bucket.id/removeTag/@t.name" method="post" class="form-delbutton">
 	<span class="label label-info">@t.name
-			<button class="removetag">&times;</button>
+			<button class="removetag" onclick="return removeTag(this, 'buckets/@bucket.id/removeTag/@t.name')">&times;</button>
 	</span>
-	</form>
 }
 </span>
