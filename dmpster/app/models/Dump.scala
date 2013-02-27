@@ -10,7 +10,7 @@ import java.util.Calendar
 
 case class Dump(
   id: Long,
-  name: String,
+  bucket: Bucket,
   filename: String,
   content: String,
   timestamp: Date) {
@@ -33,11 +33,11 @@ object Dump {
     SQL("select * from dump where id = {id}").on('id -> id).as(dump.singleOpt)
   }
 
-  def create(name: String, filename: String, content: String) = {
+  def create(bucket: Bucket, filename: String, content: String) = {
     DB.withConnection { implicit c =>
-      SQL("insert into dump (name, filename, content, timestamp) " +
-        "values ({name}, {filename}, {content}, {timestamp})").on(
-        'name -> name,
+      SQL("insert into dump (bucketId, filename, content, timestamp) " +
+        "values ({bucketId}, {filename}, {content}, {timestamp})").on(
+        'bucketId -> bucket.id,
         'filename -> filename,
         'content -> content,
         'timestamp -> new Date()).executeUpdate
@@ -64,12 +64,12 @@ object Dump {
 
   val dump = {
     get[Long]("id") ~
-      get[String]("name") ~
+      get[Long]("bucketId") ~
       get[String]("filename") ~
       get[String]("content") ~
       get[Date]("timestamp") map {
-        case id ~ name ~ filename ~ content ~ timestamp =>
-          Dump(id, name, filename, content, timestamp)
+        case id ~ bucketId ~ filename ~ content ~ timestamp =>
+          Dump(id, Bucket.byId(bucketId), filename, content, timestamp)
       }
   }
 }

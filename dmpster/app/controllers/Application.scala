@@ -12,6 +12,7 @@ import play.api.Play.current
 import utils.DmpParser
 import play.Logger
 import models.Tag
+import models.Bucket
 
 object Application extends Controller {
 
@@ -24,7 +25,9 @@ object Application extends Controller {
   }
 
   def viewDetails(id: Long) = Action {
-    Dump.byId(id).map(b => views.html.details(b)).map(Ok(_)).getOrElse(Ok("not found"))
+    Dump.byId(id)
+      .map(dump => views.html.details(dump))
+      .map(Ok(_)).getOrElse(BadRequest("dump not found"))
   }
 
   def uploadAjax = Action(parse.multipartFormData) {
@@ -43,8 +46,10 @@ object Application extends Controller {
       val futureResult = Akka.future { DmpParser(newFile).parse }
       Async {
         futureResult.map(p => {
-          Dump.create(p._1, filename, p._2)
-          Ok(toJson(Map("status" -> "OK")))
+          Bucket.create(p._1).map(Bucket.byId(_)).map(bucket => {
+            Dump.create(bucket, filename, p._2)
+            Ok(toJson(Map("status" -> "OK")))
+          }).getOrElse(BadRequest("failed to parse DMP"))
         })
       }
     }.getOrElse {

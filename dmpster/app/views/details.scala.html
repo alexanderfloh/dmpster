@@ -1,13 +1,13 @@
-@(bucket: Bucket) 
+@(dump: Dump) 
 @import helper._ 
 @import helper.twitterBootstrap._ 
-@main(bucket.name) {
+@main(dump.bucket.name) {
 
-	<h3>@bucket.filename</h3>
+	<h3>@dump.filename</h3>
 	<div class="row">
 		<div class="span14">
 		<pre>
-@bucket.content
+@dump.content
 		</pre>
 		</div>
 	

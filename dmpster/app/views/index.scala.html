@@ -36,7 +36,7 @@ function removeTag(source, url) {
 <div class="row">
 	<div class="span8">
 		<ul>
-			@dumps.groupBy(_._1.name).map { category =>
+			@dumps.groupBy(_._1.bucket.name).map { category =>
 			<li>@category._1</li>
 			<ul>
 				@category._2.map { dump =>
