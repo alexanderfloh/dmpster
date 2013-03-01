@@ -32,8 +32,8 @@ function readfiles(files) {
 		if (tests.formdata)
 			formData.append('file', files[i]);
 		var file = files[i];
-		holder.innerHTML = 'Uploading ' + file.name + ' ('
-			+ (file.size ? (file.size / (1024 * 1024) | 0) + 'MB' : '') + ')...';
+		//holder.innerHTML = 'Uploading ' + file.name + ' ('
+		//	+ (file.size ? (file.size / (1024 * 1024) | 0) + 'MB' : '') + ')...';
 		console.log(file);
 	}
 
