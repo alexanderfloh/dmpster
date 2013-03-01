@@ -5,31 +5,18 @@
 <head>
 	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
 	<script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+	<link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
 </head>
 <body id="holder">
 
 <header>
 	<h1>
-		dmpster
+		<a href="@routes.Application.index">dmpster</a>
+		<!-- trashcan image by Christopher Lee, from The Noun Project -->
 		<img src="@routes.Assets.at("images/trashcan-top.svg")">
 		<img src="@routes.Assets.at("images/trashcan-bottom.svg")">
 	</h1>
-	<span>drop dmp here to upload
-		<p id="upload" class="hidden">
-			<label>Drag & drop not supported, but you can still upload
-				via"/Users/alexanderfloh/dmps/dump-log.TXT" this input field:<br>
-			<input type="file">
-			</label>
-		</p>
-		<p id="filereader">File API & FileReader API not supported</p>
-		<p id="formdata">XHR2's FormData is not supported</p>
-		<p id="progress">XHR2's upload progress isn't supported</p>
-		<div>
-			<progress id="uploadprogress" min="0" max="100" value="0" class="hidden">0</progress>
-		</div>
-		
-	
-	</span>
+	<span>drop DMP here to upload</span>
 </header>
 <body>
 @content

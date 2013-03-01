@@ -23,6 +23,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 
 @import url(http://fonts.googleapis.com/css?family=Gochi+Hand);
 @import url(~"http://fonts.googleapis.com/css?family=Open+Sans:300italic,600,700,800");
+@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro);
 
 
 body {
@@ -41,7 +42,12 @@ header {
 		text-align: center;
 		margin-left: -150px;
 		position: relative;
-
+		
+		a {
+			text-decoration: none;
+			color: white;
+		}
+		
 		img {
 			position: absolute;
 			left: 50%;
@@ -70,14 +76,14 @@ header {
 		}
 	}
 }
-/*
-header:hover, // remove this when drag'n'drop works
+
+//header:hover, // remove this when drag'n'drop works
 .dragging {
 	h1 img:first-of-type {
 		.transform(rotate(25deg));
 	}
 }
-*/
+
 article {
 	padding-left: 10%;
 	margin: 75px 0;
@@ -110,11 +116,17 @@ article {
 		position: relative;
 		padding: 10px;
 		min-width: 250px;
+		//max-width: 500px;
 		overflow: hidden;
 		border: 1px solid rgba(0,0,0, 0.07);
 		margin-right: 20px;
+		margin-bottom: 20px;
 
+		a {
+			text-decoration: none;
+		} 
 		h1 {
+		 	
 			margin: -10px;
 			margin-bottom: 10px;
 			padding: 10px;
@@ -214,7 +226,10 @@ article {
 	display: none !important;
 }
 
-
+pre {
+	font-family: 'Source Code Pro', sans-serif;
+	//margin: 5%;
+}
 
 
 

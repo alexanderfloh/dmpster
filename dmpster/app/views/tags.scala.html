@@ -1,12 +1,10 @@
 @(dump: Dump, tags: Seq[Tag]) 
 @import helper._ 
-@import helper.twitterBootstrap._ 
 <span id="tags">
 @for(t <- tags) {
-
-	<span class="label label-info">@t.name
-			<button class="removetag" 
-				onclick="return removeTag(this, 'dmpster/@dump.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</button>
+	<span class="tag mine remove" 
+		onclick="return removeTag(this, 'dmpster/@dump.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">
+		@t.name
 	</span>
 }
 </span>

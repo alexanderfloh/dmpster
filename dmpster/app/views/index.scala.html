@@ -1,27 +1,24 @@
-@(dumps: List[(Dump, Seq[Tag])], tags: Seq[Tag]) 
+@(dumps: List[(Dump, Seq[Tag])], allTags: Seq[Tag]) 
 @import helper._ 
 @import helper.twitterBootstrap._ 
 @main("View DMPs") {
 
 <datalist id="tags">
-  @for(t <- tags) {
+  @for(t <- allTags) {
     <option>@t.name</option>
   }
 </datalist>
 <script>
-function handleKey(source, event) {
-	if(event.keyCode == 13 || event.which == 13) {
-		var tagName = source.value;
-		source.value = '';
-		$.ajax({
-			type: 'POST',
-			url: source.getAttribute('baseurl') + encodeURIComponent(tagName)
-			
-		}).done(function(data) {
-			$(source.parentElement).find('#tags').replaceWith(data);		
-		});
-		$('datalist#tags').append('<option>' + tagName + '<option>');
-	}
+function addTag(input) {
+	$.ajax({
+		type: 'POST',
+		url: input.getAttribute('baseurl') + encodeURIComponent(input.value)
+		
+	}).done(function(data) {
+		$(input).siblings('#tags').replaceWith(data);		
+	});
+	$('datalist#tags').append('<option>' + input.value + '<option>');
+	input.value = '';
 }
 
 function removeTag(source, url) {
@@ -29,90 +26,60 @@ function removeTag(source, url) {
 		type: 'POST',
 		url: url
 	}).done(function(data) {
-		$(source.parentElement.parentElement).replaceWith(data);
+		$(source.parentElement).replaceWith(data);
 	});
 }
 </script>
-@dumps.groupBy(_._1.bucket.name).map { category =>
-<article>
-	<h1>
-		@category._1
-		<span class="tag">{{tag}}</span>
-		<span class="tag mine">{{tag}}</span>
-		<a href=# class="tag add">add a tag...</a>
-	</h1>
-
-	@category._2.map { dump =>
-	<section @if(dump._1.isNew) { class="new" }>
-		<h1>@dump._1.filename</h1>
-		<span class="tag">{{tag}}</span>
-		<span id="tags">
-		@for(t <- dump._2) {
-			<span class="tag mine remove">@t.name
-			<!-- 
-				<a class="remove" 
-					onclick="return removeTag(this, 'dmpster/@dump._1.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</a>
-					 -->
-			</span>
+	@dumps.groupBy(_._1.bucket.name).map { category =>
+	<article>
+		<h1>
+			@category._1
+			<span class="tag">{{tag}}</span>
+			<span class="tag mine">{{tag}}</span>
+			<a href=# class="tag add">add a tag...</a>
+		</h1>
+	
+		@category._2.map { dump =>
+		<section @if(dump._1.isNew) { class="new" }>
+			<a href="dmpster/@dump._1.id/details"><h1>@dump._1.filename</h1></a>
+			<a href="@routes.Assets.at("dmps/" + dump._1.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
+			<!-- <span class="tag">{{tag}}</span> -->
+			
+			@tags(dump._1, dump._2)
+			<br>
+			<a href=# class="tag add">add a tag...</a>
+			<input type="text" 
+				class="tag-input"
+				baseurl="dmpster/@dump._1.id/addTag/" 
+				list="tags" 
+				placeholder="add a Tag"
+				style="display:none">
+			</input>
+			<time>1 day old</time>
+		</section>
 		}
-		</span>
-		<br>
-		<a href=# class="tag add">add a tag...</a>
-		<time>1 day old</time>
-	</section>
+	</article>
 	}
+	
+<script>
+$('.tag.add').click( function() {
+  $(this).hide();
+  var input = $(this).next('.tag-input');
+  input.show();
+  input.focus();
+} );
+$('.tag-input').keypress( function(event) {
+	if(event.keyCode == 13 || event.which == 13) {
+		addTag(this);
+		$(this).hide();
+		$(this).prev('.tag.add').show();
+	}
+} );
+$('.tag-input').blur( function() {
+	$(this).val('');
+	$(this).hide();
+	$(this).prev('.tag.add').show();
+} );
 
-	<section class="new">
-		<h1>{{dmp name}}</h1>
-		<span class="tag">{{tag}}</span>
-		<span class="tag mine">{{tag}}</span>
-		<br>
-		<a href=# class="tag add">add a tag...</a>
-		<time>1 day old</time>
-	</section>
-
-	<section class="new">
-		<h1>{{dmp name}}</h1>
-		<span class="tag">{{tag}}</span>
-		<span class="tag mine">{{tag}}</span>
-		<br>
-		<a href=# class="tag add">add a tag...</a>
-		<time>1 day old</time>
-	</section>
-</article>
-}
-
-<div class="row">
-	<div class="span8">
-		<ul>
-			@dumps.groupBy(_._1.bucket.name).map { category =>
-			<li>@category._1</li>
-			<ul>
-				@category._2.map { dump =>
-				<li><a href="dmpster/@dump._1.id/details">@dump._1.filename</a>
-				
-				@if(dump._1.isNew) {<span class="label label-inverse">new</span> }
-				
-				<span id="tags">
-				@for(t <- dump._2) {
-					<span class="label label-info">@t.name
-						<button class="removetag" 
-							onclick="return removeTag(this, 'dmpster/@dump._1.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">&times;</button>
-					</span>
-				}
-				</span>
-				<input type="text" 
-					baseurl="dmpster/@dump._1.id/addTag/" 
-					list="tags" 
-					onkeypress="return handleKey(this, event)" 
-					placeholder="add a Tag">
-				</input>
-									
-				</li>
-				}
-			</ul> 
-			}
-		</ul>
-	</div>
-</div>
+</script>
 }

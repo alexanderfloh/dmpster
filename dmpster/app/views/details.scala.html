@@ -2,14 +2,12 @@
 @import helper._ 
 @import helper.twitterBootstrap._ 
 @main(dump.bucket.name) {
-
-	<h3>@dump.filename</h3>
-	<div class="row">
-		<div class="span14">
+<article>
+	<h1>@dump.filename</h1>
+	<section>
 		<pre>
 @dump.content
 		</pre>
-		</div>
-	
-	</div>
+	</section>
+</article>
 }
