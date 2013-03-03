@@ -28,12 +28,18 @@ CREATE TABLE bucket (
 	name varchar(255) NOT NULL
 );
 
+CREATE TABLE bucketToTag (
+	bucketId integer NOT NULL,
+	tagId integer NOT NULL
+);
+
 # --- !Downs
  
 DROP TABLE dump;
 DROP TABLE tag;
 DROP TABLE dumpToTag;
 DROP TABLE bucket;
+DROP TABLE bucketToTag;
 DROP SEQUENCE dump_id_seq;
 DROP SEQUENCE tag_id_seq;
 DROP SEQUENCE bucket_id_seq;

@@ -59,7 +59,7 @@ object Application extends Controller {
     }
   }
 
-  def addTag(id: Long, tagName: String) = Action {
+  def addTagToDmp(id: Long, tagName: String) = Action {
     val tag = Tag.findByName(tagName).getOrElse({
       Tag.create(tagName)
       Tag.findByName(tagName).get
@@ -74,13 +74,37 @@ object Application extends Controller {
       }).getOrElse(BadRequest("Invalid dump id"))
   }
 
-  def removeTag(id: Long, tagName: String) = Action {
+  def removeTagFromDmp(id: Long, tagName: String) = Action {
     Tag.findByName(tagName).flatMap(tag => {
       Dump.byId(id).map(dump => {
         Dump.removeTag(dump, tag)
         Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
       })
     }).getOrElse(BadRequest("Invalid dump id or tag"))
+  }
+
+  def addTagToBucket(id: Long, tagName: String) = Action {
+    val tag = Tag.findByName(tagName).getOrElse({
+      Tag.create(tagName)
+      Tag.findByName(tagName).get
+    })
+
+    val bucket = Bucket.byId(id)
+    if (Tag.forBucket(bucket).exists(_.name == tagName))
+      Ok(views.html.tags(bucket, Tag.forBucket(bucket)))
+    else {
+      Bucket.addTag(bucket, tag)
+      Ok(views.html.tags(bucket, Tag.forBucket(bucket)))
+    }
+  }
+
+  def removeTagFromBucket(id: Long, tagName: String) = Action {
+    Tag.findByName(tagName).map(tag => {
+      val bucket = Bucket.byId(id)
+      Bucket.removeTag(bucket, tag)
+      Ok(views.html.tags(bucket, Tag.forBucket(bucket)))
+
+    }).getOrElse(BadRequest("Invalid tag"))
   }
 
   def deleteBucket(id: Long) = TODO

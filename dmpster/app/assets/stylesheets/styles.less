@@ -77,7 +77,6 @@ header {
 	}
 }
 
-//header:hover, // remove this when drag'n'drop works
 .dragging {
 	h1 img:first-of-type {
 		.transform(rotate(25deg));
@@ -122,10 +121,16 @@ article {
 		margin-right: 20px;
 		margin-bottom: 20px;
 
-		a {
-			text-decoration: none;
-		} 
 		h1 {
+		 	a {
+		 		text-decoration: none;
+		 		color: white;
+		 		
+		 		img {
+					height: 20px;
+					padding-right: 5px;
+				}
+		 	}
 		 	
 			margin: -10px;
 			margin-bottom: 10px;

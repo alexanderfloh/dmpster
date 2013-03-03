@@ -8,9 +8,11 @@ GET     /                           controllers.Application.index
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
-GET		/dmpster					controllers.Application.dmpster
-GET		/dmpster/:id/details		controllers.Application.viewDetails(id: Long)
-POST	/upload						controllers.Application.uploadAjax
-POST	/dmpster/:id/delete			controllers.Application.deleteBucket(id: Long)
-POST    /dmpster/:id/addTag/:tagName controllers.Application.addTag(id: Long, tagName: String)
-POST    /dmpster/:id/removeTag/:tagName controllers.Application.removeTag(id: Long, tagName: String)
+GET		/dmpster							controllers.Application.dmpster
+GET		/dmpster/dmp/:id/details			controllers.Application.viewDetails(id: Long)
+POST	/upload								controllers.Application.uploadAjax
+POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)
+POST    /dmpster/dmp/:id/addTag/:tagName 	controllers.Application.addTagToDmp(id: Long, tagName: String)
+POST    /dmpster/dmp/:id/removeTag/:tagName controllers.Application.removeTagFromDmp(id: Long, tagName: String)
+POST    /dmpster/bucket/:id/addTag/:tagName 	controllers.Application.addTagToBucket(id: Long, tagName: String)
+POST    /dmpster/bucket/:id/removeTag/:tagName 	controllers.Application.removeTagFromBucket(id: Long, tagName: String)

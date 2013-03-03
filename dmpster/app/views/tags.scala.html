@@ -1,10 +1,11 @@
-@(dump: Dump, tags: Seq[Tag]) 
+@(taggable: Taggable, tags: Seq[Tag]) 
 @import helper._ 
 <span id="tags">
 @for(t <- tags) {
 	<span class="tag mine remove" 
-		onclick="return removeTag(this, 'dmpster/@dump.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">
+		onclick="return removeTag(this, 'dmpster/@taggable.url/@taggable.id/removeTag/@(java.net.URLEncoder.encode(t.name, "UTF-8"))')">
 		@t.name
 	</span>
 }
 </span>
+

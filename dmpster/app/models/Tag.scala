@@ -5,6 +5,11 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
+trait Taggable {
+  val url: String
+  val id: Long
+}
+
 case class Tag(id: Long, name: String) {
 
 }
@@ -19,6 +24,13 @@ object Tag {
     {
       SQL("select * from dumpToTag dtt inner join tag t on t.id = dtt.tagId where dtt.dumpId = {dumpId}")
         .on('dumpId -> dump.id).as(tag *)
+    }
+  }
+  
+  def forBucket(bucket: Bucket) = DB.withConnection { implicit c =>
+    {
+      SQL("select * from bucketToTag btt inner join tag t on t.id = btt.tagId where btt.bucketId = {bucketId}")
+        .on('bucketId -> bucket.id).as(tag *)
     }
   }
 

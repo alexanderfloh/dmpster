@@ -8,12 +8,14 @@ import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Calendar
 
-case class Dump(
+case class Dump (
   id: Long,
   bucket: Bucket,
   filename: String,
   content: String,
-  timestamp: Date) {
+  timestamp: Date) extends Taggable {
+  
+  val url = "dmp"
 
   def isNew = {
     val tsCal = new GregorianCalendar()
