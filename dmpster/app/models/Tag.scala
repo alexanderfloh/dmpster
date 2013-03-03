@@ -8,6 +8,7 @@ import anorm.SqlParser._
 trait Taggable {
   val url: String
   val id: Long
+  def tags : List[Tag]
 }
 
 case class Tag(id: Long, name: String) {
@@ -20,7 +21,7 @@ object Tag {
       SQL("select * from tag").as(tag *)
   }
 
-  def tagsForDump(dump: Dump) = DB.withConnection { implicit c =>
+  def forDump(dump: Dump) = DB.withConnection { implicit c =>
     {
       SQL("select * from dumpToTag dtt inner join tag t on t.id = dtt.tagId where dtt.dumpId = {dumpId}")
         .on('dumpId -> dump.id).as(tag *)

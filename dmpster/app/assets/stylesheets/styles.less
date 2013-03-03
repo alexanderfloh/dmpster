@@ -115,11 +115,14 @@ article {
 		position: relative;
 		padding: 10px;
 		min-width: 250px;
-		//max-width: 500px;
 		overflow: hidden;
 		border: 1px solid rgba(0,0,0, 0.07);
 		margin-right: 20px;
 		margin-bottom: 20px;
+		
+		&.dmp {
+			max-width: 500px;
+		}
 
 		h1 {
 		 	a {
@@ -204,13 +207,16 @@ article {
 			&:before { color: #2f6090; }
 		}
 	}
-	&.remove {
+	&.remove &:hover {
+		cursor: pointer;
 		text-decoration: none;
+		background-color: #2f6090;
+		&:before { color: #2f6090; }
 
 		&:after {
 			content: '\00D7';
 			font-weight: 900;
-			color: rgba(76, 136, 196, 0.85);
+			color: #2f6090;
 			background-color: white;
 			display: inline-block;
 			width: 12px;
@@ -220,10 +226,6 @@ article {
 			margin-left: 4px;
 		}
 			
-		&:hover {
-			background-color: #2f6090;
-			&:before { color: #2f6090; }
-		}
 	}
 }
 
@@ -233,7 +235,6 @@ article {
 
 pre {
 	font-family: 'Source Code Pro', sans-serif;
-	//margin: 5%;
 }
 
 

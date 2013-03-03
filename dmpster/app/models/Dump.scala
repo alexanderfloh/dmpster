@@ -24,6 +24,8 @@ case class Dump (
     calendar.add(Calendar.DAY_OF_MONTH, -1)
     calendar.before(tsCal)
   }
+  
+  def tags = Tag.forDump(this)
 }
 
 object Dump {

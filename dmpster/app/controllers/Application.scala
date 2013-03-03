@@ -21,7 +21,7 @@ object Application extends Controller {
   }
 
   def dmpster = Action {
-    Ok(views.html.index(Dump.all.map(dump => (dump, Tag.tagsForDump(dump))), Tag.all))
+    Ok(views.html.index(Dump.all, Tag.all))
   }
 
   def viewDetails(id: Long) = Action {
@@ -66,11 +66,11 @@ object Application extends Controller {
     })
 
     Dump.byId(id).map(dump =>
-      if (Tag.tagsForDump(dump).exists(_.name == tagName))
-        Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
+      if (Tag.forDump(dump).exists(_.name == tagName))
+        Ok(views.html.listTags(dump))
       else {
         Dump.addTag(dump, tag)
-        Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
+        Ok(views.html.listTags(dump))
       }).getOrElse(BadRequest("Invalid dump id"))
   }
 
@@ -78,7 +78,7 @@ object Application extends Controller {
     Tag.findByName(tagName).flatMap(tag => {
       Dump.byId(id).map(dump => {
         Dump.removeTag(dump, tag)
-        Ok(views.html.tags(dump, Tag.tagsForDump(dump)))
+        Ok(views.html.listTags(dump))
       })
     }).getOrElse(BadRequest("Invalid dump id or tag"))
   }
@@ -91,10 +91,10 @@ object Application extends Controller {
 
     val bucket = Bucket.byId(id)
     if (Tag.forBucket(bucket).exists(_.name == tagName))
-      Ok(views.html.tags(bucket, Tag.forBucket(bucket)))
+      Ok(views.html.listTags(bucket))
     else {
       Bucket.addTag(bucket, tag)
-      Ok(views.html.tags(bucket, Tag.forBucket(bucket)))
+      Ok(views.html.listTags(bucket))
     }
   }
 
@@ -102,7 +102,7 @@ object Application extends Controller {
     Tag.findByName(tagName).map(tag => {
       val bucket = Bucket.byId(id)
       Bucket.removeTag(bucket, tag)
-      Ok(views.html.tags(bucket, Tag.forBucket(bucket)))
+      Ok(views.html.listTags(bucket))
 
     }).getOrElse(BadRequest("Invalid tag"))
   }

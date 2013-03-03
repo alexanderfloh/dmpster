@@ -1,67 +1,48 @@
-@(dumps: List[(Dump, Seq[Tag])], allTags: Seq[Tag]) 
+@(dumps: List[Dump], allTags: Seq[Tag]) 
 @import helper._ 
-@main("View DMPs") {
 
-<datalist id="tags">
-  @for(t <- allTags) {
-    <option>@t.name</option>
-  }
-</datalist>
-<script>
-function addTag(input) {
-	$.ajax({
-		type: 'POST',
-		url: input.getAttribute('baseurl') + encodeURIComponent(input.value)
-		
-	}).done(function(data) {
-		$(input).siblings('#tags').replaceWith(data);		
-	});
-	$('datalist#tags').append('<option>' + input.value + '<option>');
-	input.value = '';
+@splitBucketName(bucketName: String) = @{
+	bucketName.split("!") match { case Array(x1, x2) => (x1, x2) } 
 }
 
-function removeTag(source, url) {
-	$.ajax({
-		type: 'POST',
-		url: url
-	}).done(function(data) {
-		$(source.parentElement).replaceWith(data);
-	});
+@addTag(taggable: Taggable) = {
+	<a href=# class="tag add">add a tag...</a>
+	<input type="text" 
+		class="tag-input"
+		baseurl="dmpster/@taggable.url/@taggable.id/addTag/" 
+		list="tags" 
+		placeholder="add a Tag"
+		style="display:none">
+	</input>
 }
-</script>
-	@dumps.groupBy(_._1.bucket.name).map { category =>
+
+@main {
+
+	<datalist id="tags">
+	  @allTags.map{ t => 
+	    <option>@t.name</option>
+	  }
+	</datalist>
+
+	@dumps.groupBy(_.bucket.name).map { case(bucketName, dmps) =>
 	<article>
 		<h1>
-			@category._1.split("!").head<wbr>!@category._1.split("!").last
-			@tags(category._2.head._1.bucket, Tag.forBucket(category._2.head._1.bucket))
-			<a href=# class="tag add">add a tag...</a>
-			<input type="text" 
-				class="tag-input"
-				baseurl="dmpster/@category._2.head._1.bucket.url/@category._2.head._1.bucket.id/addTag/" 
-				list="tags" 
-				placeholder="add a Tag"
-				style="display:none">
-			</input>
+			@defining(splitBucketName(bucketName)) { split =>
+				@split._1<wbr>!@split._2
+			}
+			@listTags(dmps.head.bucket)
+			@addTag(dmps.head.bucket)
 		</h1>
 	
-		@category._2.map { dump =>
-		<section @if(dump._1.isNew) { class="new" }>
+		@dmps.map { dump =>
+		<section class="@if(dump.isNew) { new } dmp">
 			<h1>
-			<a href="@routes.Assets.at("dmps/" + dump._1.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
-			<a href="dmpster/dmp/@dump._1.id/details">@dump._1.filename</a>
+				<a href="@routes.Assets.at("dmps/" + dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
+				<a href="dmpster/dmp/@dump.id/details">@dump.filename</a>
 			</h1>
-			<!-- <span class="tag">{{tag}}</span> -->
 			
-			@tags(dump._1, dump._2)
-			<br>
-			<a href=# class="tag add">add a tag...</a>
-			<input type="text" 
-				class="tag-input"
-				baseurl="dmpster/@dump._1.url/@dump._1.id/addTag/" 
-				list="tags" 
-				placeholder="add a Tag"
-				style="display:none">
-			</input>
+			@listTags(dump)
+			@addTag(dump)
 			
 			<time>1 day old</time>
 		</section>
@@ -69,25 +50,5 @@ function removeTag(source, url) {
 	</article>
 	}
 	
-<script>
-$('.tag.add').on('click', function() {
-  $(this).hide();
-  var input = $(this).next('.tag-input');
-  input.show();
-  input.focus();
-} );
-$('.tag-input').on('keypress', function(event) {
-	if(event.keyCode == 13 || event.which == 13) {
-		addTag(this);
-		$(this).hide();
-		$(this).prev('.tag.add').show();
-	}
-} );
-$('.tag-input').on('blur', function() {
-	$(this).val('');
-	$(this).hide();
-	$(this).prev('.tag.add').show();
-} );
-
-</script>
+<script src="@routes.Assets.at("javascripts/tagging.js")"></script>
 }
