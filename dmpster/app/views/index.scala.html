@@ -30,22 +30,23 @@
 			@defining(splitBucketName(bucketName)) { split =>
 				@split._1<wbr>!@split._2
 			}
+			<br/>
 			@listTags(dmps.head.bucket)
 			@addTag(dmps.head.bucket)
 		</h1>
 	
 		@dmps.map { dump =>
-		<section class="@if(dump.isNew) { new } dmp">
-			<h1>
-				<a href="@routes.Assets.at("dmps/" + dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
-				<a href="dmpster/dmp/@dump.id/details">@dump.filename</a>
-			</h1>
-			
-			@listTags(dump)
-			@addTag(dump)
-			
-			<time>1 day old</time>
-		</section>
+			<section class="@if(dump.isNew) { new } dmp">
+				<h1>
+					<a href="@routes.Assets.at("dmps/" + dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
+					<a href="dmpster/dmp/@dump.id/details">@dump.filename</a>
+				</h1>
+				
+				@listTags(dump)
+				@addTag(dump)
+				
+				<time>1 day old</time>
+			</section>
 		}
 	</article>
 	}
