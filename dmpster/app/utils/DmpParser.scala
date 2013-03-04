@@ -2,6 +2,7 @@ package utils
 
 import scala.io.Source
 import scala.collection.JavaConversions._
+import play.api.Play
 
 trait DmpParser {
   def parse: (String, String) = {
@@ -15,15 +16,14 @@ trait DmpParser {
 
 class DmpParserImpl(file: java.io.File) extends DmpParser {
   protected def readFile = {
-    val commands = List("C:\\Program Files (x86)\\Windows Kits\\8.0\\Debuggers\\x86\\cdb.exe",
-	      "-logo",
-	      "out.log",
+    import DmpParser._
+    val commands = List(cdbPath,
 	      "-y",
-	      "cache*s:\\temp\\symbolcache;srv*http://lnz-jenny/symbolstore;srv*http://lnz-jenny/symbolstore-release;srv*http://msdl.microsoft.com/download/symbols;srv*http://chromium-browser-symsrv.commondatastorage.googleapis.com;srv*http://symbols.mozilla.org/firefox;srv*http://symbols.mozilla.org/xulrunner",
+	      symbolPath,
 	      "-srcpath",
-	      "srv*",
+	      sourcePath,
 	      "-i",
-	      "srv*http://msdl.microsoft.com/download/symbols",
+	      imagePath,
 	      "-c",
 	      //"!analyze -v;~*kb;.detach",
 	      "!analyze -v;.detach",
@@ -48,6 +48,11 @@ class DummyParser extends DmpParser {
 }
 
 object DmpParser {
+  lazy val cdbPath = Play.current.configuration.getString("dmpster.cdb.path").getOrElse("cdb")
+  lazy val symbolPath = Play.current.configuration.getString("dmpster.symbol.path").getOrElse("")
+  lazy val sourcePath = Play.current.configuration.getString("dmpster.source.path").getOrElse("")
+  lazy val imagePath = Play.current.configuration.getString("dmpster.image.path").getOrElse("")
+  
   def apply(file: java.io.File) = {
     if (System.getProperty("os.name").toLowerCase.contains("win"))
       new DmpParserImpl(file)
