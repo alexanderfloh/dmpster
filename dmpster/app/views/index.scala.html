@@ -1,10 +1,6 @@
 @(dumps: List[Dump], allTags: Seq[Tag]) 
 @import helper._ 
 
-@splitBucketName(bucketName: String) = @{
-	bucketName.split("!") match { case Array(x1, x2) => (x1, x2) } 
-}
-
 @addTag(taggable: Taggable) = {
 	<a href=# class="tag add">add a tag...</a>
 	<input type="text" 
@@ -27,9 +23,7 @@
 	@dumps.groupBy(_.bucket.name).map { case(bucketName, dmps) =>
 	<article>
 		<h1>
-			@defining(splitBucketName(bucketName)) { split =>
-				@split._1<wbr>!@split._2
-			}
+			@Html(bucketName.replace("!", "!<wbr>"))
 			<br/>
 			@listTags(dmps.head.bucket)
 			@addTag(dmps.head.bucket)
@@ -39,13 +33,13 @@
 			<section class="@if(dump.isNew) { new } dmp">
 				<h1>
 					<a href="@routes.Assets.at("dmps/" + dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
-					<a href="dmpster/dmp/@dump.id/details">@dump.filename</a>
+					<a href="@routes.Application.viewDetails(dump.id)">@dump.filename</a>
 				</h1>
 				
 				@listTags(dump)
 				@addTag(dump)
 				
-				<time>1 day old</time>
+				<time>@dump.ageInDays day old</time>
 			</section>
 		}
 	</article>

@@ -7,22 +7,24 @@ import play.api.Play.current
 import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Calendar
+import org.joda.time.DateTime
+import org.joda.time.Period
 
 case class Dump (
   id: Long,
   bucket: Bucket,
   filename: String,
   content: String,
-  timestamp: Date) extends Taggable {
+  timestamp: DateTime) extends Taggable {
   
   val url = "dmp"
 
   def isNew = {
-    val tsCal = new GregorianCalendar()
-    tsCal.setTime(timestamp)
-    val calendar = new GregorianCalendar()
-    calendar.add(Calendar.DAY_OF_MONTH, -1)
-    calendar.before(tsCal)
+    timestamp.plusDays(1).isAfterNow()
+  }
+  
+  def ageInDays = {
+    new Period(timestamp, DateTime.now()).getDays()
   }
   
   def tags = Tag.forDump(this)
@@ -73,7 +75,7 @@ object Dump {
       get[String]("content") ~
       get[Date]("timestamp") map {
         case id ~ bucketId ~ filename ~ content ~ timestamp =>
-          Dump(id, Bucket.byId(bucketId), filename, content, timestamp)
+          Dump(id, Bucket.byId(bucketId), filename, content, new DateTime(timestamp))
       }
   }
 }
