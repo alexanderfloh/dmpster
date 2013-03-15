@@ -207,25 +207,25 @@ article {
 			&:before { color: #2f6090; }
 		}
 	}
-	&.remove &:hover {
-		cursor: pointer;
-		text-decoration: none;
-		background-color: #2f6090;
-		&:before { color: #2f6090; }
-
-		&:after {
-			content: '\00D7';
-			font-weight: 900;
-			color: #2f6090;
-			background-color: white;
-			display: inline-block;
-			width: 12px;
-			height: 12px;
-			border-radius: 6px;
-			text-align: center;
-			margin-left: 4px;
-		}
-			
+	&.remove {
+		&:hover {
+			cursor: pointer;
+			text-decoration: none;
+			background-color: #2f6090;
+	
+			&:after {
+				content: '\00D7';
+				font-weight: 900;
+				color: #2f6090;
+				background-color: white;
+				display: inline-block;
+				width: 12px;
+				height: 12px;
+				border-radius: 6px;
+				text-align: center;
+				margin-left: 4px;
+			}
+		}			
 	}
 }
 
