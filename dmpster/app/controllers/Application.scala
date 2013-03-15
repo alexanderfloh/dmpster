@@ -14,6 +14,12 @@ import utils.DmpParser
 import play.Logger
 import models.Tag
 import models.Bucket
+import org.joda.time.DateTime
+import scala.collection.immutable.ListMap
+
+object Joda {
+  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
+}
 
 object Application extends Controller {
 
@@ -22,7 +28,17 @@ object Application extends Controller {
   }
 
   def dmpster = Action {
-    Ok(views.html.index(Dump.all, Tag.all))
+    import Joda._
+    
+    def sortByTimeStamp(l: Dump, r: Dump) = l.timestamp.isBefore(r.timestamp)
+    val dumpsByBucket = Dump.all.groupBy(_.bucket).map {
+      case (bucket, dumps) => {
+        ((bucket, dumps.sortBy(_.timestamp).last), dumps)
+      }
+    }
+    val sorted = ListMap(dumpsByBucket.toList.sortBy{case ((bucket, newest), dumps) => newest.timestamp}:_*)
+    
+    Ok(views.html.index(sorted, Tag.all))
   }
 
   def viewDetails(id: Long) = Action {

@@ -10,7 +10,13 @@ case class Bucket(
   name: String) extends Taggable {
   
   val url = "bucket"
+    
   def tags = Tag.forBucket(this)
+  
+  override def equals(other: Any) = other match {
+    case otherBucket: Bucket => this.name == otherBucket.name
+    case _ => false
+  }
 }
 
 object Bucket {
@@ -46,4 +52,5 @@ object Bucket {
         case id ~ name => Bucket(id, name)
       }
   }
+  
 }

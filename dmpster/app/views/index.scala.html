@@ -1,4 +1,4 @@
-@(dumps: List[Dump], allTags: Seq[Tag]) 
+@(dumps: scala.collection.immutable.ListMap[(Bucket, Dump), List[Dump]], allTags: Seq[Tag]) 
 @import helper._ 
 
 @addTag(taggable: Taggable) = {
@@ -20,13 +20,13 @@
 	  }
 	</datalist>
 
-	@dumps.groupBy(_.bucket.name).map { case(bucketName, dmps) =>
+	@dumps.map { case((bucket, newest), dmps) =>
 	<article>
 		<h1>
-			@Html(bucketName.replace("!", "!<wbr>"))
+			@Html(bucket.name.replace("!", "!<wbr>"))
 			<br/>
-			@listTags(dmps.head.bucket)
-			@addTag(dmps.head.bucket)
+			@listTags(bucket)
+			@addTag(bucket)
 		</h1>
 	
 		@dmps.map { dump =>
