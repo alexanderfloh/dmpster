@@ -30,13 +30,12 @@ object Application extends Controller {
   def dmpster = Action {
     import Joda._
     
-    def sortByTimeStamp(l: Dump, r: Dump) = l.timestamp.isBefore(r.timestamp)
     val dumpsByBucket = Dump.all.groupBy(_.bucket).map {
       case (bucket, dumps) => {
         ((bucket, dumps.sortBy(_.timestamp).last), dumps)
       }
     }
-    val sorted = ListMap(dumpsByBucket.toList.sortBy{case ((bucket, newest), dumps) => newest.timestamp}:_*)
+    val sorted = ListMap(dumpsByBucket.toList.sortBy{case ((bucket, newest), dumps) => newest.timestamp}: _*)
     
     Ok(views.html.index(sorted, Tag.all))
   }

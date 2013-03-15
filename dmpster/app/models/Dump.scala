@@ -5,10 +5,8 @@ import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
 import java.util.Date
-import java.util.GregorianCalendar
-import java.util.Calendar
 import org.joda.time.DateTime
-import org.joda.time.Period
+import org.joda.time.Days
 
 case class Dump (
   id: Long,
@@ -19,13 +17,9 @@ case class Dump (
   
   val url = "dmp"
 
-  def isNew = {
-    timestamp.plusDays(1).isAfterNow()
-  }
+  def isNew = timestamp.plusDays(1).isAfterNow
   
-  def ageInDays = {
-    new Period(timestamp, DateTime.now()).getDays()
-  }
+  def ageInDays = Days.daysBetween(timestamp, DateTime.now).getDays
   
   def tags = Tag.forDump(this)
 }
@@ -46,7 +40,7 @@ object Dump {
         'bucketId -> bucket.id,
         'filename -> filename,
         'content -> content,
-        'timestamp -> new Date()).executeUpdate
+        'timestamp -> DateTime.now.toDate).executeUpdate
     }
   }
 
