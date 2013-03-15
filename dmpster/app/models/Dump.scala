@@ -7,20 +7,22 @@ import play.api.Play.current
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.Days
+import scala.collection.immutable.ListMap
+import language.postfixOps
 
-case class Dump (
+case class Dump(
   id: Long,
   bucket: Bucket,
   filename: String,
   content: String,
   timestamp: DateTime) extends Taggable {
-  
+
   val url = "dmp"
 
   def isNew = timestamp.plusDays(1).isAfterNow
-  
+
   def ageInDays = Days.daysBetween(timestamp, DateTime.now).getDays
-  
+
   def tags = Tag.forDump(this)
 }
 
@@ -60,6 +62,22 @@ object Dump {
     DB.withConnection { implicit c =>
       SQL("delete from dump where id = {id}").on('id -> id).executeUpdate
     }
+  }
+
+  def groupDumpsByBucket(dumps: List[Dump]) = {
+    object Joda {
+      implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
+    }
+    import Joda._
+
+    val dumpsByBucket = dumps.groupBy(_.bucket)
+    val sortedDumpsByBucket = dumpsByBucket.map {
+      case (bucket, dumps) => {
+        val sortedDumps = dumps.sortBy(_.timestamp)
+        ((bucket, sortedDumps.head), sortedDumps)
+      }
+    }
+    ListMap(sortedDumpsByBucket.toList.sortBy { case ((bucket, newest), dumps) => newest.timestamp }: _*)
   }
 
   val dump = {

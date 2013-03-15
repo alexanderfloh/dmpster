@@ -17,10 +17,6 @@ import models.Bucket
 import org.joda.time.DateTime
 import scala.collection.immutable.ListMap
 
-object Joda {
-  implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
-}
-
 object Application extends Controller {
 
   def index = Action {
@@ -28,16 +24,7 @@ object Application extends Controller {
   }
 
   def dmpster = Action {
-    import Joda._
-    
-    val dumpsByBucket = Dump.all.groupBy(_.bucket).map {
-      case (bucket, dumps) => {
-        ((bucket, dumps.sortBy(_.timestamp).last), dumps)
-      }
-    }
-    val sorted = ListMap(dumpsByBucket.toList.sortBy{case ((bucket, newest), dumps) => newest.timestamp}: _*)
-    
-    Ok(views.html.index(sorted, Tag.all))
+    Ok(views.html.index(Dump.groupDumpsByBucket(Dump.all), Tag.all))
   }
 
   def viewDetails(id: Long) = Action {
@@ -61,12 +48,12 @@ object Application extends Controller {
       Logger.info("parsing DMP")
       val futureResult = Akka.future { DmpParser(newFile).parse }
       Async {
-        futureResult.map(p => {
-          Bucket.create(p._1).map(Bucket.byId(_)).map(bucket => {
-            Dump.create(bucket, filename, p._2)
-            Ok(toJson(Map("status" -> "OK")))
-          }).getOrElse(BadRequest("failed to parse DMP"))
-        })
+        futureResult.map{case (bucketName, content) => 
+          val bucket = Bucket.findOrCreate(bucketName)
+
+          Dump.create(bucket, filename, content)
+          Ok(toJson(Map("status" -> "OK")))
+        }
       }
     }.getOrElse {
       Logger.warn("file missing")

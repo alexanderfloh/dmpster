@@ -4,6 +4,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import language.postfixOps
 
 case class Bucket(
   id: Long,
@@ -12,11 +13,6 @@ case class Bucket(
   val url = "bucket"
     
   def tags = Tag.forBucket(this)
-  
-  override def equals(other: Any) = other match {
-    case otherBucket: Bucket => this.name == otherBucket.name
-    case _ => false
-  }
 }
 
 object Bucket {
@@ -28,6 +24,12 @@ object Bucket {
     SQL("insert into bucket (name) values ({name})")
       .on('name -> name)
       .executeInsert()
+  }
+  
+  def findOrCreate(name: String) : Bucket = DB.withConnection { implicit c => 
+  	SQL("select * from bucket where name = {name}").on('name -> name)
+  		.as(bucket singleOpt)
+  		.getOrElse(create(name).map(id => byId(id)).get)
   }
 
   def byId(id: Long) = DB.withConnection { implicit c =>
