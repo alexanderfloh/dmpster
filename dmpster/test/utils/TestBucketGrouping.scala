@@ -11,7 +11,7 @@ import scala.collection.immutable.ListMap
 
 class TestBucketGrouping extends Specification {
   "Buckets" should {
-    "be sorted by date" in {
+    "be grouped and sorted by date" in {
       val bucket = Bucket(1, "asdf")
       val dump1 = Dump(1, bucket, "dump1.dmp", "a crash!", new DateTime().minusDays(5))
       val dump2 = Dump(2, bucket, "dump2.dmp", "another crash!", new DateTime())

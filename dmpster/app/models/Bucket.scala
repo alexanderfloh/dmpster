@@ -19,7 +19,7 @@ object Bucket {
   def all: List[Bucket] = DB.withConnection { implicit c =>
     SQL("select * from bucket").as(bucket *)
   }
-
+  
   def create(name: String): Option[Long] = DB.withConnection { implicit c =>
     SQL("insert into bucket (name) values ({name})")
       .on('name -> name)

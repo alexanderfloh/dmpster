@@ -46,3 +46,18 @@ holder.ondrop = function(e) {
 	e.preventDefault();
 	readfiles(e.dataTransfer.files);
 }
+
+var intervalId = window.setInterval(checkForUpdate, 5000);
+
+function checkForUpdate() {
+	var latestTimestamp = $("input#latest").val()
+	$.ajax({
+		type: 'GET',
+		url: 'dmpster/newerThan/' + latestTimestamp
+	}).done(function(data) {
+		if(data != null && data.trim().length > 0) {
+			$(data).hide().insertAfter('input#latest').fadeIn('slow');
+			$("input#latest").val(Date.now())
+		}
+	});
+}

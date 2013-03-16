@@ -9,6 +9,7 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET		/dmpster							controllers.Application.dmpster
+GET		/dmpster/newerThan/:timestamp		controllers.Application.newerThan(timestamp: Long)
 GET		/dmpster/dmp/:id/details			controllers.Application.viewDetails(id: Long)
 POST	/upload								controllers.Application.uploadAjax
 POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)

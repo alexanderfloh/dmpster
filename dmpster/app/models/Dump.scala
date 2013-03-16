@@ -30,9 +30,19 @@ object Dump {
   def all: List[Dump] = DB.withConnection { implicit c =>
     SQL("select * from dump").as(dump *)
   }
+  
+  def newerThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
+  	SQL("select * from dump where timestamp > {timestamp}")
+  	.on('timestamp -> time.toDate).as(dump *)
+  }
 
   def byId(id: Long) = DB.withConnection { implicit c =>
     SQL("select * from dump where id = {id}").on('id -> id).as(dump.singleOpt)
+  }
+  
+  def byBucket(bucket: Bucket) = DB.withConnection { implicit c => 
+  	SQL("select * from dump where bucketId = {bucketId}")
+  	.on('bucketId -> bucket.id).as(dump *)
   }
 
   def create(bucket: Bucket, filename: String, content: String) = {

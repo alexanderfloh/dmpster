@@ -26,6 +26,17 @@ object Application extends Controller {
   def dmpster = Action {
     Ok(views.html.index(Dump.groupDumpsByBucket(Dump.all), Tag.all))
   }
+  
+  def newerThan(timestamp: Long) = Action {
+    val time = new DateTime(timestamp)
+    val newDumps = Dump.newerThan(time)
+    val groupedByBucket = newDumps.groupBy(_.bucket)
+    val allDumpsByBucket = groupedByBucket.map{case (bucket, _) =>
+    	(bucket, Dump.byBucket(bucket))
+    }
+    
+    Ok(views.html.buckets(allDumpsByBucket))
+  }
 
   def viewDetails(id: Long) = Action {
     Dump.byId(id)
