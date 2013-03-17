@@ -55,9 +55,19 @@ function checkForUpdate() {
 		type: 'GET',
 		url: 'dmpster/newerThan/' + latestTimestamp
 	}).done(function(data) {
-		if(data != null && data.trim().length > 0) {
-			$(data).hide().insertAfter('input#latest').fadeIn('slow');
-			$("input#latest").val(Date.now())
-		}
+		for(bucket in data) {
+			var article = $('article#' + bucket);
+			if(article.length > 0) {
+				$(data[bucket]).hide()
+				article.fadeOut('slow', function() {
+					$(this).remove();
+					$(data[bucket]).hide().insertAfter('input#latest').fadeIn('slow');
+				});
+			}
+			else {
+				$(data[bucket]).hide().insertAfter('input#latest').fadeIn('slow');
+			}
+		}	
+		$("input#latest").val(Date.now())
 	});
 }

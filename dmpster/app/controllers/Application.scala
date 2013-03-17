@@ -28,14 +28,19 @@ object Application extends Controller {
   }
   
   def newerThan(timestamp: Long) = Action {
+    import utils.Joda._
+    
     val time = new DateTime(timestamp)
     val newDumps = Dump.newerThan(time)
     val groupedByBucket = newDumps.groupBy(_.bucket)
     val allDumpsByBucket = groupedByBucket.map{case (bucket, _) =>
-    	(bucket, Dump.byBucket(bucket))
+    	(bucket, Dump.byBucket(bucket).sortBy(_.timestamp))
     }
+    val json = toJson(allDumpsByBucket.map{case (bucket, dumps) =>
+    	(bucket.id.toString, views.html.bucket(bucket, dumps).body)
+    })
     
-    Ok(views.html.buckets(allDumpsByBucket))
+    Ok(json)
   }
 
   def viewDetails(id: Long) = Action {

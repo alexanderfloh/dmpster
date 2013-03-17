@@ -75,10 +75,7 @@ object Dump {
   }
 
   def groupDumpsByBucket(dumps: List[Dump]) = {
-    object Joda {
-      implicit def dateTimeOrdering: Ordering[DateTime] = Ordering.fromLessThan(_ isAfter _)
-    }
-    import Joda._
+    import utils.Joda._
 
     val dumpsByBucket = dumps.groupBy(_.bucket)
     val sortedDumpsByBucket = dumpsByBucket.map {

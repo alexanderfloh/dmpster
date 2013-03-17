@@ -1,38 +1,6 @@
 @(groupedDumps: Map[Bucket, List[Dump]]) 
 @import helper._ 
 
-@addTag(taggable: Taggable) = {
-	<a href=# class="tag add">add a tag...</a>
-	<input type="text" 
-		class="tag-input"
-		baseurl="dmpster/@taggable.url/@taggable.id/addTag/" 
-		list="tags" 
-		placeholder="add a Tag"
-		style="display:none">
-	</input>
-}
-
 @groupedDumps.map { case(bucket, dmps) =>
-<article id="@bucket.name">
-	<h1>
-		@Html(bucket.name.replace("!", "!<wbr>"))
-		<br/>
-		@listTags(bucket)
-		@addTag(bucket)
-	</h1>
-
-	@dmps.map { dump =>
-		<section class="@if(dump.isNew) { new } dmp">
-			<h1>
-				<a href="@routes.Assets.at("dmps/" + dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
-				<a href="@routes.Application.viewDetails(dump.id)">@dump.filename</a>
-			</h1>
-			
-			@listTags(dump)
-			@addTag(dump)
-			
-			<time>@dump.ageInDays day@if(dump.ageInDays != 1) {s} old</time>
-		</section>
-	}
-</article>
+	@views.html.bucket(bucket, dmps)
 }
