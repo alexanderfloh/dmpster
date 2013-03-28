@@ -9,7 +9,7 @@ import language.postfixOps
 trait Taggable {
   val url: String
   val id: Long
-  def tags : List[Tag]
+  def tags: List[Tag]
 }
 
 case class Tag(id: Long, name: String) {
@@ -28,7 +28,7 @@ object Tag {
         .on('dumpId -> dump.id).as(tag *)
     }
   }
-  
+
   def forBucket(bucket: Bucket) = DB.withConnection { implicit c =>
     {
       SQL("select * from bucketToTag btt inner join tag t on t.id = btt.tagId where btt.bucketId = {bucketId}")
@@ -40,7 +40,7 @@ object Tag {
     DB.withConnection {
       implicit c =>
         SQL("insert into tag (name) values ({name})")
-          .on('name -> name).executeUpdate
+          .on('name -> name).executeInsert()
     }
   }
 
@@ -50,6 +50,13 @@ object Tag {
         SQL("select * from tag where name = {name}")
           .on('name -> name).as(tag.singleOpt)
     }
+  }
+
+  def findOrCreate(name: String): Tag = {
+    findByName(name)
+      .getOrElse(create(name)
+        .map(id => Tag(id, name))
+        .getOrElse(throw new Exception("unable to insert tag '" + name + "'")))
   }
 
   def tag = {

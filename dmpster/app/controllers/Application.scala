@@ -26,20 +26,22 @@ object Application extends Controller {
   def dmpster = Action {
     Ok(views.html.index(Dump.groupDumpsByBucket(Dump.all), Tag.all))
   }
-  
+
   def newerThan(timestamp: Long) = Action {
     import utils.Joda._
-    
+
     val time = new DateTime(timestamp)
     val newDumps = Dump.newerThan(time)
     val groupedByBucket = newDumps.groupBy(_.bucket)
-    val allDumpsByBucket = groupedByBucket.map{case (bucket, _) =>
-    	(bucket, Dump.byBucket(bucket).sortBy(_.timestamp))
+    val allDumpsByBucket = groupedByBucket.map {
+      case (bucket, _) =>
+        (bucket, Dump.byBucket(bucket).sortBy(_.timestamp))
     }
-    val json = toJson(allDumpsByBucket.map{case (bucket, dumps) =>
-    	(bucket.id.toString, views.html.bucket(bucket, dumps).body)
+    val json = toJson(allDumpsByBucket.map {
+      case (bucket, dumps) =>
+        (bucket.id.toString, views.html.bucket(bucket, dumps).body)
     })
-    
+
     Ok(json)
   }
 
@@ -63,12 +65,23 @@ object Application extends Controller {
 
       Logger.info("parsing DMP")
       val futureResult = Akka.future { DmpParser(newFile).parse }
-      Async {
-        futureResult.map{case (bucketName, content) => 
-          val bucket = Bucket.findOrCreate(bucketName)
 
-          Dump.create(bucket, filename, content)
-          Ok(toJson(Map("status" -> "OK")))
+      Async {
+        futureResult.map {
+          case (bucketName, content) =>
+            val bucket = Bucket.findOrCreate(bucketName)
+
+            val dump = Dump.create(bucket, filename, content)
+
+            request.body.dataParts.get("tags").map { tags =>
+              tags.head.split(",").foreach(tagName => {
+                val tag = Tag.findOrCreate(tagName)
+                Dump.addTag(dump, tag)
+              })
+
+            }.getOrElse(Logger.info("no tags provided"))
+
+            Ok(toJson(Map("status" -> "OK")))
         }
       }
     }.getOrElse {
@@ -79,10 +92,7 @@ object Application extends Controller {
   }
 
   def addTagToDmp(id: Long, tagName: String) = Action {
-    val tag = Tag.findByName(tagName).getOrElse({
-      Tag.create(tagName)
-      Tag.findByName(tagName).get
-    })
+    val tag = Tag.findOrCreate(tagName)
 
     Dump.byId(id).map(dump =>
       if (Tag.forDump(dump).exists(_.name == tagName))

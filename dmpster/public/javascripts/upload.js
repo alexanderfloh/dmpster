@@ -21,6 +21,7 @@ function readfiles(files) {
 		//	+ (file.size ? (file.size / (1024 * 1024) | 0) + 'MB' : '') + ')...';
 		console.log(file);
 	}
+	//formData.append('tags', "Asdf, Foo")
 
 	// now post a new XHR request
 	var xhr = new XMLHttpRequest();
