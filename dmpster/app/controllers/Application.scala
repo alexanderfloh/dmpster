@@ -74,10 +74,13 @@ object Application extends Controller {
             val dump = Dump.create(bucket, filename, content)
 
             request.body.dataParts.get("tags").map { tags =>
-              tags.head.split(",").foreach(tagName => {
-                val tag = Tag.findOrCreate(tagName)
-                Dump.addTag(dump, tag)
-              })
+              tags.head.split(",")
+                .map(_.trim)
+                .filter(!_.isEmpty())
+                .foreach(tagName => {
+                  val tag = Tag.findOrCreate(tagName)
+                  Dump.addTag(dump, tag)
+                })
 
             }.getOrElse(Logger.info("no tags provided"))
 
