@@ -58,7 +58,8 @@ object Application extends Controller {
       import java.io.File
       val filename = dmp.filename
       val contentType = dmp.contentType
-      val dir = new File("public/dmps")
+      val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+      val dir = new File(dmpPath)
       dir.mkdirs()
       val newFile = new File(dir, filename)
       dmp.ref.moveTo(newFile, true)
