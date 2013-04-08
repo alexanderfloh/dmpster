@@ -23,7 +23,7 @@
 	@dumps.map { dump =>
 		<section class="@if(dump.isNew) { new } dmp">
 			<h1>
-				<a href="@routes.ExternalAssets.at(dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
+				<a href="@routes.Dmp.at(dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
 				<a href="@routes.Application.viewDetails(dump.id)">@dump.filename</a>
 			</h1>
 			
