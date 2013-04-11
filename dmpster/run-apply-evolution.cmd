@@ -1,0 +1,1 @@
+play -Dhttp.port=80 -Dfile.separator=\/ -Dconfig.resource=prod.conf -DapplyEvolutions.default=true start
