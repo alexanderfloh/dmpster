@@ -14,7 +14,7 @@
 
 <article id="@bucket.id">
 	<h1>
-		@Html(bucket.name.replace("!", "!<wbr>"))
+		@Html(bucket.name.replace("!", "!<wbr>").replace("_", "_<wbr>").replace("::", "::<wbr>"))
 		<br/>
 		@listTags(bucket)
 		@addTag(bucket)
