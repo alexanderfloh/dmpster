@@ -9,6 +9,7 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 import scala.collection.immutable.ListMap
 import language.postfixOps
+import org.joda.time.format.DateTimeFormat
 
 case class Dump(
   id: Long,
@@ -24,6 +25,11 @@ case class Dump(
   def ageInDays = Days.daysBetween(timestamp, DateTime.now).getDays
 
   def tags = Tag.forDump(this)
+  
+  def dateFormatted = {
+    if(isNew) "today " + timestamp.toString(DateTimeFormat.forPattern("HH:mm"))
+    else timestamp.toString(DateTimeFormat.forPattern("YYYY-MM-dd HH:mm"))
+  } 
 }
 
 object Dump {

@@ -30,7 +30,7 @@
 			@listTags(dump)
 			@addTag(dump)
 			
-			<time>@dump.ageInDays day@if(dump.ageInDays != 1) {s} old</time>
+			<time>added @dump.dateFormatted - @dump.ageInDays day@if(dump.ageInDays != 1) {s} old</time>
 		</section>
 	}
 </article>
