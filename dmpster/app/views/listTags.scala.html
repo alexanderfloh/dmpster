@@ -2,7 +2,7 @@
 @import helper._ 
 <span id="tags">
 @taggable.tags.map { tag =>
-	<span class="tag mine remove" 
+	<span class="tag mine remove @tag.name.replace(" ", "-")" 
 		onclick="return removeTag(this, 'dmpster/@taggable.url/@taggable.id/removeTag/@(java.net.URLEncoder.encode(tag.name, "UTF-8"))')">
 		@tag.name
 	</span>

@@ -41,6 +41,11 @@ object Dump {
   	SQL("select * from dump where timestamp > {timestamp}")
   	.on('timestamp -> time.toDate).as(dump *)
   }
+  
+  def olderThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
+  	SQL("select * from dump where timestamp < {timestamp}")
+  	.on('timestamp -> time.toDate).as(dump *)
+  }
 
   def byId(id: Long) = DB.withConnection { implicit c =>
     SQL("select * from dump where id = {id}").on('id -> id).as(dump.singleOpt)
@@ -49,6 +54,11 @@ object Dump {
   def byBucket(bucket: Bucket) = DB.withConnection { implicit c => 
   	SQL("select * from dump where bucketId = {bucketId}")
   	.on('bucketId -> bucket.id).as(dump *)
+  }
+  
+  def byTag(tag: Tag) = DB.withConnection { implicit c =>
+    SQL("select * from dumpToTag dtt inner join dump d on d.id = dtt.dumpId where dtt.tagId = {tagId}")
+    .on('tagId -> tag.id).as(dump *)
   }
 
   def create(bucket: Bucket, filename: String, content: String) : Dump = {
