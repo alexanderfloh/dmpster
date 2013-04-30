@@ -1,9 +1,13 @@
 @(dump: Dump) 
-@import helper._ 
 @main {
 <article>
 	<h1>@dump.filename</h1>
+	
 	<section>
+		<h1>
+			<a href="@routes.Dmp.at(dump.filename)"><img src="@routes.Assets.at("images/download.svg")"></img></a>
+			@listTags(dump)
+		</h1>
 		<pre>
 @dump.content
 		</pre>

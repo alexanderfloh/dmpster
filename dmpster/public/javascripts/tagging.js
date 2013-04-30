@@ -19,20 +19,20 @@ function removeTag(source, url) {
 	});
 }
 
-$('.tag.add').on('click', function() {
+$('body').on('click', '.tag.add', function() {
 	$(this).hide();
 	var input = $(this).next('.tag-input');
 	input.show();
 	input.focus();
 });
-$('.tag-input').on('keypress', function(event) {
+$('body').on('keypress', '.tag-input', function(event) {
 	if (event.keyCode == 13 || event.which == 13) {
 		addTag(this);
 		$(this).hide();
 		$(this).prev('.tag.add').show();
 	}
 });
-$('.tag-input').on('blur', function() {
+$('body').on('blur', '.tag-input', function() {
 	$(this).val('');
 	$(this).hide();
 	$(this).prev('.tag.add').show();
