@@ -1,0 +1,17 @@
+@(processingDmps: List[String])
+@if(!processingDmps.isEmpty) {
+<article id="processing">
+	<h1>
+		Currently Processing...
+		<br/>
+	</h1>
+
+	@processingDmps.map { dumpName =>
+		<section class="dmp">
+			<h1>
+			@dumpName
+			</h1>
+		</section>
+	}
+</article>
+}

@@ -6,6 +6,7 @@ import utils.CleanUpActor
 import concurrent.duration._
 import utils.CleanUp
 import play.api.libs.concurrent.Execution.Implicits._
+import utils.AnalyzeMaster
 
 object Global extends GlobalSettings {
   override def onStart(app: Application) {
@@ -15,6 +16,8 @@ object Global extends GlobalSettings {
       case Mode.Prod => 24.hours
     }
     Akka.system.scheduler.schedule(5.seconds, interval, actor, CleanUp)
+    
+    val analyzeMaster = Akka.system.actorOf(Props[AnalyzeMaster], name = "analyzeMaster")
   }
 
   override def onStop(app: Application) {

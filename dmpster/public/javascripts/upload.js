@@ -27,7 +27,7 @@ function readfiles(files) {
 	var xhr = new XMLHttpRequest();
 	xhr.open('POST', '/upload');
 	xhr.onload = function() {
-
+		checkForUpdate();
 	};
 
 	xhr.send(formData);
@@ -51,7 +51,29 @@ holder.ondrop = function(e) {
 var intervalId = window.setInterval(checkForUpdate, 5000);
 
 function checkForUpdate() {
-	var latestTimestamp = $("input#latest").val()
+	$.ajax({
+		type: 'GET',
+		url: 'dmpster/analyzing'
+	}).done(function(data) {
+		if(data.length > 0) {
+			console.log(data)
+			var processing = $('article#processing');
+			if(processing.length) {
+				processing.fadeOut('slow', function() {
+					$(this).remove();
+					$(data).hide().insertBefore('input#latest').fadeIn('slow');
+				});
+			}
+			else {
+				$(data).hide().insertBefore('input#latest').fadeIn('slow');
+			}
+		}
+		else {
+			$('article#processing').fadeOut('slow').remove();
+		}
+	});
+
+	var latestTimestamp = $("input#latest").val();
 	$.ajax({
 		type: 'GET',
 		url: 'dmpster/newerThan/' + latestTimestamp

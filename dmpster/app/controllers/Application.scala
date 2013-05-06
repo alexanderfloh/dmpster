@@ -14,8 +14,14 @@ import utils.DmpParser
 import play.Logger
 import models.Tag
 import models.Bucket
-import org.joda.time.DateTime
 import scala.collection.immutable.ListMap
+import org.joda.time.DateTime
+import akka.pattern.ask
+import utils.Work
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.concurrent.Future
+import akka.util.Timeout
 
 object Application extends Controller {
 
@@ -51,6 +57,15 @@ object Application extends Controller {
       .map(Ok(_)).getOrElse(BadRequest("dump not found"))
   }
 
+  def analyzing = Action {
+    val analyzer = Akka.system.actorFor("/user/analyzeMaster")
+    implicit val timeout = Timeout(5 seconds)
+    val jobs = analyzer ? utils.QueryRunningJobs
+    val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
+    Logger.info("currently analyzing " + files.mkString(", "))
+    Ok(toJson(views.html.processing(files.map(_.getName)).body.trim))
+  }
+
   def uploadAjax = Action(parse.multipartFormData) {
     Logger.info("upload")
     request => request.body.file("file").map { dmp =>
@@ -65,29 +80,32 @@ object Application extends Controller {
       dmp.ref.moveTo(newFile, true)
 
       Logger.info("parsing DMP")
-      val futureResult = Akka.future { DmpParser(newFile).parse }
+      val analyzer = Akka.system.actorFor("/user/analyzeMaster")
 
-      Async {
-        futureResult.map {
-          case (bucketName, content) =>
-            val bucket = Bucket.findOrCreate(bucketName)
+      val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
+      //val futureResult = Akka.future { DmpParser(newFile).parse }
 
-            val dump = Dump.create(bucket, filename, content)
+      val response = futureResult.map {
+        case utils.Result(file, bucketName, content) =>
+          val bucket = Bucket.findOrCreate(bucketName)
 
-            request.body.dataParts.get("tags").map { tags =>
-              tags.head.split(",")
-                .map(_.trim)
-                .filter(!_.isEmpty())
-                .foreach(tagName => {
-                  val tag = Tag.findOrCreate(tagName)
-                  Dump.addTag(dump, tag)
-                })
+          val dump = Dump.create(bucket, filename, content)
 
-            }.getOrElse(Logger.info("no tags provided"))
+          request.body.dataParts.get("tags").map { tags =>
+            tags.head.split(",")
+              .map(_.trim)
+              .filter(!_.isEmpty())
+              .foreach(tagName => {
+                val tag = Tag.findOrCreate(tagName)
+                Dump.addTag(dump, tag)
+              })
 
-            Ok(toJson(Map("status" -> "OK")))
-        }
+          }.getOrElse(Logger.info("no tags provided"))
+
+          Ok(toJson(Map("status" -> "OK")))
       }
+
+      Await.result(response, Duration.Inf)
     }.getOrElse {
       Logger.warn("file missing")
       Redirect(routes.Application.index).flashing(
