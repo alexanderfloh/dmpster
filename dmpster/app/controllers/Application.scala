@@ -52,9 +52,10 @@ object Application extends Controller {
   }
 
   def viewDetails(id: Long) = Action {
-    Dump.byId(id)
-      .map(dump => views.html.details(dump))
-      .map(Ok(_)).getOrElse(BadRequest("dump not found"))
+    val optResult = for {
+      dump <- Dump.byId(id)
+    } yield Ok(views.html.details(dump))
+    optResult.getOrElse(BadRequest("dump not found"))
   }
 
   def analyzing = Action {
