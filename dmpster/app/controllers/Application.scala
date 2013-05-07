@@ -63,7 +63,6 @@ object Application extends Controller {
     implicit val timeout = Timeout(5 seconds)
     val jobs = analyzer ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
-    Logger.info("currently analyzing " + files.mkString(", "))
     Ok(toJson(views.html.processing(files.map(_.getName)).body.trim))
   }
 
