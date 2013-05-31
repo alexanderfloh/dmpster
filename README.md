@@ -1,6 +1,7 @@
 #dmpster#
-dmpster is a simple web app for storing `.dmp`-files, 
-which also does a simple analysis of the `.dmp`-file to give you a quick overview what happend.
+![dmpster screenshot](dmpster.png)
+_dmpster_ is a simple web app for storing `.dmp`-files. 
+It also does a simple analysis of the `.dmp`-file to give you a quick overview what happend.
 
 #Installation#
 * Install Java
