@@ -10,6 +10,7 @@ import org.joda.time.Days
 import scala.collection.immutable.ListMap
 import language.postfixOps
 import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTimeConstants
 
 case class Dump(
   id: Long,
@@ -20,61 +21,76 @@ case class Dump(
 
   val url = "dmp"
 
-  def isNew = timestamp.plusDays(1).isAfterNow
+  /** 
+   * Reference for 'now' instant in time. 
+   * The intention for this is to be able to provide a custom implementation in unit tests. 
+   */
+  protected def now = DateTime.now
+  
+  private def firstDayOfNewness = {
+    now.getDayOfWeek() match {
+      case DateTimeConstants.MONDAY => now.minusDays(3).withTimeAtStartOfDay
+      case _ => now.minusDays(1).withTimeAtStartOfDay
+    }
+  }
 
-  def ageInDays = Days.daysBetween(timestamp, DateTime.now).getDays
+  def isNew = firstDayOfNewness.isBefore(timestamp)
+
+  def ageInDays = Days.daysBetween(timestamp, now).getDays
 
   def tags = Tag.forDump(this)
   
+  private def isFromToday = now.withTimeAtStartOfDay.isBefore(timestamp)
+
   def dateFormatted = {
-    if(isNew) "today " + timestamp.toString(DateTimeFormat.forPattern("HH:mm"))
+    if (isFromToday) "today " + timestamp.toString(DateTimeFormat.forPattern("HH:mm"))
     else timestamp.toString(DateTimeFormat.forPattern("YYYY-MM-dd HH:mm"))
-  } 
+  }
 }
 
 object Dump {
   def all: List[Dump] = DB.withConnection { implicit c =>
     SQL("select * from dump").as(dump *)
   }
-  
+
   def newerThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
-  	SQL("select * from dump where timestamp > {timestamp}")
-  	.on('timestamp -> time.toDate).as(dump *)
+    SQL("select * from dump where timestamp > {timestamp}")
+      .on('timestamp -> time.toDate).as(dump *)
   }
-  
+
   def olderThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
-  	SQL("select * from dump where timestamp < {timestamp}")
-  	.on('timestamp -> time.toDate).as(dump *)
+    SQL("select * from dump where timestamp < {timestamp}")
+      .on('timestamp -> time.toDate).as(dump *)
   }
 
   def byId(id: Long) = DB.withConnection { implicit c =>
     SQL("select * from dump where id = {id}").on('id -> id).as(dump.singleOpt)
   }
-  
-  def byBucket(bucket: Bucket) = DB.withConnection { implicit c => 
-  	SQL("select * from dump where bucketId = {bucketId}")
-  	.on('bucketId -> bucket.id).as(dump *)
-  }
-  
-  def byTag(tag: Tag) = DB.withConnection { implicit c =>
-    SQL("select * from dumpToTag dtt inner join dump d on d.id = dtt.dumpId where dtt.tagId = {tagId}")
-    .on('tagId -> tag.id).as(dump *)
+
+  def byBucket(bucket: Bucket) = DB.withConnection { implicit c =>
+    SQL("select * from dump where bucketId = {bucketId}")
+      .on('bucketId -> bucket.id).as(dump *)
   }
 
-  def create(bucket: Bucket, filename: String, content: String) : Dump = {
+  def byTag(tag: Tag) = DB.withConnection { implicit c =>
+    SQL("select * from dumpToTag dtt inner join dump d on d.id = dtt.dumpId where dtt.tagId = {tagId}")
+      .on('tagId -> tag.id).as(dump *)
+  }
+
+  def create(bucket: Bucket, filename: String, content: String): Dump = {
     val timestamp = DateTime.now
     DB.withConnection { implicit c =>
       SQL("insert into dump (bucketId, filename, content, timestamp) " +
         "values ({bucketId}, {filename}, {content}, {timestamp})")
         .on(
-        'bucketId -> bucket.id,
-        'filename -> filename,
-        'content -> content,
-        'timestamp -> timestamp.toDate)
+          'bucketId -> bucket.id,
+          'filename -> filename,
+          'content -> content,
+          'timestamp -> timestamp.toDate)
         .executeInsert() match {
-        case Some(id) => Dump(id, bucket, filename, content, timestamp)
-        case None => throw new Exception("unable to insert dump into db")
-      }
+          case Some(id) => Dump(id, bucket, filename, content, timestamp)
+          case None => throw new Exception("unable to insert dump into db")
+        }
     }
   }
 
