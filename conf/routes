@@ -13,7 +13,8 @@ GET		/dmpster							controllers.Application.dmpster
 GET		/dmpster/newerThan/:timestamp		controllers.Application.newerThan(timestamp: Long)
 GET		/dmpster/dmp/:id/details			controllers.Application.viewDetails(id: Long)
 GET		/dmpster/analyzing					controllers.Application.analyzing
-POST	/upload								controllers.Application.uploadAjax
+POST	/upload								controllers.Application.upload
+POST    /uploadAsync                        controllers.Application.uploadAsync
 POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)
 POST    /dmpster/dmp/:id/addTag/:tagName 	controllers.Application.addTagToDmp(id: Long, tagName: String)
 POST    /dmpster/dmp/:id/removeTag/:tagName controllers.Application.removeTagFromDmp(id: Long, tagName: String)

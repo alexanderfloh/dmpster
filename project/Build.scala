@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
     val appName         = "dmpster"
-    val appVersion      = "1.0-SNAPSHOT"
+    val appVersion      = "1.0.1-SNAPSHOT"
 
     val appDependencies = Seq(
       anorm, jdbc

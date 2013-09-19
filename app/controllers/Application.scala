@@ -22,6 +22,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import akka.util.Timeout
+import play.api.libs.Files.TemporaryFile
 
 object Application extends Controller {
 
@@ -66,51 +67,65 @@ object Application extends Controller {
     Ok(toJson(views.html.processing(files.map(_.getName)).body.trim))
   }
 
-  def uploadAjax = Action(parse.multipartFormData) {
-    Logger.info("upload")
-    request => request.body.file("file").map { dmp =>
-      Logger.info("moving file " + dmp.filename)
-      import java.io.File
-      val filename = dmp.filename
-      val contentType = dmp.contentType
-      val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
-      val dir = new File(dmpPath)
-      dir.mkdirs()
-      val newFile = new File(dir, filename)
-      dmp.ref.moveTo(newFile, true)
-
-      Logger.info("parsing DMP")
-      val analyzer = Akka.system.actorFor("/user/analyzeMaster")
-
-      val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
-      //val futureResult = Akka.future { DmpParser(newFile).parse }
-
-      val response = futureResult.map {
-        case utils.Result(file, bucketName, content) =>
-          val bucket = Bucket.findOrCreate(bucketName)
-
-          val dump = Dump.create(bucket, filename, content)
-
-          request.body.dataParts.get("tags").map { tags =>
-            tags.head.split(",")
-              .map(_.trim)
-              .filter(!_.isEmpty())
-              .foreach(tagName => {
-                val tag = Tag.findOrCreate(tagName)
-                Dump.addTag(dump, tag)
-              })
-
-          }.getOrElse(Logger.info("no tags provided"))
-
-          Ok(toJson(Map("status" -> "OK")))
+  def upload = Action(parse.multipartFormData) {
+    request =>
+      {
+        val futureResults = handleUpload(request)
+        val result = Await.result(futureResults, Duration.Inf)
+        Ok(toJson(Map("files" -> toJson(result))))
       }
+  }
 
-      Await.result(response, Duration.Inf)
-    }.getOrElse {
-      Logger.warn("file missing")
-      Redirect(routes.Application.index).flashing(
-        "error" -> "Missing file")
-    }
+  def uploadAsync = Action(parse.multipartFormData) {
+    request =>
+      {
+        handleUpload(request)
+        Ok(toJson(Map("files" -> "")))
+      }
+  }
+
+  private def handleUpload(request: Request[MultipartFormData[TemporaryFile]]) = {
+    Logger.info("upload")
+    val futureResults =
+      Future.sequence(request.body.files.map { dmp =>
+
+        Logger.info("moving file " + dmp.filename)
+        import java.io.File
+        val filename = dmp.filename
+        val contentType = dmp.contentType
+        val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+        val dir = new File(dmpPath)
+        dir.mkdirs()
+        val newFile = new File(dir, filename)
+        dmp.ref.moveTo(newFile, true)
+
+        Logger.info("parsing DMP")
+        val analyzer = Akka.system.actorFor("/user/analyzeMaster")
+
+        val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
+
+        val response = futureResult.map {
+          case utils.Result(file, bucketName, content) =>
+            val bucket = Bucket.findOrCreate(bucketName)
+
+            val dump = Dump.create(bucket, filename, content)
+
+            request.body.dataParts.get("tags").map { tags =>
+              tags.head.split(",")
+                .map(_.trim)
+                .filter(!_.isEmpty())
+                .foreach(tagName => {
+                  val tag = Tag.findOrCreate(tagName)
+                  Dump.addTag(dump, tag)
+                })
+
+            }.getOrElse(Logger.info("no tags provided"))
+
+            toJson(Map("name" -> toJson(filename)))
+        }
+        response
+      })
+    futureResults
   }
 
   def addTagToDmp(id: Long, tagName: String) = Action {
