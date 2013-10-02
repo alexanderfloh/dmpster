@@ -1,0 +1,12 @@
+
+* load the appropriate .NET access DLL
+!for_each_module .if(($sicmp( "@#ModuleName" , "mscorwks") = 0) ) {.loadby sos mscorwks} .elsif ($sicmp( "@#ModuleName" , "clr") = 0) {.loadby sos clr}
+
+* analyze
+!analyze -v;
+
+* list all modules, including version information
+lmv;
+
+* finally, detach
+.detach

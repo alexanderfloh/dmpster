@@ -3,6 +3,8 @@ package utils
 import scala.io.Source
 import scala.collection.JavaConversions._
 import play.api.Play
+import scala.sys.process.ProcessBuilder
+import play.api.Logger
 
 trait DmpParser {
   def parse: (String, String) = {
@@ -25,21 +27,14 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
 	      "-i",
 	      imagePath,
 	      "-c",
-	      //"!analyze -v;~*kb;.detach",
-	      "!analyze -v;.detach",
+	      "$$<" + scriptPath, 
 	      "-z",
 	      file.getAbsolutePath())
 	      
-    val pb = new ProcessBuilder(commands)
-    pb.redirectErrorStream(true)
-    
-    val process = pb.start()
-    process.getOutputStream().close
-    
-    val is = process.getInputStream()
-    val lines = Source.fromInputStream(is).getLines.toList
-    process.waitFor()
-    lines
+    import scala.sys.process._
+    val forwardErrorsToApplicationLog = ProcessLogger(line => Logger.warn(line)) 
+    val outStream = commands.lines_!(forwardErrorsToApplicationLog)
+    outStream.toList
   }
 }
 
@@ -55,6 +50,7 @@ object DmpParser {
   lazy val symbolPath = Play.current.configuration.getString("dmpster.symbol.path").getOrElse("")
   lazy val sourcePath = Play.current.configuration.getString("dmpster.source.path").getOrElse("")
   lazy val imagePath = Play.current.configuration.getString("dmpster.image.path").getOrElse("")
+  lazy val scriptPath = Play.current.configuration.getString("dmpster.script.path").getOrElse("conf\\commands.txt")
   
   def apply(file: java.io.File) = {
     if (System.getProperty("os.name").toLowerCase.contains("win"))

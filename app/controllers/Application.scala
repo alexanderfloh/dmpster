@@ -89,15 +89,19 @@ object Application extends Controller {
     val futureResults =
       Future.sequence(request.body.files.map { dmp =>
 
-        Logger.info("moving file " + dmp.filename)
-        import java.io.File
-        val filename = dmp.filename
-        val contentType = dmp.contentType
-        val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
-        val dir = new File(dmpPath)
-        dir.mkdirs()
-        val newFile = new File(dir, filename)
-        dmp.ref.moveTo(newFile, true)
+        def moveFile(dmp: MultipartFormData.FilePart[TemporaryFile]) = {
+          Logger.info("moving file " + dmp.filename)
+          import java.io.File
+          
+          val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+          val dir = new File(dmpPath)
+          dir.mkdirs()
+          val newFile = new File(dir, dmp.filename)
+          dmp.ref.moveTo(newFile, true)
+          (newFile, dmp.filename)
+        }
+
+        val (newFile, filename) = moveFile(dmp)
 
         Logger.info("parsing DMP")
         val analyzer = Akka.system.actorFor("/user/analyzeMaster")
@@ -110,15 +114,16 @@ object Application extends Controller {
 
             val dump = Dump.create(bucket, filename, content)
 
-            request.body.dataParts.get("tags").map { tags =>
-              tags.head.split(",")
-                .map(_.trim)
-                .filter(!_.isEmpty())
-                .foreach(tagName => {
-                  val tag = Tag.findOrCreate(tagName)
-                  Dump.addTag(dump, tag)
-                })
+            def extractTagsFrom(request: Request[MultipartFormData[TemporaryFile]]) = {
+              request.body.dataParts.get("tags").map { tags =>
+                tags.head.split(",")
+                  .map(_.trim)
+                  .filter(!_.isEmpty())
+              }
+            }
 
+            extractTagsFrom(request).map { tags =>
+              tags.foreach(tagName => Dump.addTag(dump, Tag.findOrCreate(tagName)))
             }.getOrElse(Logger.info("no tags provided"))
 
             toJson(Map("name" -> toJson(filename)))
