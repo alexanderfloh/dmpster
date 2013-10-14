@@ -13,7 +13,7 @@ object Global extends GlobalSettings {
     val actor = Akka.system.actorOf(Props[CleanUpActor], name = "cleanUpActor")
     def interval = Play.mode match {
       case Mode.Dev => 30.minutes
-      case Mode.Prod => 24.hours
+      case Mode.Prod => 3.hours
     }
     Akka.system.scheduler.schedule(5.seconds, interval, actor, CleanUp)
     
