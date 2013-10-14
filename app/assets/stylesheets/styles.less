@@ -1,273 +1,285 @@
 
 
 /* Eric Meyer's Reset CSS v2.0 - http://cssreset.com */
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}
+html , body , div , span , applet , object , iframe , h1 , h2 , h3 , h4 , h5 , h6 , p , blockquote , pre , a , abbr , acronym , address , big , cite , code , del , dfn , em , img , ins , kbd , q , s , samp , small , strike , strong , sub , sup , tt , var , b , u , i , center , dl , dt , dd , ol , ul , li , fieldset , form , label , legend , table , caption , tbody , tfoot , thead , tr , th , td , article , aside , canvas , details , embed , figure , figcaption , footer , header , hgroup , menu , nav , output , ruby , section , summary , time , mark , audio , video {
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  margin: 0;
+  padding: 0
+}
 
+article , aside , details , figcaption , figure , footer , header , hgroup , menu , nav , section {
+  display: block
+}
+
+body {
+  line-height: 1
+}
+
+ol , ul {
+  list-style: none
+}
+
+blockquote , q {
+  quotes: none
+}
+
+blockquote:before , blockquote:after , q:before , q:after {
+  content: none
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0
+}
 
 .transition (@transition) {
-	-webkit-transition: @transition;  
-	-moz-transition:    @transition;
-	-ms-transition:     @transition; 
-	-o-transition:      @transition;  
-	transition:         @transition;  
-}
-.transform(@string){
-	-webkit-transform: @string;
-	-moz-transform:    @string;
-	-ms-transform: 	   @string;
-	-o-transform: 	   @string;
-	transform: 	       @string;
+  -webkit-transition: @transition;
+  -moz-transition: @transition;
+  -ms-transition: @transition;
+  -o-transition: @transition;
+  transition: @transition;
 }
 
-
+.transform (@string) {
+  -webkit-transform: @string;
+  -moz-transform: @string;
+  -ms-transform: @string;
+  -o-transform: @string;
+  transform: @string;
+}
 
 @import url(http://fonts.googleapis.com/css?family=Gochi+Hand);
 @import url(~"http://fonts.googleapis.com/css?family=Open+Sans:300italic,600,700,800");
 @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro);
-
-
 body {
-	font-family: 'Open Sans', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 header {
-	background-color: black;
-	color: white;
-	padding: 75px 0 50px;
-	position: relative;
+  background-color: black;
+  color: white;
+  padding: 75px 0 50px;
+  position: relative;
+  h1 {
+    font-weight: 900;
+    font-size: 7em;
+    text-align: center;
+    margin-left: -150px;
+    position: relative;
+    a {
+      text-decoration: none;
+      color: white;
+      sup {
+        vertical-align: top;
+        color: red;
+        font-size: 0.2em;
+        padding-right: 80px;
+      }
+    }
 
-	h1 {
-		font-weight: 900;
-		font-size: 7em;
-		text-align: center;
-		margin-left: -150px;
-		position: relative;
-		
-		a {
-			text-decoration: none;
-			color: white;
-			
-			sup {
-				vertical-align: top;
-				color: red;
-				font-size: 0.2em;
-				padding-right: 80px;
-			}
-		}
-		
-		img {
-			position: absolute;
-			left: 50%;
-			margin-left: 240px;
-			bottom: -15px;
-			height: 150px;
-			.transition(all 0.3s);
-		}
-	}
+    img {
+      position: absolute;
+      left: 50%;
+      margin-left: 240px;
+      bottom: -15px;
+      height: 150px;
+      .transition (all 0.3s);
+    }
+  }
 
-	span {
-		font-family: 'Gochi Hand', cursive;
-		position: absolute;
-		left: 50%;
-		margin-left: 310px;
-		top: 75px;
-		font-size: 1.5em;
-		.transform(rotate(25deg));
-
-		&:before {
-			content: url(../images/arrow.png);
-			position: absolute;
-			left: 10px;
-			top: 38px;
-			.transform(rotate(-20deg));
-		}
-	}
+  span {
+    font-family: 'Gochi Hand', cursive;
+    position: absolute;
+    left: 50%;
+    margin-left: 310px;
+    top: 75px;
+    font-size: 1.5em;
+    .transform (rotate(25deg));
+    &:before {
+      content: url(../images/arrow.png);
+      position: absolute;
+      left: 10px;
+      top: 38px;
+      .transform (rotate(-20deg));
+    }
+  }
 }
 
 .dragging {
-	header {
-		h1 img:first-of-type {
-			.transform(rotate(25deg));
-		}
-	}
+  header {
+    h1 img:first-of-type {
+      .transform (rotate(25deg));
+    }
+  }
 }
 
 article {
-	padding-left: 10%;
-	margin: 75px 0;
-	> h1 {
-		font-size: 1.5em;
-		font-weight: bold;
-		margin-bottom: 20px;
-		position: relative;
+  padding-left: 10%;
+  margin: 75px 0;
+  > h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    position: relative;
+    &:before {
+      content: "";
+      background-image: url(../images/trashcan.svg);
+      background-size: 100%;
+      background-repeat: no-repeat;
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      top: -12px;
+      left: -52px;
+    }
 
-		&:before {
-			content: "";
-			background-image: url(../images/trashcan.svg);
-			background-size: 100%;
-			background-repeat: no-repeat;
-			height: 50px;
-			width: 50px;
-			position: absolute;
-			top: -12px;
-			left: -52px;
-		}
+    .tag:first-of-type:not(.add) {
+      margin-left: 15px;
+    }
+  }
 
-		.tag:first-of-type:not(.add) {
-			margin-left: 15px;
-		}
-	}
+  section {
+    background-color: rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    position: relative;
+    padding: 15px;
+    min-width: 250px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    margin-right: 20px;
+    margin-bottom: 20px;
+    &.dmp {
+      max-width: 500px;
+    }
 
-	section {
-		background-color: rgba(0,0,0, 0.05);
-		display: inline-block;
-		position: relative;
-		padding: 15px;
-		min-width: 250px;
-		overflow: hidden;
-		border: 1px solid rgba(0,0,0, 0.07);
-		margin-right: 20px;
-		margin-bottom: 20px;
-		
-		&.dmp {
-			max-width: 500px;
-		}
+    h1 {
+      a {
+        text-decoration: none;
+        color: white;
+        &:hover {
+          text-decoration: underline;
+        }
 
-		h1 {
-		 	a {
-		 		text-decoration: none;
-		 		color: white;
-		 		
-		 		img {
-					height: 20px;
-					padding-right: 5px;
-				}
-		 	}
-		 	
-			margin: -15px;
-			margin-bottom: 10px;
-			padding: 10px;
-			background-color: rgba(0,0,0, 0.66);
-			color: white;
-			font-weight: bold;
-		}
+        img {
+          height: 20px;
+          padding-right: 5px;
+        }
+      }
 
-		time {
-			//font-style: italic;
-			opacity: 0.5;
-			position: absolute;
-			font-size: 0.6em;
-			bottom: 5px;
-			right: 5px;
-		}
+      margin: -15px;
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: rgba(0, 0, 0, 0.66);
+      color: white;
+      font-weight: bold;
+    }
 
-		&.new {
-			&:before {
-				content: "new";
-				color: white;
-				background-color: rgb(86, 175, 0);
-				font-weight: bold;
-				font-size: 0.8em;
-				padding: 4px 0;
-				text-align: center;
-				position: absolute;
-				width: 150px;
-				.transform(rotate(45deg));
-				right: -51px;
-				top: 12px;
-				z-index: 10;
-			}
-		}
-	}
+    time {
+      opacity: 0.5;
+      position: absolute;
+      font-size: 0.6em;
+      bottom: 5px;
+      right: 5px;
+    }
+
+    &.new {
+      &:before {
+        content: "new";
+        color: white;
+        background-color: rgb(86, 175, 0);
+        font-weight: bold;
+        font-size: 0.8em;
+        padding: 4px 0;
+        text-align: center;
+        position: absolute;
+        width: 150px;
+        .transform (rotate(45deg));
+        right: -51px;
+        top: 12px;
+        z-index: 10;
+      }
+    }
+  }
 }
 
 .tag {
-	display: inline-block;
-	margin: 2px 0;
-	border-radius: 3px;
-	background-color: rgba(0,0,0, 0.4);
-	color: white;
-	padding: 3px 5px;
-	font-size: 12px;
-	font-weight: normal;
+  display: inline-block;
+  margin: 2px 0;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  padding: 3px 5px;
+  font-size: 12px;
+  font-weight: normal;
+  &.mine , &.add {
+    background-color: rgba(76, 136, 196, 0.85);
+  }
 
-	&.mine, &.add {
-		background-color: rgba(76, 136, 196, 0.85);
-	}
-	
-	&.marked-for-deletion, &.keep-forever {
-		background-color: rgba(128, 0, 0, 0.85);
-	}
+  &.marked-for-deletion , &.keep-forever {
+    background-color: rgba(128, 0, 0, 0.85);
+  }
 
-	&.add {
-		text-decoration: none;
+  &.add {
+    text-decoration: none;
+    &:before {
+      content: '+';
+      font-weight: 900;
+      color: rgba(76, 136, 196, 0.85);
+      background-color: white;
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      text-align: center;
+      margin-right: 4px;
+    }
 
-		&:before {
-			content: '+';
-			font-weight: 900;
-			color: rgba(76, 136, 196, 0.85);
-			background-color: white;
-			display: inline-block;
-			width: 12px;
-			height: 12px;
-			border-radius: 6px;
-			text-align: center;
-			margin-right: 4px;
-		}
+    &:hover {
+      background-color: #2f6090;
+      &:before {
+        color: #2f6090;
+      }
+    }
+  }
 
-		&:hover {
-			background-color: #2f6090;
-			&:before { color: #2f6090; }
-		}
-	}
-	&.remove {
-		&:hover {
-			cursor: pointer;
-			text-decoration: none;
-			background-color: #2f6090;
-	
-			&:after {
-				content: '\00D7';
-				font-weight: 900;
-				color: #2f6090;
-				background-color: white;
-				display: inline-block;
-				width: 12px;
-				height: 12px;
-				border-radius: 6px;
-				text-align: center;
-				margin-left: 4px;
-			}
-		}			
-	}
+  &.remove {
+    &:hover {
+      cursor: pointer;
+      text-decoration: none;
+      background-color: #2f6090;
+      &:after {
+        content: '\00D7';
+        font-weight: 900;
+        color: #2f6090;
+        background-color: white;
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 6px;
+        text-align: center;
+        margin-left: 4px;
+      }
+    }
+  }
 }
 
 .processing {
   text-align: center;
 }
+
 .hidden {
-	display: none !important;
+  display: none ! important;
 }
 
 .bar {
-    height: 18px;
-    background: rgb(86, 175, 0);
+  height: 18px;
+  background: rgb(86, 175, 0);
 }
 
 pre {
-	font-family: 'Source Code Pro', sans-serif;
+  font-family: 'Source Code Pro', sans-serif;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
