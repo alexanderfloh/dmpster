@@ -92,7 +92,7 @@ object Application extends Controller {
         def moveFile(dmp: MultipartFormData.FilePart[TemporaryFile]) = {
           Logger.info("moving file " + dmp.filename)
           import java.io.File
-          
+
           val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
           val dir = new File(dmpPath)
           dir.mkdirs()
@@ -126,7 +126,8 @@ object Application extends Controller {
               tags.foreach(tagName => Dump.addTag(dump, Tag.findOrCreate(tagName)))
             }.getOrElse(Logger.info("no tags provided"))
 
-            toJson(Map("name" -> toJson(filename)))
+            toJson(Map("name" -> toJson(filename),
+              "url" -> toJson("/dmpster/dmp/" + dump.id + "/details")))
         }
         response
       })
