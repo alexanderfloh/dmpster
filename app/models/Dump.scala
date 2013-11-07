@@ -15,7 +15,7 @@ import org.joda.time.DateTimeConstants
 case class Dump(
   id: Long,
   bucket: Bucket,
-  filename: String,
+  relFilePath : String,
   content: String,
   timestamp: DateTime) extends Taggable {
 
@@ -39,6 +39,8 @@ case class Dump(
   def ageInDays = Days.daysBetween(timestamp, now).getDays
 
   def tags = Tag.forDump(this)
+  
+  def filename = new java.io.File(relFilePath).getName();
   
   private def isFromToday = now.withTimeAtStartOfDay.isBefore(timestamp)
 
@@ -77,18 +79,18 @@ object Dump {
       .on('tagId -> tag.id).as(dump *)
   }
 
-  def create(bucket: Bucket, filename: String, content: String): Dump = {
+  def create(bucket: Bucket, relFilePath: String, content: String): Dump = {
     val timestamp = DateTime.now
     DB.withConnection { implicit c =>
       SQL("insert into dump (bucketId, filename, content, timestamp) " +
         "values ({bucketId}, {filename}, {content}, {timestamp})")
         .on(
           'bucketId -> bucket.id,
-          'filename -> filename,
+          'filename -> relFilePath,
           'content -> content,
           'timestamp -> timestamp.toDate)
         .executeInsert() match {
-          case Some(id) => Dump(id, bucket, filename, content, timestamp)
+          case Some(id) => Dump(id, bucket, relFilePath, content, timestamp)
           case None => throw new Exception("unable to insert dump into db")
         }
     }

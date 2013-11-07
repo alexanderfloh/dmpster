@@ -36,11 +36,10 @@ object Dmp extends Controller {
    * @param absoluteRootPath the root folder for searching the static resource files such as `"/home/peter/public"`, `C:\external` or `relativeToYourApp`
    * @param file the file part extracted from the URL
    */
-  def at(rootPath: String, file: String): Action[AnyContent] = Action { request =>
-    val fileToServe = rootPath match {
-      case AbsolutePath(_) => new File(rootPath, file)
-      case _ => new File(Play.application.getFile(rootPath), file)
-    }
+  def at(file: String): Action[AnyContent] = Action { request =>
+    
+    val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("C:\\dumps")
+    val fileToServe = new File(dmpPath, file)
 
     if (fileToServe.exists) {
       Ok.sendFile(fileToServe, inline = true).withHeaders(CACHE_CONTROL -> "max-age=3600")

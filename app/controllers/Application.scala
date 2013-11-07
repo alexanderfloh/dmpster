@@ -83,6 +83,10 @@ object Application extends Controller {
         Ok(toJson(Map("files" -> "")))
       }
   }
+  
+  private def createDumpSubDirName : String = {
+    new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_S").format(new java.util.Date);
+  }
 
   private def handleUpload(request: Request[MultipartFormData[TemporaryFile]]) = {
     Logger.info("upload")
@@ -94,14 +98,16 @@ object Application extends Controller {
           import java.io.File
 
           val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
-          val dir = new File(dmpPath)
+          val subDir = createDumpSubDirName
+          val relFilePath = subDir + "\\" + dmp.filename
+          val dir = new File(dmpPath, subDir)
           dir.mkdirs()
           val newFile = new File(dir, dmp.filename)
           dmp.ref.moveTo(newFile, true)
-          (newFile, dmp.filename)
+          (newFile, dmp.filename, relFilePath)
         }
 
-        val (newFile, filename) = moveFile(dmp)
+        val (newFile, filename, relFilePath) = moveFile(dmp)
 
         Logger.info("parsing DMP")
         val analyzer = Akka.system.actorFor("/user/analyzeMaster")
@@ -112,7 +118,7 @@ object Application extends Controller {
           case utils.Result(file, bucketName, content) =>
             val bucket = Bucket.findOrCreate(bucketName)
 
-            val dump = Dump.create(bucket, filename, content)
+            val dump = Dump.create(bucket, relFilePath, content)
 
             def extractTagsFrom(request: Request[MultipartFormData[TemporaryFile]]) = {
               request.body.dataParts.get("tags").map { tags =>
