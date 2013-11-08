@@ -27,6 +27,15 @@ class CleanUpActor extends Actor {
     case Mode.Dev => DateTime.now().minusSeconds(15)
     case Mode.Prod => DateTime.now().minusDays(14)
   }
+  
+  private def deleteSingleDump(dmpPath : String, dump : Dump) {
+    new java.io.File(dmpPath, dump.relFilePath).delete
+    var currentRelDir = java.nio.file.Paths.get(dump.relFilePath).getParent()
+    while (currentRelDir != null) {
+      new java.io.File(dmpPath, currentRelDir.toString()).delete
+      currentRelDir = currentRelDir.getParent()
+    }
+  }
 
   private def deleteMarkedDumps(oldTag: Tag, keepForeverTag: Tag) = {
     val dumpsToKeepForever = Dump.byTag(keepForeverTag)
@@ -35,7 +44,7 @@ class CleanUpActor extends Actor {
     Logger.info("deleting " + oldDumpsToDelete.size + " dumps")
     val dmpPath = Play.current.configuration.getString("dmpster.dmp.path")
     oldDumpsToDelete.foreach(dump => {
-      dmpPath.map(new java.io.File(_, dump.filename).delete)
+      dmpPath.map(deleteSingleDump(_, dump))
         .getOrElse(Logger.warn("dmpster.dmp.path not set - unable to delete dmp file"))
       Dump.delete(dump.id)
     })
