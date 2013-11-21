@@ -39,7 +39,7 @@ object Tag {
   def create(name: String) = {
     DB.withConnection {
       implicit c =>
-        SQL("insert into tag (name) values ({name})")
+        SQL("insert into tag (name) select ({name}) where not exists (select * from tag where name = {name})")
           .on('name -> name).executeInsert()
     }
   }
@@ -56,7 +56,7 @@ object Tag {
     findByName(name)
       .getOrElse(create(name)
         .map(id => Tag(id, name))
-        .getOrElse(throw new Exception("unable to insert tag '" + name + "'")))
+        .getOrElse(findByName(name).get)) // concurrent insert, just re-query 
   }
 
   def tag = {
