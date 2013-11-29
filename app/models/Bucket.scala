@@ -28,7 +28,7 @@ object Bucket {
 
   def findOrCreate(name: String): Bucket = DB.withConnection { implicit c =>
     findByName(name)
-      .getOrElse(create(name).map(byId) // does not exist yet, create it
+      .getOrElse(create(name).flatMap(byId) // does not exist yet, create it
         .getOrElse(findByName(name).get)) // someone created it at the same time, re-find by name
   }
 
@@ -38,7 +38,7 @@ object Bucket {
   }
 
   def byId(id: Long) = DB.withConnection { implicit c =>
-    SQL("select * from bucket where id = {id}").on('id -> id).as(bucket single)
+    SQL("select * from bucket where id = {id}").on('id -> id).as(bucket singleOpt)
   }
 
   def addTag(bucket: Bucket, tag: Tag) =

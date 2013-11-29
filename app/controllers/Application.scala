@@ -59,6 +59,15 @@ object Application extends Controller {
     optResult.getOrElse(BadRequest("dump not found"))
   }
 
+  def viewBucket(id: Long) = Action {
+    val result = for {
+      bucket <- Bucket.byId(id)
+      dumps = Dump.byBucket(bucket)
+    } yield Ok(views.html.viewBucket(bucket, dumps, List()))
+
+    result.getOrElse(NotFound("Bucket " + id))
+  }
+
   def analyzing = Action {
     val analyzer = Akka.system.actorFor("/user/analyzeMaster")
     implicit val timeout = Timeout(5 seconds)
@@ -83,73 +92,69 @@ object Application extends Controller {
         Ok(toJson(Map("files" -> "")))
       }
   }
-  
-  private def createDumpSubDirName : String = {
+
+  private def createDumpSubDirName: String = {
     new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_S").format(new java.util.Date);
   }
 
   private def handleUpload(request: Request[MultipartFormData[TemporaryFile]]) = {
     Logger.info("upload")
-    val futureResults =
-      Future.sequence(request.body.files.map { dmp =>
+    val futureResults = Future.sequence(request.body.files.map { dmp =>
 
-        def moveFile(dmp: MultipartFormData.FilePart[TemporaryFile]) = {
-          Logger.info("moving file " + dmp.filename)
-          import java.io.File
+      def moveFile(dmp: MultipartFormData.FilePart[TemporaryFile]) = {
+        Logger.info("moving file " + dmp.filename)
+        import java.io.File
 
-          val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
-          val subDir = createDumpSubDirName
-          val relFilePath = subDir + "\\" + dmp.filename
-          val dir = new File(dmpPath, subDir)
-          dir.mkdirs()
-          val newFile = new File(dir, dmp.filename)
-          dmp.ref.moveTo(newFile, true)
-          (newFile, dmp.filename, relFilePath)
-        }
+        val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+        val subDir = createDumpSubDirName
+        val relFilePath = subDir + "\\" + dmp.filename
+        val dir = new File(dmpPath, subDir)
+        dir.mkdirs()
+        val newFile = new File(dir, dmp.filename)
+        dmp.ref.moveTo(newFile, true)
+        (newFile, dmp.filename, relFilePath)
+      }
 
-        val (newFile, filename, relFilePath) = moveFile(dmp)
+      val (newFile, filename, relFilePath) = moveFile(dmp)
 
-        Logger.info("parsing DMP")
-        val analyzer = Akka.system.actorFor("/user/analyzeMaster")
+      Logger.info("parsing DMP")
+      val analyzer = Akka.system.actorFor("/user/analyzeMaster")
 
-        val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
+      val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
 
-        val response = futureResult.map {
-          case utils.Result(file, bucketName, content) =>
-            val bucket = Bucket.findOrCreate(bucketName)
+      val response = futureResult.map {
+        case utils.Result(file, bucketName, content) =>
+          val bucket = Bucket.findOrCreate(bucketName)
 
-            val dump = Dump.create(bucket, relFilePath, content)
+          val dump = Dump.create(bucket, relFilePath, content)
 
-            def extractTagsFrom(request: Request[MultipartFormData[TemporaryFile]]) = {
-              request.body.dataParts.get("tags").map { tags =>
-                tags.head.split(",")
-                  .map(_.trim)
-                  .filter(!_.isEmpty())
-              }
+          def extractTagsFrom(request: Request[MultipartFormData[TemporaryFile]]) = {
+            request.body.dataParts.get("tags").map { tags =>
+              tags.head.split(",")
+                .map(_.trim)
+                .filter(!_.isEmpty())
             }
+          }
 
-            extractTagsFrom(request).map { tags =>
-              tags.foreach(tagName => Dump.addTag(dump, Tag.findOrCreate(tagName)))
-            }.getOrElse(Logger.info("no tags provided"))
+          extractTagsFrom(request).map { tags =>
+            tags.foreach(tagName => Dump.addTag(dump, Tag.findOrCreate(tagName)))
+          }.getOrElse(Logger.info("no tags provided"))
 
-            toJson(Map("name" -> toJson(filename),
-              "url" -> toJson("/dmpster/dmp/" + dump.id + "/details")))
-        }
-        response
-      })
+          toJson(Map("name" -> toJson(filename),
+            "url" -> toJson("/dmpster/dmp/" + dump.id + "/details")))
+      }
+      response
+    })
     futureResults
   }
 
   def addTagToDmp(id: Long, tagName: String) = Action {
     val tag = Tag.findOrCreate(tagName)
 
-    Dump.byId(id).map(dump =>
-      if (Tag.forDump(dump).exists(_.name == tagName))
-        Ok(views.html.listTags(dump))
-      else {
-        Dump.addTag(dump, tag)
-        Ok(views.html.listTags(dump))
-      }).getOrElse(BadRequest("Invalid dump id"))
+    Dump.byId(id).map(dump => {
+      if (!Tag.forDump(dump).exists(_.name == tagName)) Dump.addTag(dump, tag)
+      Ok(views.html.listTags(dump))
+    }).getOrElse(NotFound("Invalid dump id"))
   }
 
   def removeTagFromDmp(id: Long, tagName: String) = Action {
@@ -158,31 +163,29 @@ object Application extends Controller {
         Dump.removeTag(dump, tag)
         Ok(views.html.listTags(dump))
       })
-    }).getOrElse(BadRequest("Invalid dump id or tag"))
+    }).getOrElse(NotFound("Invalid dump id or tag"))
   }
 
   def addTagToBucket(id: Long, tagName: String) = Action {
-    val tag = Tag.findByName(tagName).getOrElse({
-      Tag.create(tagName)
-      Tag.findByName(tagName).get
-    })
-
-    val bucket = Bucket.byId(id)
-    if (Tag.forBucket(bucket).exists(_.name == tagName))
-      Ok(views.html.listTags(bucket))
-    else {
-      Bucket.addTag(bucket, tag)
-      Ok(views.html.listTags(bucket))
+    val tag = Tag.findOrCreate(tagName)
+    val result = for { bucket <- Bucket.byId(id) } yield {
+      if (Tag.forBucket(bucket).exists(_.name == tagName))
+        Ok(views.html.listTags(bucket))
+      else {
+        Bucket.addTag(bucket, tag)
+        Ok(views.html.listTags(bucket))
+      }
     }
+    result.getOrElse(NotFound("Bucket " + id))
   }
 
   def removeTagFromBucket(id: Long, tagName: String) = Action {
-    Tag.findByName(tagName).map(tag => {
-      val bucket = Bucket.byId(id)
+    val tag = Tag.findOrCreate(tagName)
+    val result = for (bucket <- Bucket.byId(id)) yield {
       Bucket.removeTag(bucket, tag)
       Ok(views.html.listTags(bucket))
-
-    }).getOrElse(BadRequest("Invalid tag"))
+    }
+    result.getOrElse(NotFound("Bucket " + id))
   }
 
   def deleteBucket(id: Long) = TODO

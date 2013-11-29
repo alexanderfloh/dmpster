@@ -13,6 +13,7 @@ GET		/dmpster							controllers.Application.dmpster
 GET		/dmpster/newerThan/:timestamp		controllers.Application.newerThan(timestamp: Long)
 GET		/dmpster/dmp/:id/details			controllers.Application.viewDetails(id: Long)
 GET		/dmpster/analyzing					controllers.Application.analyzing
+GET		/dmpster/bucket/:id					controllers.Application.viewBucket(id: Long)
 POST	/upload								controllers.Application.upload
 POST    /uploadAsync                        controllers.Application.uploadAsync
 POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)

@@ -40,7 +40,7 @@ case class Dump(
 
   def tags = Tag.forDump(this)
   
-  def filename = new java.io.File(relFilePath).getName();
+  val filename = new java.io.File(relFilePath).getName;
   
   private def isFromToday = now.withTimeAtStartOfDay.isBefore(timestamp)
 
@@ -134,7 +134,7 @@ object Dump {
       get[String]("content") ~
       get[Date]("timestamp") map {
         case id ~ bucketId ~ filename ~ content ~ timestamp =>
-          Dump(id, Bucket.byId(bucketId), filename, content, new DateTime(timestamp))
+          Dump(id, Bucket.byId(bucketId).get, filename, content, new DateTime(timestamp))
       }
   }
 }

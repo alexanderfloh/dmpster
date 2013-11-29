@@ -1,0 +1,18 @@
+@(bucket: Bucket, dumps: List[Dump], allTags: Seq[Tag]) 
+
+@main {
+
+	<datalist class="hidden" id="tags">
+	  @allTags.map{ t => 
+	    <option>@t.name</option>
+	  }
+	</datalist>
+	<input id="latest" type="hidden" value="@{dumps.headOption.map{
+			 newest => newest.timestamp.getMillis
+		}.getOrElse(0)
+	}"/>
+
+	@views.html.bucket(bucket, dumps)
+
+	
+}
