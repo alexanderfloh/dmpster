@@ -58,4 +58,5 @@ $(function() {
 			$("input#latest").val(Date.now())
 		});
 	}
+	checkForUpdate();
 });
