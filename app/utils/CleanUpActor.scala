@@ -7,37 +7,66 @@ import play.api._
 import Play.current
 import models.Dump
 import models.Tag
+import models.Bucket
 
 case class CleanUp()
 
 class CleanUpActor extends Actor {
+
+  lazy val maxNumberOfDumpsPerBucket = Play.current.configuration.getInt("dmpster.max.number.of.dmps.per.bucket").getOrElse(5)
+
+  lazy val oldTag = Tag.findOrCreate("marked for deletion")
+  lazy val keepForeverTag = Tag.findOrCreate("keep forever")
+
   def receive = {
     case CleanUp => {
       Logger.info("starting clean up")
-      val oldTag = Tag.findOrCreate("marked for deletion")
-      val keepForeverTag = Tag.findOrCreate("keep forever")
 
-      deleteMarkedDumps(oldTag, keepForeverTag)
-      
-      markOldDumps(oldTag, keepForeverTag)
+      limitNumberOfDumpsPerBucket
+      deleteMarkedDumps
+      markOldDumps
     }
   }
 
-  private def dateForOldness = Play.mode match {
+  def dateForOldness = Play.mode match {
     case Mode.Dev => DateTime.now().minusSeconds(15)
     case Mode.Prod => DateTime.now().minusDays(14)
   }
-  
-  private def deleteSingleDump(dmpPath : String, dump : Dump) {
-    new java.io.File(dmpPath, dump.relFilePath).delete
-    var currentRelDir = java.nio.file.Paths.get(dump.relFilePath).getParent()
+
+  def deleteSingleDump(dmpPath: String, dump: Dump) {
+    import java.io.File
+    import java.nio.file.Paths
+    
+    new File(dmpPath, dump.relFilePath).delete
+    var currentRelDir = Paths.get(dump.relFilePath).getParent()
     while (currentRelDir != null) {
-      new java.io.File(dmpPath, currentRelDir.toString()).delete
+      new File(dmpPath, currentRelDir.toString()).delete
       currentRelDir = currentRelDir.getParent()
     }
   }
 
-  private def deleteMarkedDumps(oldTag: Tag, keepForeverTag: Tag) = {
+  def limitNumberOfDumpsPerBucket = {
+    import Joda._
+
+    val dumpsByBucket = for {
+      bucket <- Bucket.all
+      dumps = Dump.byBucket(bucket)
+      if (dumps.length > maxNumberOfDumpsPerBucket)
+    } yield (bucket, dumps.sortBy(_.timestamp))
+
+    dumpsByBucket.foreach{case (bucket, dumps) => {
+      val dumpsToDeleteCount = dumps.length - maxNumberOfDumpsPerBucket
+      val dumpsToDelete = dumps.filterNot(dump => dump.tags.contains(keepForeverTag)).take(dumpsToDeleteCount)
+      
+      Logger.info(s"removing ${dumpsToDelete.length} Dmps from Bucket '${bucket.name}'")
+      markForDeletion(dumpsToDelete)
+    }}
+  }
+
+  def markForDeletion(dump: Dump): Unit = Dump.addTag(dump, oldTag)
+  def markForDeletion(dumps: List[Dump]): Unit = dumps.foreach(markForDeletion)
+
+  def deleteMarkedDumps = {
     val dumpsToKeepForever = Dump.byTag(keepForeverTag)
     val oldDumpsToDelete = Dump.byTag(oldTag).filterNot(dumpsToKeepForever.contains(_))
 
@@ -50,14 +79,15 @@ class CleanUpActor extends Actor {
     })
   }
 
-  private def markOldDumps(oldTag: Tag, keepForeverTag: Tag) = {
+  def markOldDumps = {
     val oldDumps = Dump.olderThan(dateForOldness)
 
     val dumpsToMark = oldDumps.filterNot(dump => {
       val tags = Tag.forDump(dump)
       tags.contains(oldTag) || tags.contains(keepForeverTag)
     })
-    Logger.info("marking " + dumpsToMark.size + " as old")
-    dumpsToMark.foreach(dump => Dump.addTag(dump, oldTag))
+    
+    Logger.info(s"marking ${dumpsToMark.size} as old")
+    markForDeletion(dumpsToMark)
   }
 }

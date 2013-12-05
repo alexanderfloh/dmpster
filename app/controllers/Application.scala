@@ -56,7 +56,7 @@ object Application extends Controller {
     val optResult = for {
       dump <- Dump.byId(id)
     } yield Ok(views.html.details(dump))
-    optResult.getOrElse(BadRequest("dump not found"))
+    optResult.getOrElse(BadRequest(s"Dump ${id} not found"))
   }
 
   def viewBucket(id: Long) = Action {
@@ -65,7 +65,7 @@ object Application extends Controller {
       dumps = Dump.byBucket(bucket)
     } yield Ok(views.html.viewBucket(bucket, dumps, List()))
 
-    result.getOrElse(NotFound("Bucket " + id))
+    result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
   def analyzing = Action {
@@ -102,12 +102,12 @@ object Application extends Controller {
     val futureResults = Future.sequence(request.body.files.map { dmp =>
 
       def moveFile(dmp: MultipartFormData.FilePart[TemporaryFile]) = {
-        Logger.info("moving file " + dmp.filename)
+        Logger.info(s"moving file ${dmp.filename}")
         import java.io.File
 
         val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
         val subDir = createDumpSubDirName
-        val relFilePath = subDir + "\\" + dmp.filename
+        val relFilePath = s"${subDir}\\${dmp.filename}"
         val dir = new File(dmpPath, subDir)
         dir.mkdirs()
         val newFile = new File(dir, dmp.filename)
@@ -141,7 +141,7 @@ object Application extends Controller {
           }.getOrElse(Logger.info("no tags provided"))
 
           toJson(Map("name" -> toJson(filename),
-            "url" -> toJson("/dmpster/dmp/" + dump.id + "/details")))
+            "url" -> toJson(s"/dmpster/dmp/${dump.id}/details")))
       }
       response
     })
@@ -154,7 +154,7 @@ object Application extends Controller {
     Dump.byId(id).map(dump => {
       if (!Tag.forDump(dump).exists(_.name == tagName)) Dump.addTag(dump, tag)
       Ok(views.html.listTags(dump))
-    }).getOrElse(NotFound("Invalid dump id"))
+    }).getOrElse(NotFound(s"Invalid dump id ${id}"))
   }
 
   def removeTagFromDmp(id: Long, tagName: String) = Action {
@@ -176,7 +176,7 @@ object Application extends Controller {
         Ok(views.html.listTags(bucket))
       }
     }
-    result.getOrElse(NotFound("Bucket " + id))
+    result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
   def removeTagFromBucket(id: Long, tagName: String) = Action {
@@ -185,7 +185,7 @@ object Application extends Controller {
       Bucket.removeTag(bucket, tag)
       Ok(views.html.listTags(bucket))
     }
-    result.getOrElse(NotFound("Bucket " + id))
+    result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
   def deleteBucket(id: Long) = TODO
