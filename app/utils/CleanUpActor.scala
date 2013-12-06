@@ -52,7 +52,7 @@ class CleanUpActor extends Actor {
       bucket <- Bucket.all
       dumps = Dump.byBucket(bucket)
       if (dumps.length > maxNumberOfDumpsPerBucket)
-    } yield (bucket, dumps.sortBy(_.timestamp))
+    } yield (bucket, dumps.sortBy(_.timestamp).reverse)
 
     dumpsByBucket.foreach{case (bucket, dumps) => {
       val dumpsToDeleteCount = dumps.length - maxNumberOfDumpsPerBucket
