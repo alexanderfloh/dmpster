@@ -23,6 +23,8 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import akka.util.Timeout
 import play.api.libs.Files.TemporaryFile
+import org.joda.time.format.DateTimeFormat
+import scala.language.postfixOps
 
 object Application extends Controller {
 
@@ -69,7 +71,7 @@ object Application extends Controller {
   }
 
   def analyzing = Action {
-    val analyzer = Akka.system.actorFor("/user/analyzeMaster")
+    val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
     implicit val timeout = Timeout(5 seconds)
     val jobs = analyzer ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
@@ -93,57 +95,58 @@ object Application extends Controller {
       }
   }
 
-  private def createDumpSubDirName: String = {
-    new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_S").format(new java.util.Date);
+  private def createDumpSubDirName =
+    DateTime.now.toString(DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss_SSS"))
+
+  type MultiPartRequest = Request[MultipartFormData[TemporaryFile]]
+  type FilePart = MultipartFormData.FilePart[TemporaryFile]
+
+  def extractTagsFrom(request: MultiPartRequest) = {
+    request.body.dataParts.get("tags").map { tags =>
+      tags.head.split(",").map { case Tag(t) => t }
+    }
   }
 
-  private def handleUpload(request: Request[MultipartFormData[TemporaryFile]]) = {
+  def moveFile(dmp: FilePart) = {
+    Logger.info(s"moving file ${dmp.filename}")
+    import java.io.File
+
+    val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+    val subDir = createDumpSubDirName
+    val relFilePath = s"${subDir}\\${dmp.filename}"
+    val dir = new File(dmpPath, subDir)
+    dir.mkdirs()
+    val newFile = new File(dir, dmp.filename)
+    dmp.ref.moveTo(newFile, true)
+    (newFile, dmp.filename, relFilePath)
+  }
+
+  private def handleUpload(request: MultiPartRequest) = {
     Logger.info("upload")
     val futureResults = Future.sequence(request.body.files.map { dmp =>
-
-      def moveFile(dmp: MultipartFormData.FilePart[TemporaryFile]) = {
-        Logger.info(s"moving file ${dmp.filename}")
-        import java.io.File
-
-        val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
-        val subDir = createDumpSubDirName
-        val relFilePath = s"${subDir}\\${dmp.filename}"
-        val dir = new File(dmpPath, subDir)
-        dir.mkdirs()
-        val newFile = new File(dir, dmp.filename)
-        dmp.ref.moveTo(newFile, true)
-        (newFile, dmp.filename, relFilePath)
-      }
 
       val (newFile, filename, relFilePath) = moveFile(dmp)
 
       Logger.info("parsing DMP")
-      val analyzer = Akka.system.actorFor("/user/analyzeMaster")
+      val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
 
       val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
 
-      val response = futureResult.map {
-        case utils.Result(file, bucketName, content) =>
-          val bucket = Bucket.findOrCreate(bucketName)
+      for {
+        utils.Result(file, bucketName, content) <- futureResult
+        bucket = Bucket.findOrCreate(bucketName)
+        dump = Dump.create(bucket, relFilePath, content)
 
-          val dump = Dump.create(bucket, relFilePath, content)
+      } yield {
+        extractTagsFrom(request).map { tags => tags.foreach(tagName => Dump.addTag(dump, tagName))
+        }.getOrElse(Logger.info("no tags provided"))
 
-          def extractTagsFrom(request: Request[MultipartFormData[TemporaryFile]]) = {
-            request.body.dataParts.get("tags").map { tags =>
-              tags.head.split(",")
-                .map(_.trim)
-                .filter(!_.isEmpty())
-            }
-          }
-
-          extractTagsFrom(request).map { tags =>
-            tags.foreach(tagName => Dump.addTag(dump, Tag.findOrCreate(tagName)))
-          }.getOrElse(Logger.info("no tags provided"))
-
-          toJson(Map("name" -> toJson(filename),
-            "url" -> toJson(s"/dmpster/dmp/${dump.id}/details")))
+        toJson(Map {
+          "name" -> toJson(filename)
+          "url" -> toJson(s"/dmpster/dmp/${dump.id}/details")
+        })
       }
-      response
+
     })
     futureResults
   }

@@ -8,6 +8,8 @@ import akka.util.Timeout
 import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent.duration._
 import play.Logger
+import play.api.Play
+import scala.language.postfixOps
 
 case class Work(file: File)
 case class Result(file: File, bucketName: String, content: String)
@@ -17,24 +19,25 @@ case class FinishedWork(file: File)
 
 class AnalyzeMaster extends Actor {
   val activeWork = collection.mutable.ListBuffer[File]()
+  
+  val analyzerWorkers = Play.current.configuration.getInt("dmpster.analyzer.workers").getOrElse(2)
+  val router = context.actorOf(Props[AnalyzeWorker].withRouter(RoundRobinRouter(analyzerWorkers)), "router")
 
   def receive = {
     case work @ Work(file) => {
-      val worker = context.actorOf(Props[AnalyzeWorker])
-
-      Logger.info("adding " + file + " to active work")
+      Logger.info(s"adding $file to active work")
       activeWork.append(file)
-      implicit val timeout = Timeout(5 minutes)
-      val result = worker ? work
+      implicit val timeout = Timeout(10 minutes)
+      val result = router ? work
       pipe(result) to sender
     }
-    
+
     case QueryRunningJobs => {
       sender ! RunningJobs(activeWork.toList)
     }
 
     case FinishedWork(file) => {
-      Logger.info("removing " + file + " from active work")
+      Logger.info(s"removing $file from active work")
       activeWork -= file
     }
   }
@@ -43,9 +46,9 @@ class AnalyzeMaster extends Actor {
 class AnalyzeWorker extends Actor {
   def receive = {
     case Work(file) => {
-      val result = DmpParser(file).parse
-      sender ! Result(file, result._1, result._2)
-      this.context.parent ! FinishedWork(file)
+      val (bucketName, content) = DmpParser(file).parse
+      sender ! Result(file, bucketName, content)
+      context.actorSelection("../..") ! FinishedWork(file)
     }
   }
 }

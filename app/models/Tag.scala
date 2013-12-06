@@ -65,4 +65,10 @@ object Tag {
         case id ~ name => Tag(id, name)
       }
   }
+  
+  def unapply(tagName: String) = {
+    val trimmed = tagName.trim 
+    if(!trimmed.isEmpty) Some(findOrCreate(trimmed))
+    else None
+  }
 }
