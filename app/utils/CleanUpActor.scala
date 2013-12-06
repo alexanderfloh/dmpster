@@ -22,15 +22,15 @@ class CleanUpActor extends Actor {
     case CleanUp => {
       Logger.info("starting clean up")
 
-      limitNumberOfDumpsPerBucket
       deleteMarkedDumps
       markOldDumps
+      limitNumberOfDumpsPerBucket
     }
   }
 
   def dateForOldness = Play.mode match {
-    case Mode.Dev => DateTime.now().minusSeconds(15)
-    case Mode.Prod => DateTime.now().minusDays(14)
+    case Mode.Dev => DateTime.now.minusSeconds(15)
+    case Mode.Prod => DateTime.now.minusDays(14)
   }
 
   def deleteSingleDump(dmpPath: String, dump: Dump) {
