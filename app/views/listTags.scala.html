@@ -3,7 +3,7 @@
 <span id="tags">
 @taggable.tags.map { tag =>
 	<span class="tag mine remove @tag.name.replace(" ", "-")" 
-		onclick="return removeTag(this, 'dmpster/@taggable.url/@taggable.id/removeTag/@(java.net.URLEncoder.encode(tag.name, "UTF-8"))')">
+		onclick="return removeTag(this, 'dmpster/@taggable.url/@taggable.id/removeTag/@(tag.nameUrlEncoded)')">
 		@tag.name
 	</span>
 }

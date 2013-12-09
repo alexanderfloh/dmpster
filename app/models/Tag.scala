@@ -5,6 +5,7 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 import language.postfixOps
+import java.net.URLEncoder
 
 trait Taggable {
   val url: String
@@ -13,7 +14,7 @@ trait Taggable {
 }
 
 case class Tag(id: Long, name: String) {
-
+  val nameUrlEncoded = URLEncoder.encode(name, "UTF-8").replace("+", "%20")
 }
 
 object Tag {
@@ -65,10 +66,10 @@ object Tag {
         case id ~ name => Tag(id, name)
       }
   }
-  
+
   def unapply(tagName: String) = {
-    val trimmed = tagName.trim 
-    if(!trimmed.isEmpty) Some(findOrCreate(trimmed))
+    val trimmed = tagName.trim
+    if (!trimmed.isEmpty) Some(findOrCreate(trimmed))
     else None
   }
 }
