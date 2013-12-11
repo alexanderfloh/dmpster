@@ -339,6 +339,37 @@ article {
   
 }
 
+.balloon {
+  min-width: 20px;
+  padding: 5px;
+  border: solid 1px #777;
+  color: black;
+  background-color: white;
+  z-index: 32767;
+  
+  h2 {
+    font-size: 15px;
+    text-align: center;
+  }
+  li {
+  	text-align: left;
+    margin-left: 5px;
+    margin-top: 3px;
+  	color: white;
+    padding: 3px 5px;
+	font-size: 12px;
+	font-weight: normal;
+  	
+  	&.marked-for-deletion {
+	  	background-color: @tag-delete;
+  	} 
+  
+  	&.keep-forever {
+    	background-color: @tag-archive;
+	}
+  }
+}
+
 .processing {
   text-align: center;
 }

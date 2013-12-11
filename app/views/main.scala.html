@@ -5,6 +5,7 @@
 <head>
 	<link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
 	<script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+	<script src="@routes.Assets.at("javascripts/jquery.balloon.js")"></script>
 	<link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
 	<title>dmpster</title>
 </head>
@@ -88,6 +89,22 @@ $(function () {
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
     
+});
+
+$(function() {
+  $.balloon.defaults.classname = 'balloon';
+  $.balloon.defaults.css = null;
+  $('.tag-input').balloon({
+    position: 'right',
+    classname: 'balloon',     
+    contents: '<div>' 
+	  + '<h2>Special tags</h2>'
+	  + '<ul>'
+	  +  '<li class="keep-forever">keep forever</li>' 
+	  +  '<li class="marked-for-deletion">marked for deletion</li>'
+	  +'</ul>'
+	  +'</div>'
+  });
 });
 </script>
 
