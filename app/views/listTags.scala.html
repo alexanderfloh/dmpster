@@ -2,9 +2,14 @@
 @import helper._ 
 <span id="tags">
 @taggable.tags.map { tag =>
-	<span class="tag mine remove @tag.name.replace(" ", "-")" 
-		onclick="return removeTag(this, 'dmpster/@taggable.url/@taggable.id/removeTag/@(tag.nameUrlEncoded)')">
+	<span class="tag mine remove @tag.name.replace(" ", "-")" >
 		@tag.name
+		<span class="remove-tag">
+		<a href="javascript:void(0);" onclick="return removeTag(this, 'dmpster/@taggable.url/@taggable.id/removeTag/@(tag.nameUrlEncoded)')">
+			<!-- Delete by Julian Norton from The Noun Project -->
+			<img src="@routes.Assets.at("images/delete.svg")" title="remove tag"></img>
+		</a>
+		</span>
 	</span>
 }
 </span>

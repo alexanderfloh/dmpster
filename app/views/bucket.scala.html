@@ -33,6 +33,22 @@
 			@addTag(dump)
 			
 			<time>added @dump.dateFormatted - @dump.ageInDays day@if(dump.ageInDays != 1) {s} old</time>
+			<span class="side-menu">
+			<a 
+				class="remove-dump" 
+				href="javascript: void(0);"
+				baseurl="dmpster/@dump.url/@dump.id/addTag/">
+				<!-- Delete by Julian Norton from The Noun Project -->
+				<img src="@routes.Assets.at("images/delete.svg")" title="delete dump"></img>
+			</a>
+			<a 
+				class="archive-dump" 
+				href="javascript: void(0);"
+				baseurl="dmpster/@dump.url/@dump.id/addTag/">
+				<!-- Box by Michael Rowe from The Noun Project -->
+				<img src="@routes.Assets.at("images/archive.svg")" title="archive dump"></img>
+			</a>
+			</span>
 		</section>
 	}
 </article>

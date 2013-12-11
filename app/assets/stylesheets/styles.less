@@ -58,6 +58,15 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+@tag-default: #2980B9;
+@tag-hover: darken(@tag-default, 10%);
+ 
+@tag-delete: #D35400;
+@tag-delete-hover: darken(@tag-delete, 10%);
+
+@tag-archive: rgb(86, 175, 0);
+@tag-archive-hover: darken(@tag-archive, 10%);
+
 header {
   background-color: black;
   color: white;
@@ -152,6 +161,7 @@ article {
   section {
     background-color: rgba(0, 0, 0, 0.05);
     display: inline-block;
+    max-width: 95%;
     position: relative;
     padding: 15px;
     min-width: 250px;
@@ -160,21 +170,28 @@ article {
     margin-right: 20px;
     margin-bottom: 20px;
     &.dmp {
-      max-width: 500px;
+      //max-width: 500px;
     }
 
     h1 {
       a {
         text-decoration: none;
         color: white;
+        
         &:hover {
           text-decoration: underline;
         }
 
         img {
+          // download dmp
           height: 20px;
-          padding-right: 5px;
+          //padding: 5px;
+          margin-right: 5px;
+          &:hover {
+          	background-color: rgb(86, 175, 0);
+          }
         }
+        
       }
 
       margin: -15px;
@@ -208,26 +225,53 @@ article {
         right: -51px;
         top: 12px;
         z-index: 10;
+        overflow: hidden;
       }
     }
+    
+    .side-menu {
+      display: none;
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      width: 35px;
+      height: 100%;
+      right: 0px;
+      bottom: 0px;
+      .remove-dump img:hover {
+      	background-color: rgb(211, 84, 0);
+      }
+      .archive-dump img:hover {
+      	background-color: rgb(86, 175, 0);
+      }
+      img {
+          height: 25px;
+          padding: 5px;
+        }
+    }
+  }
+  section:hover .side-menu { 
+  	display: block;
+  	z-index: 11;	
+  }
+  section:hover {
+  	z-index: 10;
   }
 }
 
 .tag {
   display: inline-block;
   margin: 2px 0;
-  border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.4);
+  position: relative;
   color: white;
   padding: 3px 5px;
   font-size: 12px;
   font-weight: normal;
-  &.mine , &.add {
-    background-color: rgba(76, 136, 196, 0.85);
+  &:hover {
+    cursor: pointer;
   }
-
-  &.marked-for-deletion , &.keep-forever {
-    background-color: rgba(128, 0, 0, 0.85);
+  &.mine , &.add {
+    background-color: @tag-default;
   }
 
   &.add {
@@ -246,32 +290,53 @@ article {
     }
 
     &:hover {
-      background-color: #2f6090;
-      &:before {
-        color: #2f6090;
+      background-color: @tag-hover;
+    }
+  }
+  .remove-tag {
+  	position: absolute;
+  	width: 20px;
+    height: 100%;
+    right: -20px;
+    bottom: 0px;
+    background-color: inherit;
+    display: none;
+    
+    img {
+      height: 10px;
+      padding: 4px;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.4)
       }
     }
   }
-
-  &.remove {
+  &:hover .remove-tag {
+  	z-index: 11;
+  	display: inline-block;
+  }
+/*  &.remove {
     &:hover {
       cursor: pointer;
       text-decoration: none;
       background-color: #2f6090;
-      &:after {
-        content: '\00D7';
-        font-weight: 900;
-        color: #2f6090;
-        background-color: white;
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 6px;
-        text-align: center;
-        margin-left: 4px;
-      }
     }
   }
+*/
+  
+  &.marked-for-deletion {
+  	background-color: @tag-delete;
+  	&:hover {
+  	  background-color: @tag-delete-hover;
+  	}
+  } 
+  
+  &.keep-forever {
+    background-color: @tag-archive;
+    &:hover {
+      background-color: @tag-archive-hover;
+    }
+  }
+  
 }
 
 .processing {
