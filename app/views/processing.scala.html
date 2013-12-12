@@ -1,18 +1,18 @@
 @(processingDmps: List[String])
 @if(!processingDmps.isEmpty) {
 <article id="processing">
-	<h1>
-		Currently Processing...
-		<br/>
-	</h1>
+  <h1>
+    Currently processing...
+    <br/>
+  </h1>
 
-	@processingDmps.map { dumpName =>
-		<section class="dmp processing">
-			<h1>
-			@dumpName
-			</h1>
-			<img src="@routes.Assets.at("images/spinner.gif")" />
-		</section>
-	}
+  @processingDmps.map { dumpName =>
+    <section class="dmp processing">
+      <h1>
+      @dumpName
+      </h1>
+      <img src="@routes.Assets.at("images/spinner.gif")" />
+    </section>
+  }
 </article>
 }

@@ -2,53 +2,53 @@
 @import helper._ 
 
 @addTag(taggable: Taggable) = {
-	<a href="javascript:void(0);" class="tag add">add a tag...</a>
-	<input type="text" 
-		class="tag-input"
-		baseurl="dmpster/@taggable.url/@taggable.id/addTag/" 
-		list="tags" 
-		placeholder="add a Tag"
-		style="display:none">
-	</input>
+  <a href="javascript:void(0);" class="tag add">add a tag...</a>
+  <input type="text" 
+    class="tag-input"
+    baseurl="dmpster/@taggable.url/@taggable.id/addTag/" 
+    list="tags" 
+    placeholder="add a tag"
+    style="display:none">
+  </input>
 }
 
 <article id="@bucket.id">
-	<h1>
-		<a href="@routes.Application.viewBucket(bucket.id)">
-		@Html(bucket.name.replace("!", "!<wbr>").replace("_", "_<wbr>").replace("::", "::<wbr>"))
-		</a>
-		<br/>
-		@listTags(bucket)
-		@addTag(bucket)
-	</h1>
+  <h1>
+    <a href="@routes.Application.viewBucket(bucket.id)">
+    @Html(bucket.name.replace("!", "!<wbr>").replace("_", "_<wbr>").replace("::", "::<wbr>"))
+    </a>
+    <br/>
+    @listTags(bucket)
+    @addTag(bucket)
+  </h1>
 
-	@dumps.map { dump =>
-		<section class="@if(dump.isNew) { new } dmp">
-			<h1>
-				<a href="@routes.Dmp.at(dump.relFilePath)" download><img src="@routes.Assets.at("images/download.svg")" title="download @dump.filename"></img></a>
-				<a href="@routes.Application.viewDetails(dump.id)">@dump.filename</a>
-			</h1>
-			
-			@listTags(dump)
-			@addTag(dump)
-			
-			<time>added @dump.dateFormatted - @dump.ageInDays day@if(dump.ageInDays != 1) {s} old</time>
-			<span class="side-menu">
-			<a 
-				class="remove-dump" 
-				href="javascript: void(0);"
-				baseurl="dmpster/@dump.url/@dump.id/addTag/">
-				<!-- Delete by Julian Norton from The Noun Project -->
-				<img src="@routes.Assets.at("images/delete.svg")" title="delete dump"></img>
-			</a>
-			<a 
-				class="archive-dump" 
-				href="javascript: void(0);"
-				baseurl="dmpster/@dump.url/@dump.id/addTag/">
-				<!-- Box by Michael Rowe from The Noun Project -->
-				<img src="@routes.Assets.at("images/archive.svg")" title="archive dump"></img>
-			</a>
-			</span>
-		</section>
-	}
+  @dumps.map { dump =>
+    <section class="@if(dump.isNew) { new } dmp">
+      <h1>
+        <a href="@routes.Dmp.at(dump.relFilePath)" download><img src="@routes.Assets.at("images/download.svg")" title="download @dump.filename"></img></a>
+        <a href="@routes.Application.viewDetails(dump.id)">@dump.filename</a>
+      </h1>
+      
+      @listTags(dump)
+      @addTag(dump)
+      
+      <time>added @dump.dateFormatted - @dump.ageInDays day@if(dump.ageInDays != 1) {s} old</time>
+      <span class="side-menu">
+      <a 
+        class="remove-dump" 
+        href="javascript: void(0);"
+        baseurl="dmpster/@dump.url/@dump.id/addTag/">
+        <!-- Delete by Julian Norton from The Noun Project -->
+        <img src="@routes.Assets.at("images/delete.svg")" title="mark for deletion"></img>
+      </a>
+      <a 
+        class="archive-dump" 
+        href="javascript: void(0);"
+        baseurl="dmpster/@dump.url/@dump.id/addTag/">
+        <!-- Box by Michael Rowe from The Noun Project -->
+        <img src="@routes.Assets.at("images/archive.svg")" title="keep forever"></img>
+      </a>
+      </span>
+    </section>
+  }
 </article>
