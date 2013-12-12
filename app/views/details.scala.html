@@ -1,16 +1,18 @@
 @(dump: Dump) 
 @main {
 <article>
-	<h1>@dump.filename</h1>
-	
-	<section>
-		<h1>
-			<a href="@routes.Dmp.at(dump.relFilePath)" download><img src="@routes.Assets.at("images/download.svg")" title="download @dump.filename"></img></a>
-			@listTags(dump)
-		</h1>
-		<pre>
+  <h1>@dump.filename</h1>
+  
+  <section>
+    <h1>
+      <a href="@routes.Dmp.at(dump.relFilePath)" download>
+        <img src="@routes.Assets.at("images/download.svg")" title="download @dump.filename"></img>
+      </a>
+      @listTags(dump)
+    </h1>
+    <pre>
 @dump.content
-		</pre>
-	</section>
+    </pre>
+  </section>
 </article>
 }
