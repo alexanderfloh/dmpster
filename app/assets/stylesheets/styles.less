@@ -67,6 +67,10 @@ body {
 @tag-archive: rgb(86, 175, 0);
 @tag-archive-hover: darken(@tag-archive, 10%);
 
+@tag-add: #aaa;
+@tag-add-plus: lighten(@tag-add, 10%);
+@tag-add-hover: darken(@tag-add, 10%);
+
 header {
   background-color: black;
   color: white;
@@ -169,9 +173,6 @@ article {
     border: 1px solid rgba(0, 0, 0, 0.07);
     margin-right: 20px;
     margin-bottom: 20px;
-    &.dmp {
-      //max-width: 500px;
-    }
 
     h1 {
       a {
@@ -188,7 +189,7 @@ article {
           //padding: 5px;
           margin-right: 5px;
           &:hover {
-          	background-color: rgb(86, 175, 0);
+            background-color: rgb(86, 175, 0);
           }
         }
         
@@ -238,10 +239,10 @@ article {
       right: 0px;
       bottom: 0px;
       .remove-dump img:hover {
-      	background-color: rgb(211, 84, 0);
+        background-color: rgb(211, 84, 0);
       }
       .archive-dump img:hover {
-      	background-color: rgb(86, 175, 0);
+        background-color: rgb(86, 175, 0);
       }
       img {
           height: 25px;
@@ -250,37 +251,43 @@ article {
     }
   }
   section:hover .side-menu { 
-  	display: block;
-  	z-index: 11;	
+    display: block;
+    z-index: 11;  
   }
   section:hover {
-  	z-index: 10;
+    z-index: 10;
   }
 }
 
 .tag {
   display: inline-block;
   margin: 2px 0;
-  background-color: rgba(0, 0, 0, 0.4);
   position: relative;
   color: white;
   padding: 3px 5px;
   font-size: 12px;
   font-weight: normal;
+  
   &:hover {
     cursor: pointer;
   }
-  &.mine , &.add {
+  
+  &.mine {
     background-color: @tag-default;
+    &:hover {
+      background-color: @tag-hover;
+    }
   }
 
   &.add {
     text-decoration: none;
+    background-color: @tag-add;
+    
     &:before {
       content: '+';
       font-weight: 900;
-      color: rgba(76, 136, 196, 0.85);
-      background-color: white;
+      color: white;
+      background-color: @tag-add-plus;
       display: inline-block;
       width: 12px;
       height: 12px;
@@ -288,14 +295,15 @@ article {
       text-align: center;
       margin-right: 4px;
     }
-
+    
     &:hover {
-      background-color: @tag-hover;
+      background-color: @tag-add-hover;
     }
   }
+  
   .remove-tag {
-  	position: absolute;
-  	width: 20px;
+    position: absolute;
+    width: 20px;
     height: 100%;
     right: -20px;
     bottom: 0px;
@@ -310,24 +318,17 @@ article {
       }
     }
   }
+  
   &:hover .remove-tag {
-  	z-index: 11;
-  	display: inline-block;
+    z-index: 11;
+    display: inline-block;
   }
-/*  &.remove {
-    &:hover {
-      cursor: pointer;
-      text-decoration: none;
-      background-color: #2f6090;
-    }
-  }
-*/
   
   &.marked-for-deletion {
-  	background-color: @tag-delete;
-  	&:hover {
-  	  background-color: @tag-delete-hover;
-  	}
+    background-color: @tag-delete;
+    &:hover {
+      background-color: @tag-delete-hover;
+    }
   } 
   
   &.keep-forever {
@@ -351,22 +352,23 @@ article {
     font-size: 15px;
     text-align: center;
   }
+  
   li {
-  	text-align: left;
+    text-align: left;
     margin-left: 5px;
     margin-top: 3px;
-  	color: white;
+    color: white;
     padding: 3px 5px;
-	font-size: 12px;
-	font-weight: normal;
-  	
-  	&.marked-for-deletion {
-	  	background-color: @tag-delete;
-  	} 
+  font-size: 12px;
+  font-weight: normal;
+    
+    &.marked-for-deletion {
+      background-color: @tag-delete;
+    } 
   
-  	&.keep-forever {
-    	background-color: @tag-archive;
-	}
+    &.keep-forever {
+      background-color: @tag-archive;
+  }
   }
 }
 
@@ -375,7 +377,7 @@ article {
 }
 
 .hidden {
-  display: none ! important;
+  display: none !important;
 }
 
 .bar {
