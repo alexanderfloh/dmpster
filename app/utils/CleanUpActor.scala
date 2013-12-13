@@ -29,7 +29,7 @@ class CleanUpActor extends Actor {
   }
 
   def dateForOldness = Play.mode match {
-    case Mode.Dev => DateTime.now.minusSeconds(15)
+    case Mode.Dev => DateTime.now.minusMinutes(15)
     case Mode.Prod => DateTime.now.minusDays(14)
   }
 
@@ -58,12 +58,16 @@ class CleanUpActor extends Actor {
       val dumpsToDeleteCount = dumps.length - maxNumberOfDumpsPerBucket
       val dumpsToDelete = dumps.filterNot(dump => dump.tags.contains(keepForeverTag)).take(dumpsToDeleteCount)
       
-      Logger.info(s"removing ${dumpsToDelete.length} Dmps from Bucket '${bucket.name}'")
+      Logger.info(s"marking ${dumpsToDelete.length} Dmps from Bucket '${bucket.name}' for deletion")
       markForDeletion(dumpsToDelete)
     }}
   }
 
-  def markForDeletion(dump: Dump): Unit = Dump.addTag(dump, oldTag)
+  def markForDeletion(dump: Dump): Unit = {
+    if(!dump.tags.contains(oldTag))
+      Dump.addTag(dump, oldTag)
+  }
+  
   def markForDeletion(dumps: List[Dump]): Unit = dumps.foreach(markForDeletion)
 
   def deleteMarkedDumps = {
