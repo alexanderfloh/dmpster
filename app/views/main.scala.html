@@ -38,11 +38,11 @@
  </section>
 </body>
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
-<script src="assets/jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget.js"></script>
+<script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget.js")"></script>
 <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="assets/jQuery-File-Upload-8.8.5/js/jquery.iframe-transport.js"></script>
+<script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/jquery.iframe-transport.js")"></script>
 <!-- The basic File Upload plugin -->
-<script src="assets/jQuery-File-Upload-8.8.5/js/jquery.fileupload.js"></script>
+<script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/jquery.fileupload.js")"></script>
 <script>
 /*jslint unparam: true */
 /*global window, $ */
@@ -109,6 +109,6 @@ $(function() {
 </script>
 
 
-<script src="@routes.Assets.at("javascripts/upload.js")"></script>
+
 <script src="@routes.Assets.at("javascripts/tagging.js")"></script>
 </html>
