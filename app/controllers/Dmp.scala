@@ -4,10 +4,9 @@ import play.api._
 import play.api.mvc._
 import play.api.libs._
 import play.api.libs.iteratee._
-
 import Play.current
-
 import java.io._
+import java.net.URLDecoder
 
 /**
  * Controller that serves static resources from an external folder.
@@ -37,9 +36,11 @@ object Dmp extends Controller {
    * @param file the file part extracted from the URL
    */
   def at(file: String): Action[AnyContent] = Action { request =>
+    val decodedFileName = URLDecoder.decode(file.replace("%20", "+"), "UTF-8")
     
     val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("C:\\dumps")
-    val fileToServe = new File(dmpPath, file)
+    val fileToServe = new File(dmpPath, decodedFileName)
+    Logger.info(s"serving dump $fileToServe")
 
     if (fileToServe.exists) {
       Ok.sendFile(fileToServe, inline = true).withHeaders(CACHE_CONTROL -> "max-age=3600")
