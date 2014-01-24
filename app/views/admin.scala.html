@@ -1,0 +1,29 @@
+@* admin Template File *@
+@(totalSpace: Long, freeSpace: Long, formattedTotal: String, formattedFree: String)
+
+@main {
+  
+  <article>
+  <section>
+  <span class="diskFreeWidget">
+	  <div class="outerBar">
+	    <span class="innerBar" style="width:@(100 - (freeSpace / (totalSpace / 100)))%"></span>
+	    
+	  </div>
+	  <div class="diskFreeCaption">
+	  @formattedFree free of @formattedTotal
+	     (@(freeSpace / (totalSpace / 100))%)
+    </div>
+  </span>
+  </section>
+  </article>
+  
+  <article>
+  <section>
+	  <form method="post" action='@routes.Admin.cleanUpNow'>
+	    <input type='submit' value="Clean up now"></button>
+	  </form>
+  </section>
+  </article>
+  
+}

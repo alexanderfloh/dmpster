@@ -14,6 +14,8 @@ GET		/dmpster/newerThan/:timestamp		controllers.Application.newerThan(timestamp:
 GET		/dmpster/dmp/:id/details			controllers.Application.viewDetails(id: Long)
 GET		/dmpster/analyzing					controllers.Application.analyzing
 GET		/dmpster/bucket/:id					controllers.Application.viewBucket(id: Long)
+GET     /dmpster/admin                      controllers.Admin.index
+
 POST	/upload								controllers.Application.upload
 POST    /uploadAsync                        controllers.Application.uploadAsync
 POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)
@@ -21,3 +23,4 @@ POST    /dmpster/dmp/:id/addTag/:tagName 	controllers.Application.addTagToDmp(id
 POST    /dmpster/dmp/:id/removeTag/:tagName controllers.Application.removeTagFromDmp(id: Long, tagName: String)
 POST    /dmpster/bucket/:id/addTag/:tagName 	controllers.Application.addTagToBucket(id: Long, tagName: String)
 POST    /dmpster/bucket/:id/removeTag/:tagName 	controllers.Application.removeTagFromBucket(id: Long, tagName: String)
+POST    /dmpster/admin/cleanupNow           controllers.Admin.cleanUpNow
