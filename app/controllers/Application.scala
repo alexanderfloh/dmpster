@@ -130,7 +130,7 @@ object Application extends Controller {
       Logger.info("parsing DMP")
       val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
 
-      val futureResult = ask(analyzer, Work(newFile))(5 minutes).mapTo[utils.Result]
+      val futureResult = ask(analyzer, Work(newFile))(15 minutes).mapTo[utils.Result]
 
       for {
         utils.Result(file, bucketName, content) <- futureResult
