@@ -6,34 +6,64 @@ import play.api.Play
 import scala.sys.process.ProcessBuilder
 import play.api.Logger
 
+trait DumpBitness
+case object X86Dump extends DumpBitness
+case object X64Dump extends DumpBitness
+case object UnknownDump extends DumpBitness
+
 trait DmpParser {
+
   def parse: (String, String) = {
     val lines = readFile
-    val bucketName = lines.find(_.startsWith("FAILURE_BUCKET_ID:")).map(_.split(" ").last).getOrElse("unknown bucket")
+    val bucketName = lines.find(_.startsWith("FAILURE_BUCKET_ID:"))
+      .map(_.split(" ").last)
+      .getOrElse("unknown bucket")
     (bucketName, lines.mkString("\n"))
   }
-  
-  protected def readFile : List[String]
+
+  protected def readFile: List[String]
 }
 
 class DmpParserImpl(file: java.io.File) extends DmpParser {
   protected def readFile = {
+    val bitness = detectBitness
+    Logger.info(s"detected Bitness for $file: $bitness")
+    import DmpParser._
+    val commands = List(cdbForBitness(bitness),
+      "-y",
+      symbolPath,
+      "-srcpath",
+      sourcePath,
+      "-i",
+      imagePath,
+      "-c",
+      "$$<" + scriptForBitness(bitness),
+      "-z",
+      file.getAbsolutePath())
+
+    executeCommand(commands)
+  }
+
+  protected def detectBitness = {
     import DmpParser._
     val commands = List(cdbPath,
-	      "-y",
-	      symbolPath,
-	      "-srcpath",
-	      sourcePath,
-	      "-i",
-	      imagePath,
-	      "-c",
-	      "$$<" + scriptPath, 
-	      "-z",
-	      file.getAbsolutePath())
-	      
+      "-c",
+      ".detach",
+      "-z",
+      file.getAbsolutePath())
+
+    val output = executeCommand(commands)
+    val x86Marker = "Free x86".toLowerCase
+    val x64Marker = "Free x64".toLowerCase
+    if (output.exists(_.toLowerCase.contains(x86Marker))) X86Dump
+    else if (output.exists(_.toLowerCase.contains(x64Marker))) X64Dump
+    else UnknownDump
+  }
+
+  protected def executeCommand(commandWithArgs: List[String]) = {
     import scala.sys.process._
-    val forwardErrorsToApplicationLog = ProcessLogger(line => Logger.warn(line)) 
-    val outStream = commands.lines_!(forwardErrorsToApplicationLog)
+    val forwardErrorsToApplicationLog = ProcessLogger(line => Logger.warn(line))
+    val outStream = commandWithArgs.lines_!(forwardErrorsToApplicationLog)
     outStream.toList
   }
 }
@@ -41,22 +71,39 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
 class DummyParser extends DmpParser {
   protected def readFile = {
     Thread.sleep(30 * 1000)
-    Source.fromFile("dummy.txt").getLines.toList 
+    Source.fromFile("dummy.txt").getLines.toList
   }
 }
 
 object DmpParser {
-  lazy val cdbPath = Play.current.configuration.getString("dmpster.cdb.path").getOrElse("cdb")
-  lazy val symbolPath = Play.current.configuration.getString("dmpster.symbol.path").getOrElse("")
-  lazy val sourcePath = Play.current.configuration.getString("dmpster.source.path").getOrElse("")
-  lazy val imagePath = Play.current.configuration.getString("dmpster.image.path").getOrElse("")
-  lazy val scriptPath = Play.current.configuration.getString("dmpster.script.path").getOrElse("conf\\commands.txt")
-  
+  val config = Play.current.configuration
+  lazy val cdbPath = config.getString("dmpster.cdb.path.x86").getOrElse("cdb")
+  lazy val cdbPathX64 = config.getString("dmpster.cdb.path.x64").getOrElse(cdbPath)
+
+  lazy val symbolPath = config.getString("dmpster.symbol.path").getOrElse("")
+  lazy val sourcePath = config.getString("dmpster.source.path").getOrElse("")
+  lazy val imagePath = config.getString("dmpster.image.path").getOrElse("")
+
+  lazy val scriptPath = config.getString("dmpster.script.path.default").getOrElse("conf\\commands.txt")
+  lazy val scriptPathX86 = config.getString("dmpster.script.path.x86").getOrElse(scriptPath)
+  lazy val scriptPathX64 = config.getString("dmpster.script.path.x64").getOrElse(scriptPath)
+
   def apply(file: java.io.File) = {
     if (System.getProperty("os.name").toLowerCase.contains("win"))
       new DmpParserImpl(file)
     else
       new DummyParser
+  }
+
+  def cdbForBitness(bitness: DumpBitness) = bitness match {
+    case X64Dump => cdbPathX64
+    case _ => cdbPath
+  }
+
+  def scriptForBitness(bitness: DumpBitness) = bitness match {
+    case X64Dump => scriptPathX64
+    case X86Dump => scriptPathX86
+    case _ => scriptPath
   }
 
 }
