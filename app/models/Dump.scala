@@ -11,6 +11,7 @@ import scala.collection.immutable.ListMap
 import language.postfixOps
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTimeConstants
+import play.api.libs.json.Json
 
 case class Dump(
   id: Long,
@@ -126,6 +127,22 @@ object Dump {
     }
     ListMap(sortedDumpsByBucket.toList.sortBy { case ((bucket, newest), dumps) => newest.timestamp }: _*)
   }
+  
+  def groupDumpsByBucket2(dumps: List[Dump]) = {
+    import utils.Joda._
+
+    val dumpsByBucket = dumps.groupBy(_.bucket)
+    val sortedDumpsByBucket = dumpsByBucket.toList.map {
+      case (bucket, dumps) => {
+        val sortedDumps = dumps.sortBy(_.timestamp)
+        (bucket, sortedDumps.toSeq)
+      }
+    }
+    val allSorted = sortedDumpsByBucket.sortBy { case (bucket, List(newest, _)) =>
+      newest.timestamp
+    }
+    allSorted.toSeq
+  }
 
   val dump = {
     get[Long]("id") ~
@@ -137,4 +154,6 @@ object Dump {
           Dump(id, Bucket.byId(bucketId).get, filename, content, new DateTime(timestamp))
       }
   }
+  
+  implicit val format = Json.format[Dump]
 }

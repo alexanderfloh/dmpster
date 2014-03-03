@@ -5,6 +5,7 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 import language.postfixOps
+import play.api.libs.json._
 
 case class Bucket(
   id: Long,
@@ -60,4 +61,5 @@ object Bucket {
       }
   }
 
+  implicit val format = Json.format[Bucket]
 }

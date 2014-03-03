@@ -16,6 +16,8 @@ GET		/dmpster/analyzing					controllers.Application.analyzing
 GET		/dmpster/bucket/:id					controllers.Application.viewBucket(id: Long)
 GET     /dmpster/admin                      controllers.Admin.index
 
+GET     /dmpster/buckets.json               controllers.Application.bucketsJson
+
 POST	/upload								controllers.Application.upload
 POST    /uploadAsync                        controllers.Application.uploadAsync
 POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)

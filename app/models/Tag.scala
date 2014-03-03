@@ -6,6 +6,7 @@ import anorm._
 import anorm.SqlParser._
 import language.postfixOps
 import java.net.URLEncoder
+import play.api.libs.json.Json
 
 trait Taggable {
   val url: String
@@ -67,9 +68,13 @@ object Tag {
       }
   }
 
+  implicit val format = Json.format[Tag]
+}
+
+object TagParser {
   def unapply(tagName: String) = {
     val trimmed = tagName.trim
-    if (!trimmed.isEmpty) Some(findOrCreate(trimmed))
+    if (!trimmed.isEmpty) Some(Tag.findOrCreate(trimmed))
     else None
   }
 }
