@@ -34,25 +34,56 @@ var Bucket = React.createClass({
 var DumpList = React.createClass({
     render: function() {
       var dumpNodes = this.props.dumps.map(function(dump) {
-        return <Dump dump={dump} id={dump.id}></Dump>
+        return <Dump dump={dump} id={dump.id}></Dump>;
       });
       return (
           <div>{dumpNodes}</div>
           );
     }
-})
+});
 
 var Dump = React.createClass({
   render: function() {
     return (
-        <section class="dmp">
+        <section className="dmp">
           <h1>
             <a href={"dmpster/dmp/" + this.props.id + "/details"}>{this.props.dump.relFilePath}</a>
           </h1>
+          <Tags tags={this.props.dump.tags} />
         </section>
     );
   }
-})
+});
+
+var Tags = React.createClass({
+  render: function() {
+    var tagNodes = this.props.tags.map(function(tag) {
+      return <Tag tag={tag}></Tag>;
+    });
+    return (
+        <span id="tags">
+          {tagNodes}
+        </span>
+        );
+  }
+});
+
+var Tag = React.createClass({
+  render: function() {
+    var cx = React.addons.classSet;
+    var tagClass = this.props.tag.name.replace(' ', '-');
+    var classes = cx({
+      'tag': true,
+      'removeable': true
+    });
+    classes = classes + ' ' + tagClass;
+    return (
+      <span className={classes}>
+        {this.props.tag.name}
+      </span>
+    );
+  }
+});
 
 var Buckets = React.createClass({
   getInitialState: function() {

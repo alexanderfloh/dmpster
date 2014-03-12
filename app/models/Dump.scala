@@ -141,7 +141,7 @@ object Dump {
         (bucket, sortedDumps.toSeq)
       }
     }
-    val allSorted = sortedDumpsByBucket.sortBy { case (bucket, List(newest, _)) =>
+    val allSorted = sortedDumpsByBucket.sortBy { case (bucket, List(newest, _*)) =>
       newest.timestamp
     }
     allSorted.toSeq
@@ -161,6 +161,10 @@ object Dump {
   val format = Json.format[Dump]
   
   val writeForIndex = Writes[Dump](d => 
-    Json.obj("id" -> d.id, "relFilePath" -> d.relFilePath)
+    Json.obj(
+        "id" -> d.id, 
+        "relFilePath" -> d.relFilePath,
+        "tags" -> d.tags
+    )
   )
 }
