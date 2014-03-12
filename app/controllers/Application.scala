@@ -134,7 +134,7 @@ object Application extends Controller {
 
     val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
     val subDir = createDumpSubDirName
-    val relFilePath = s"${subDir}\\${dmp.filename}"
+    val relFilePath = s"${subDir}${File.separator}${dmp.filename}"
     val dir = new File(dmpPath, subDir)
     dir.mkdirs()
     val newFile = new File(dir, dmp.filename)

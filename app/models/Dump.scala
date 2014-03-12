@@ -163,8 +163,10 @@ object Dump {
   val writeForIndex = Writes[Dump](d => 
     Json.obj(
         "id" -> d.id, 
-        "relFilePath" -> d.relFilePath,
-        "tags" -> d.tags
+        "filename" -> d.filename,
+        "tags" -> d.tags,
+        "tagUrl" -> d.url,
+        "isNew" -> d.isNew
     )
   )
 }

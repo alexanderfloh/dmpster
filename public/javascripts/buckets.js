@@ -34,7 +34,7 @@ var Bucket = React.createClass({
 var DumpList = React.createClass({
     render: function() {
       var dumpNodes = this.props.dumps.map(function(dump) {
-        return <Dump dump={dump} id={dump.id}></Dump>;
+        return <Dump dump={dump}></Dump>;
       });
       return (
           <div>{dumpNodes}</div>
@@ -44,12 +44,22 @@ var DumpList = React.createClass({
 
 var Dump = React.createClass({
   render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'dmp': true,
+      'new': this.props.dump.isNew
+    });
     return (
-        <section className="dmp">
+        <section className={classes}>
           <h1>
-            <a href={"dmpster/dmp/" + this.props.id + "/details"}>{this.props.dump.relFilePath}</a>
+            <a href={"dmpster/dmp/" + this.props.dump.id + "/details"}>
+              {this.props.dump.filename}
+            </a>
           </h1>
-          <Tags tags={this.props.dump.tags} />
+          <Tags 
+            tags={this.props.dump.tags} 
+            tagUrl={this.props.dump.tagUrl} 
+            id={this.props.dump.id} />
         </section>
     );
   }
@@ -60,9 +70,18 @@ var Tags = React.createClass({
     var tagNodes = this.props.tags.map(function(tag) {
       return <Tag tag={tag}></Tag>;
     });
+    var style = { display: 'none'};
     return (
         <span id="tags">
           {tagNodes}
+          <a href="javascript:void(0);" className="tag add">add a tag...</a>
+          <input type="text" 
+            className="tag-input"
+            data-baseurl={'dmpster/' + this.props.tagUrl + '/' + this.props.id + '/addTag/'} 
+            list="tags" 
+            placeholder="add a tag"
+            style={style} >
+          </input>
         </span>
         );
   }
@@ -71,7 +90,7 @@ var Tags = React.createClass({
 var Tag = React.createClass({
   render: function() {
     var cx = React.addons.classSet;
-    var tagClass = this.props.tag.name.replace(' ', '-');
+    var tagClass = this.props.tag.name.split(' ').join('-');
     var classes = cx({
       'tag': true,
       'removeable': true

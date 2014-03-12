@@ -1,5 +1,5 @@
 function addTag(input) {
-  addTagRequest(input.getAttribute('baseurl'), input.value, function(data) {
+  addTagRequest(input.getAttribute('data-baseurl'), input.value, function(data) {
     $(input).siblings('#tags').replaceWith(data);
   });
   $('datalist#tags').append('<option>' + input.value + '<option>');
