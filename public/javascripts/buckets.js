@@ -2,11 +2,6 @@
  * @jsx React.DOM
  */
 
-var data = [
-    {id: 0, name: "Bucket 0"},
-    {id: 1, name: "Bucket 1"}
-]
-
 var BucketList = React.createClass({
   render: function() {
     var bucketNodes = this.props.data.map(function (bucketAndDumps) {

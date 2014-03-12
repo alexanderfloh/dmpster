@@ -12,6 +12,9 @@ import language.postfixOps
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTimeConstants
 import play.api.libs.json.Json
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import scala.util.parsing.json.JSONObject
 
 case class Dump(
   id: Long,
@@ -155,5 +158,9 @@ object Dump {
       }
   }
   
-  implicit val format = Json.format[Dump]
+  val format = Json.format[Dump]
+  
+  val writeForIndex = Writes[Dump](d => 
+    Json.obj("id" -> d.id, "relFilePath" -> d.relFilePath)
+  )
 }

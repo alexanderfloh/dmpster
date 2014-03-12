@@ -46,9 +46,9 @@ object Application extends Controller {
   }
 
   def bucketsJson = Action {
-    import Dump.format
     import Bucket.format
     import Tag.format
+    implicit val dumpWrites = Dump.writeForIndex
     //implicit val writes = Json.writes[List[(Bucket, List[Dump])]]
     val grouped = Dump.groupDumpsByBucket2(Dump.all)
     val contentJsonified = grouped.map { case (bucket, dumps) => 

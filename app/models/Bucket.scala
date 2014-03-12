@@ -62,4 +62,5 @@ object Bucket {
   }
 
   implicit val format = Json.format[Bucket]
+  
 }
