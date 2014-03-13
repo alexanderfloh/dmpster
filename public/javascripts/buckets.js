@@ -19,28 +19,20 @@ var BucketList = React.createClass({
 
 var Bucket = React.createClass({
     render: function() {
+      var dumpNodes = this.props.dumps.map(function(dump) {
+        return <Dump dump={dump}></Dump>;
+      });
       return (
         <article id={this.props.id}>
           <h1>
             {this.props.name}
           </h1>
           <br/>
-          <DumpList dumps={this.props.dumps}></DumpList>
+          {dumpNodes}
         </article>
       );
     }
   });
-
-var DumpList = React.createClass({
-    render: function() {
-      var dumpNodes = this.props.dumps.map(function(dump) {
-        return <Dump dump={dump}></Dump>;
-      });
-      return (
-          <div>{dumpNodes}</div>
-          );
-    }
-});
 
 var Dump = React.createClass({
   render: function() {
@@ -66,21 +58,58 @@ var Dump = React.createClass({
 });
 
 var Tags = React.createClass({
+  getInitialState: function() {
+    return { 
+      inputVisible: false,
+      value: ''
+    };
+  },
+  
+  handleInputKeyPress: function(event) {
+    if (event.keyCode == 13 || event.which == 13) {
+      $.ajax({
+        type : 'POST',
+        url : 'dmpster/' + this.props.tagUrl + '/' + this.props.id + '/addTag/' + encodeURIComponent(this.state.value)
+      });
+      this.setState({ 
+        inputVisible: false,
+        value: ''
+      });
+    }
+  },
+  
+  handleInputChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  
+  handleAddTagClick: function() {
+    this.setState({ inputVisible: false });
+  },
+  
   render: function() {
     var tagNodes = this.props.tags.map(function(tag) {
       return <Tag tag={tag}></Tag>;
     });
-    var style = { display: 'none'};
+    var invisible = { display: 'none'};
+    var visible = { };
     return (
         <span id="tags">
           {tagNodes}
-          <a href="javascript:void(0);" className="tag add">add a tag...</a>
+          <a 
+            href="javascript:void(0);"
+            className="tag add"
+            style={!this.state.inputVisible ? visible : invisible}>
+            add a tag...
+          </a>
+            
           <input type="text" 
             className="tag-input"
             data-baseurl={'dmpster/' + this.props.tagUrl + '/' + this.props.id + '/addTag/'} 
             list="tags" 
             placeholder="add a tag"
-            style={style} >
+            style={this.state.inputVisible ? visible : invisible} 
+            onKeyPress={this.handleInputKeyPress} 
+            onChange={this.handleInputChange} >
           </input>
         </span>
         );
