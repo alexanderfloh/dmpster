@@ -52,6 +52,8 @@ case class Dump(
     if (isFromToday) "today " + timestamp.toString(DateTimeFormat.forPattern("HH:mm"))
     else timestamp.toString(DateTimeFormat.forPattern("YYYY-MM-dd HH:mm"))
   }
+  
+  def ageLabel = s"added $dateFormatted - $ageInDays day${if(ageInDays != 1) "s"} old"
 }
 
 object Dump {
@@ -165,8 +167,11 @@ object Dump {
         "id" -> d.id, 
         "filename" -> d.filename,
         "tags" -> d.tags,
-        "tagUrl" -> d.url,
-        "isNew" -> d.isNew
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl,
+        "isNew" -> d.isNew,
+        "ageLabel" -> d.ageLabel,
+        "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}"
     )
   )
 }

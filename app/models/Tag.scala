@@ -12,6 +12,9 @@ trait Taggable {
   val url: String
   val id: Long
   def tags: List[Tag]
+
+  def addTagUrl = s"dmpster/$url/$id/addTag/"
+  def removeTagUrl = s"dmpster/$url/$id/removeTag/"
 }
 
 case class Tag(id: Long, name: String) {
@@ -69,6 +72,7 @@ object Tag {
   }
 
   implicit val format = Json.format[Tag]
+
 }
 
 object TagParser {

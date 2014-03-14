@@ -35,6 +35,20 @@ var Bucket = React.createClass({
   });
 
 var Dump = React.createClass({
+  handleClickOnRemove: function() {
+    $.ajax({
+      type : 'POST',
+      url : this.props.dump.addTagUrl + encodeURIComponent('marked for deletion')
+    });
+  },
+  
+  handleClickOnArchive: function() {
+    $.ajax({
+      type : 'POST',
+      url : this.props.dump.addTagUrl + encodeURIComponent('keep forever')
+    });
+  },
+  
   render: function() {
     var cx = React.addons.classSet;
     var classes = cx({
@@ -44,14 +58,33 @@ var Dump = React.createClass({
     return (
         <section className={classes}>
           <h1>
+            <a href={this.props.dump.dmpUrl} download={this.props.dump.filename}>
+              <img src="assets/images/download.svg" title={'download ' + this.props.dump.filename}></img>
+            </a>
             <a href={"dmpster/dmp/" + this.props.dump.id + "/details"}>
               {this.props.dump.filename}
             </a>
           </h1>
           <Tags 
-            tags={this.props.dump.tags} 
-            tagUrl={this.props.dump.tagUrl} 
-            id={this.props.dump.id} />
+            tags = {this.props.dump.tags} 
+            addTagUrl = {this.props.dump.addTagUrl}
+            removeTagUrl = {this.props.dump.removeTagUrl}
+            id = {this.props.dump.id} />
+          <time>{this.props.dump.ageLabel}</time>
+          <span className="side-menu">
+            <a 
+              className="remove-dump" 
+              href="javascript: void(0);"
+              onClick={this.handleClickOnRemove} >
+              <img src="assets/images/delete.svg" title="mark for deletion"></img>
+            </a>
+            <a 
+              className="archive-dump" 
+              href="javascript: void(0);"
+              onClick={this.handleClickOnArchive} >
+              <img src="assets/images/archive.svg" title="keep forever"></img>
+            </a>
+          </span>
         </section>
     );
   }
@@ -69,7 +102,7 @@ var Tags = React.createClass({
     if (event.keyCode == 13 || event.which == 13) {
       $.ajax({
         type : 'POST',
-        url : 'dmpster/' + this.props.tagUrl + '/' + this.props.id + '/addTag/' + encodeURIComponent(this.state.value)
+        url : this.props.addTagUrl + encodeURIComponent(this.state.value)
       });
       this.setState({ 
         inputVisible: false,
@@ -78,45 +111,71 @@ var Tags = React.createClass({
     }
   },
   
+  handleInputBlur: function() {
+    this.setState({
+      inputVisible: false,
+      value: ''
+    });
+  },
+  
   handleInputChange: function(event) {
     this.setState({value: event.target.value});
   },
   
   handleAddTagClick: function() {
-    this.setState({ inputVisible: false });
+    this.setState({ inputVisible: true });
+  },
+  
+  componentDidUpdate: function() {
+    if(this.state.inputVisible) {
+      this.refs.tagInput.getDOMNode().focus();
+    }
   },
   
   render: function() {
+    var removeTagUrl = this.props.removeTagUrl;
     var tagNodes = this.props.tags.map(function(tag) {
-      return <Tag tag={tag}></Tag>;
+      return <Tag tag={tag} removeTagUrl={removeTagUrl}></Tag>;
     });
-    var invisible = { display: 'none'};
-    var visible = { };
-    return (
+    if(this.state.inputVisible) {
+      return (
+        <span id="tags">
+          {tagNodes}
+          <input type="text" 
+            ref="tagInput"
+            className="tag-input"
+            list="tags" 
+            placeholder="  add a tag&hellip; "
+            onKeyPress={this.handleInputKeyPress} 
+            onChange={this.handleInputChange}
+            onBlur={this.handleInputBlur} >
+          </input>
+        </span>
+      );
+    } else {
+      return(
         <span id="tags">
           {tagNodes}
           <a 
             href="javascript:void(0);"
             className="tag add"
-            style={!this.state.inputVisible ? visible : invisible}>
-            add a tag...
+            onClick={this.handleAddTagClick}>
+            add a tag&hellip;
           </a>
-            
-          <input type="text" 
-            className="tag-input"
-            data-baseurl={'dmpster/' + this.props.tagUrl + '/' + this.props.id + '/addTag/'} 
-            list="tags" 
-            placeholder="add a tag"
-            style={this.state.inputVisible ? visible : invisible} 
-            onKeyPress={this.handleInputKeyPress} 
-            onChange={this.handleInputChange} >
-          </input>
         </span>
-        );
+      );
+    }
   }
 });
 
 var Tag = React.createClass({
+  handleRemoveClick: function() {
+    $.ajax({
+      type : 'POST',
+      url : this.props.removeTagUrl + encodeURIComponent(this.props.tag.name)
+    });
+  },
+  
   render: function() {
     var cx = React.addons.classSet;
     var tagClass = this.props.tag.name.split(' ').join('-');
@@ -128,6 +187,11 @@ var Tag = React.createClass({
     return (
       <span className={classes}>
         {this.props.tag.name}
+        <span className="remove-tag">
+        <a href="javascript:void(0);" onClick={this.handleRemoveClick} >
+        <img src="assets/images/delete.svg" title="remove tag"></img>
+      </a>
+        </span>
       </span>
     );
   }
