@@ -35,17 +35,35 @@ var Bucket = React.createClass({
   });
 
 var Dump = React.createClass({
+  getInitialState: function() {
+    return {tags: this.props.dump.tags};
+  },
+  
   handleClickOnRemove: function() {
-    $.ajax({
-      type : 'POST',
-      url : this.props.dump.addTagUrl + encodeURIComponent('marked for deletion')
-    });
+    this.handleAddTag('marked for deletion');
   },
   
   handleClickOnArchive: function() {
+    this.handleAddTag('keep forever');
+  },
+  
+  handleAddTag: function(tagName) {
+    var tags = this.state.tags;
+    var newTags = tags.concat([{name: tagName}]);
+    this.setState({tags: newTags});
     $.ajax({
       type : 'POST',
-      url : this.props.dump.addTagUrl + encodeURIComponent('keep forever')
+      url : this.props.dump.addTagUrl + encodeURIComponent(tagName)
+    });
+  },
+  
+  handleRemoveTag: function(tagName) {
+    var tags = this.state.tags;
+    var newTags = tags.filter(function(elem) { return elem.name !== tagName; });
+    this.setState({tags: newTags});
+    $.ajax({
+      type : 'POST',
+      url : this.props.dump.removeTagUrl + encodeURIComponent(tagName)
     });
   },
   
@@ -66,10 +84,9 @@ var Dump = React.createClass({
             </a>
           </h1>
           <Tags 
-            tags = {this.props.dump.tags} 
-            addTagUrl = {this.props.dump.addTagUrl}
-            removeTagUrl = {this.props.dump.removeTagUrl}
-            id = {this.props.dump.id} />
+            tags = {this.state.tags} 
+            handleAddTag = {this.handleAddTag}
+            handleRemoveTag = {this.handleRemoveTag} />
           <time>{this.props.dump.ageLabel}</time>
           <span className="side-menu">
             <a 
@@ -100,10 +117,7 @@ var Tags = React.createClass({
   
   handleInputKeyPress: function(event) {
     if (event.keyCode == 13 || event.which == 13) {
-      $.ajax({
-        type : 'POST',
-        url : this.props.addTagUrl + encodeURIComponent(this.state.value)
-      });
+      this.props.handleAddTag(this.state.value);
       this.setState({ 
         inputVisible: false,
         value: ''
@@ -133,9 +147,9 @@ var Tags = React.createClass({
   },
   
   render: function() {
-    var removeTagUrl = this.props.removeTagUrl;
+    var removeTag = this.props.handleRemoveTag;
     var tagNodes = this.props.tags.map(function(tag) {
-      return <Tag tag={tag} removeTagUrl={removeTagUrl}></Tag>;
+      return <Tag tag={tag} handleRemoveTag={removeTag}></Tag>;
     });
     if(this.state.inputVisible) {
       return (
@@ -170,10 +184,7 @@ var Tags = React.createClass({
 
 var Tag = React.createClass({
   handleRemoveClick: function() {
-    $.ajax({
-      type : 'POST',
-      url : this.props.removeTagUrl + encodeURIComponent(this.props.tag.name)
-    });
+    this.props.handleRemoveTag(this.props.tag.name);
   },
   
   render: function() {
