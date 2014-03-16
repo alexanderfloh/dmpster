@@ -12,11 +12,11 @@
     }.getOrElse(0)
   }"/>
 
+ @* @buckets(groupedDumps.map{ case((bucket, newest), dmps) => (bucket, dmps) }) *@
 
+  <hr></hr>
   <div id="content"></div>
   <script type="text/jsx" src="@routes.Assets.at("javascripts/buckets.js")"></script>
-  <hr></hr>
-  @buckets(groupedDumps.map{ case((bucket, newest), dmps) => (bucket, dmps) })
 
   <script src="@routes.Assets.at("javascripts/upload.js")"></script>
 }

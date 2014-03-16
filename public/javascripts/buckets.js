@@ -49,8 +49,10 @@ var Dump = React.createClass({
   
   handleAddTag: function(tagName) {
     var tags = this.state.tags;
-    var newTags = tags.concat([{name: tagName}]);
-    this.setState({tags: newTags});
+    if(!tags.some(function(tag) { return tag.name === tagName; })) {
+      var newTags = tags.concat([{name: tagName}]);
+      this.setState({tags: newTags});
+    }
     $.ajax({
       type : 'POST',
       url : this.props.dump.addTagUrl + encodeURIComponent(tagName)
