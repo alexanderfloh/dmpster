@@ -7,6 +7,7 @@ import anorm.SqlParser._
 import language.postfixOps
 import java.net.URLEncoder
 import play.api.libs.json.Json
+import play.api.libs.json.Writes
 
 trait Taggable {
   val url: String
@@ -71,8 +72,7 @@ object Tag {
       }
   }
 
-  implicit val format = Json.format[Tag]
-
+  val nameOnlyFormat = Writes[Tag] (t => Json.obj("name" -> t.name))
 }
 
 object TagParser {
