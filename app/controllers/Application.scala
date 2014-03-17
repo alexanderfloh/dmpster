@@ -51,10 +51,12 @@ object Application extends Controller {
     implicit val dumpWrites = Dump.writeForIndex
     //implicit val writes = Json.writes[List[(Bucket, List[Dump])]]
     val grouped = Dump.groupDumpsByBucket2(Dump.all)
-    val contentJsonified = grouped.map { case (bucket, dumps) => 
+    val contentJsonified = toJson(grouped.map { case (bucket, dumps) => 
       Seq(toJson(bucket), toJson(dumps))
-    }
-    Ok(toJson(contentJsonified))
+    })
+    Ok(Json.obj(
+        "analyzing" -> analyzingJson,
+        "buckets" -> contentJsonified))
   }
 
   def newerThan(timestamp: Long) = Action {
@@ -97,6 +99,15 @@ object Application extends Controller {
     val jobs = analyzer ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
     Ok(toJson(views.html.processing(files.map(_.getName)).body.trim))
+  }
+  
+  def analyzingJson = {
+    val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
+    implicit val timeout = Timeout(5 seconds)
+    val jobs = analyzer ? utils.QueryRunningJobs
+    val files = (Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs :+ new java.io.File("foo.dmp"))
+    
+    toJson(files.map(_.getName))
   }
 
   def upload = Action(parse.multipartFormData) {

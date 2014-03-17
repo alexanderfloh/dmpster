@@ -4,35 +4,61 @@
 
 var BucketList = React.createClass({
   render: function() {
-    var bucketNodes = this.props.data.map(function (bucketAndDumps) {
+    var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
       var bucket = bucketAndDumps[0];
       var dumps = bucketAndDumps[1];
-      return <Bucket id={bucket.id} name={bucket.name} dumps={dumps}></Bucket>;
+      return (<Bucket key={bucket.id} name={bucket.name} dumps={dumps}></Bucket>);
     });
     return (
       <div className="bucketList">
+        <AnalyzingBuckets analyzingDumps={this.props.analyzingDumps}></AnalyzingBuckets>
         {bucketNodes}
       </div>
     );
   }
 });
 
-var Bucket = React.createClass({
-    render: function() {
-      var dumpNodes = this.props.dumps.map(function(dump) {
-        return <Dump dump={dump}></Dump>;
-      });
+var AnalyzingBuckets = React.createClass({
+  render: function() {
+    var dumpNodes = this.props.analyzingDumps.map(function(dump) {
       return (
-        <article id={this.props.id}>
+        <section key={dump} className="dmp processing">
           <h1>
-            {this.props.name}
+          {dump}
           </h1>
-          <br/>
-          {dumpNodes}
-        </article>
+          <img src="assets/images/spinner.gif" />
+        </section>
       );
-    }
-  });
+    });
+    
+    return (
+      <article id="processing">
+        <h1>
+          Currently processing...
+          <br/>
+        </h1>
+        {dumpNodes}
+      </article>
+    );
+  }
+});
+
+var Bucket = React.createClass({
+  render: function() {
+    var dumpNodes = this.props.dumps.map(function(dump) {
+      return <Dump key={dump.id} dump={dump}></Dump>;
+    });
+    return (
+      <article id={this.props.id}>
+        <h1>
+          {this.props.name}
+        </h1>
+        <br/>
+        {dumpNodes}
+      </article>
+    );
+  }
+});
 
 var Dump = React.createClass({
   getInitialState: function() {
@@ -151,7 +177,7 @@ var Tags = React.createClass({
   render: function() {
     var removeTag = this.props.handleRemoveTag;
     var tagNodes = this.props.tags.map(function(tag) {
-      return <Tag tag={tag} handleRemoveTag={removeTag}></Tag>;
+      return <Tag key={tag.name} tag={tag} handleRemoveTag={removeTag}></Tag>;
     });
     if(this.state.inputVisible) {
       return (
@@ -212,20 +238,22 @@ var Tag = React.createClass({
 
 var Buckets = React.createClass({
   getInitialState: function() {
-    return {data: []};
+    return {dumps: [], analyzingDumps: []};
   },
+
   loadBucketsFromServer: function() {
     $.ajax({
       url: this.props.url,
       dataType: 'json',
       success: function(data) {
-        this.setState({data: data});
+        this.setState({ dumps: data.buckets, analyzingDumps: data.analyzing });
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
   },
+
   componentWillMount: function() {
     this.loadBucketsFromServer();
     setInterval(this.loadBucketsFromServer, this.props.pollInterval);
@@ -233,11 +261,12 @@ var Buckets = React.createClass({
   render: function() {
     return (
       <div className="buckets">
-        <BucketList data={this.state.data} />
+        <BucketList dumps={this.state.dumps} analyzingDumps={this.state.analyzingDumps} />
       </div>
     );
   }
 });
+
 React.renderComponent(
   <Buckets url="dmpster/buckets.json" pollInterval={2000}/>,
   document.getElementById('content')
