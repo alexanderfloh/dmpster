@@ -18,6 +18,43 @@ var BucketList = React.createClass({
   }
 });
 
+var UploadingFiles = React.createClass({
+  getInitialState: function() {
+    return {uploads: []};
+  },
+  
+  componentDidMount: function() {
+    // Change this to the location of your server-side upload handler:
+    var url = '/uploadAsync';
+    val foo = $('#holder');
+    foo.fileupload({
+        url: url,
+        dataType: 'json',
+        submit: function(e, data) {
+          var newUploads = this.state.uploads.concat([name: data.files[0].name]);
+          this.setState({uploads: newUploads});
+          return true;
+        },
+        done: function (e, data) {
+          var newUploads = this.state.uploads.filter(function(upload) { return upload.name !== data.files[0].name; });
+          this.setState({uploads: newUploads});
+        }
+    });
+    
+  },
+  
+  render: function() {
+    return (
+      <article id="uploading" className="hidden">
+        <h1>
+          Uploading...
+          <br/>
+        </h1>
+      </article>
+    );
+  }
+});
+
 var AnalyzingBuckets = React.createClass({
   render: function() {
     var dumpNodes = this.props.analyzingDumps.map(function(dump) {
