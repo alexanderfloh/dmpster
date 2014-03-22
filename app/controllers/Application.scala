@@ -104,7 +104,7 @@ object Application extends Controller {
     val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
     implicit val timeout = Timeout(5 seconds)
     val jobs = analyzer ? utils.QueryRunningJobs
-    val files = (Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs :+ new java.io.File("foo.dmp"))
+    val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
     
     toJson(files.map(_.getName))
   }

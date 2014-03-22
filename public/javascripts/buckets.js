@@ -11,6 +11,7 @@ var BucketList = React.createClass({
     });
     return (
       <div className="bucketList">
+        <UploadingFiles />
         <AnalyzingBuckets analyzingDumps={this.props.analyzingDumps}></AnalyzingBuckets>
         {bucketNodes}
       </div>
@@ -25,31 +26,60 @@ var UploadingFiles = React.createClass({
   
   componentDidMount: function() {
     // Change this to the location of your server-side upload handler:
+    var uploading = this;
     var url = '/uploadAsync';
-    val foo = $('#holder');
-    foo.fileupload({
+    $('#holder').fileupload({
         url: url,
         dataType: 'json',
         submit: function(e, data) {
-          var newUploads = this.state.uploads.concat([name: data.files[0].name]);
-          this.setState({uploads: newUploads});
+          var newUploads = uploading.state.uploads.concat(
+            [{name: data.files[0].name, progress: 0}]);
+          uploading.setState({uploads: newUploads});
           return true;
         },
+
+        progress: function(e, data) {
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          var newUploads = uploading.state.uploads.map(function(entry) { 
+            if(entry.name === data.files[0].name) {
+              return {name: entry.name, progress: progress};
+            }
+            else {
+              return entry;
+            }
+          });
+          uploading.setState({uploads: newUploads});
+        },
+
         done: function (e, data) {
-          var newUploads = this.state.uploads.filter(function(upload) { return upload.name !== data.files[0].name; });
-          this.setState({uploads: newUploads});
+          var newUploads = uploading.state.uploads.filter(
+            function(upload) { return upload.name !== data.files[0].name; });
+          uploading.setState({uploads: newUploads});
         }
-    });
+    }).prop('disabled', !$.support.fileInput)
+        .parent().addClass($.support.fileInput ? undefined : 'disabled');
     
   },
   
   render: function() {
+    var uploadingNodes = this.state.uploads.map(function(entry) {
+      var width = {width: entry.progress + '%'};
+      return (
+        <section key={entry.name} className="dmp">
+          <h1>{entry.name}</h1>
+          <div id="progress">
+            <div className="bar" style={width}></div>
+          </div>
+        </section>
+      );
+    });
     return (
-      <article id="uploading" className="hidden">
+      <article id="uploading" className={this.state.uploads.length ? '' : 'hidden'}>
         <h1>
           Uploading...
           <br/>
         </h1>
+        {uploadingNodes}
       </article>
     );
   }
@@ -69,7 +99,7 @@ var AnalyzingBuckets = React.createClass({
     });
     
     return (
-      <article id="processing">
+      <article id="processing" className={this.props.analyzingDumps.length ? '' : 'hidden'}>
         <h1>
           Currently processing...
           <br/>
