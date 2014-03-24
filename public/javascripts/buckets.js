@@ -3,6 +3,22 @@
  */
 
 var BucketList = React.createClass({
+  getInitialState: function() {
+    return {analyzingDumps: this.props.analyzingDumps};
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.setState({analyzingDumps: nextProps.analyzingDumps});
+  },
+
+  onFileUploaded: function(fileName) {
+    var analyzing = this.state.analyzingDumps;
+    if(!analyzing.some(function(a) { return a === fileName; })) {
+      var newAnalyzing = analyzing.concat([fileName]);
+      this.setState({analyzingDumps: newAnalyzing});
+    }
+  },
+
   render: function() {
     var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
       var bucket = bucketAndDumps[0];
@@ -11,8 +27,8 @@ var BucketList = React.createClass({
     });
     return (
       <div className="bucketList">
-        <UploadingFiles />
-        <AnalyzingBuckets analyzingDumps={this.props.analyzingDumps}></AnalyzingBuckets>
+        <UploadingFiles onFileUploaded={this.onFileUploaded} />
+        <AnalyzingBuckets analyzingDumps={this.state.analyzingDumps}></AnalyzingBuckets>
         {bucketNodes}
       </div>
     );
@@ -52,9 +68,11 @@ var UploadingFiles = React.createClass({
         },
 
         done: function (e, data) {
+          var finishedFile = data.files[0].name;
           var newUploads = uploading.state.uploads.filter(
-            function(upload) { return upload.name !== data.files[0].name; });
+            function(upload) { return upload.name !== finishedFile; });
           uploading.setState({uploads: newUploads});
+          uploading.props.onFileUploaded(finishedFile);
         }
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
