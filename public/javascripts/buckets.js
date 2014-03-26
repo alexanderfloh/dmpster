@@ -51,6 +51,10 @@ var UploadingFiles = React.createClass({
           var newUploads = uploading.state.uploads.concat(
             [{name: data.files[0].name, progress: 0}]);
           uploading.setState({uploads: newUploads});
+
+          $(window).on('beforeunload', function() {
+            return "There are files being uploaded to the server.";
+          });
           return true;
         },
 
@@ -73,6 +77,10 @@ var UploadingFiles = React.createClass({
             function(upload) { return upload.name !== finishedFile; });
           uploading.setState({uploads: newUploads});
           uploading.props.onFileUploaded(finishedFile);
+
+          if($('#holder').fileupload('active') === 1) {
+            $(window).off('beforeunload');
+          }
         }
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
