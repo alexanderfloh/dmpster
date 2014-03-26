@@ -46,7 +46,7 @@ object Application extends Controller {
   }
 
   def bucketsJson = Action {
-    import Bucket.format
+    implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
     
     val grouped = Dump.groupDumpsByBucket2(Dump.all)

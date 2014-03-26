@@ -161,18 +161,17 @@ object Dump {
       }
   }
 
-  val format = Json.format[Dump]
-
   val writeForIndex = Writes[Dump] { d =>
     implicit val tagFormat = Tag.nameOnlyFormat
     Json.obj(
       "id" -> d.id,
       "filename" -> d.filename,
-      "tags" -> d.tags,
-      "addTagUrl" -> d.addTagUrl,
-      "removeTagUrl" -> d.removeTagUrl,
       "isNew" -> d.isNew,
       "ageLabel" -> d.ageLabel,
-      "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}")
+      "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}",
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(d.tags),
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl))
   }
 }

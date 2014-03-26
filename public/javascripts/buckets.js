@@ -23,7 +23,7 @@ var BucketList = React.createClass({
     var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
       var bucket = bucketAndDumps[0];
       var dumps = bucketAndDumps[1];
-      return (<Bucket key={bucket.id} name={bucket.name} dumps={dumps}></Bucket>);
+      return (<Bucket key={bucket.id} name={bucket.name} tagging={bucket.tagging} dumps={dumps}></Bucket>);
     });
     return (
       <div className="bucketList">
@@ -35,13 +35,48 @@ var BucketList = React.createClass({
   }
 });
 
+var TaggingMixin = {
+  getInitialState: function() {
+    return {tags: this.props.tagging.tags};
+  },
+  
+  handleClickOnRemove: function() {
+    this.handleAddTag('marked for deletion');
+  },
+  
+  handleClickOnArchive: function() {
+    this.handleAddTag('keep forever');
+  },
+  
+  handleAddTag: function(tagName) {
+    var tags = this.state.tags;
+    if(!tags.some(function(tag) { return tag.name === tagName; })) {
+      var newTags = tags.concat([{name: tagName}]);
+      this.setState({tags: newTags});
+    }
+    $.ajax({
+      type : 'POST',
+      url : this.props.tagging.addTagUrl + encodeURIComponent(tagName)
+    });
+  },
+  
+  handleRemoveTag: function(tagName) {
+    var tags = this.state.tags;
+    var newTags = tags.filter(function(elem) { return elem.name !== tagName; });
+    this.setState({tags: newTags});
+    $.ajax({
+      type : 'POST',
+      url : this.props.tagging.removeTagUrl + encodeURIComponent(tagName)
+    });
+  }
+};
+
 var UploadingFiles = React.createClass({
   getInitialState: function() {
     return {uploads: []};
   },
   
   componentDidMount: function() {
-    // Change this to the location of your server-side upload handler:
     var uploading = this;
     var url = '/uploadAsync';
     $('#holder').fileupload({
@@ -137,15 +172,21 @@ var AnalyzingBuckets = React.createClass({
 });
 
 var Bucket = React.createClass({
+  mixins: [TaggingMixin], 
+
   render: function() {
     var dumpNodes = this.props.dumps.map(function(dump) {
-      return <Dump key={dump.id} dump={dump}></Dump>;
+      return <Dump key={dump.id} dump={dump} tagging={dump.tagging}></Dump>;
     });
     return (
       <article id={this.props.id}>
         <h1>
           {this.props.name}
         </h1>
+        <Tags 
+            tags = {this.state.tags} 
+            handleAddTag = {this.handleAddTag}
+            handleRemoveTag = {this.handleRemoveTag} />
         <br/>
         {dumpNodes}
       </article>
@@ -154,39 +195,7 @@ var Bucket = React.createClass({
 });
 
 var Dump = React.createClass({
-  getInitialState: function() {
-    return {tags: this.props.dump.tags};
-  },
-  
-  handleClickOnRemove: function() {
-    this.handleAddTag('marked for deletion');
-  },
-  
-  handleClickOnArchive: function() {
-    this.handleAddTag('keep forever');
-  },
-  
-  handleAddTag: function(tagName) {
-    var tags = this.state.tags;
-    if(!tags.some(function(tag) { return tag.name === tagName; })) {
-      var newTags = tags.concat([{name: tagName}]);
-      this.setState({tags: newTags});
-    }
-    $.ajax({
-      type : 'POST',
-      url : this.props.dump.addTagUrl + encodeURIComponent(tagName)
-    });
-  },
-  
-  handleRemoveTag: function(tagName) {
-    var tags = this.state.tags;
-    var newTags = tags.filter(function(elem) { return elem.name !== tagName; });
-    this.setState({tags: newTags});
-    $.ajax({
-      type : 'POST',
-      url : this.props.dump.removeTagUrl + encodeURIComponent(tagName)
-    });
-  },
+  mixins: [TaggingMixin],
   
   render: function() {
     var cx = React.addons.classSet;

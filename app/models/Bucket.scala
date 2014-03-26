@@ -61,6 +61,15 @@ object Bucket {
       }
   }
 
-  implicit val format = Json.format[Bucket]
-  
+  val jsonWriter = Writes[Bucket](b => {
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> b.id,
+      "name" -> b.name,
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(b.tags),
+        "addTagUrl" -> b.addTagUrl,
+        "removeTagUrl" -> b.removeTagUrl))
+  })
+
 }

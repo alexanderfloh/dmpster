@@ -16,6 +16,9 @@
   <script src="http://fb.me/react-with-addons-0.9.0.js"></script>
   <script src="http://fb.me/JSXTransformer-0.9.0.js"></script>
   <link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
+  <!-- trashcan image by Christopher Lee, from The Noun Project -->
+  <!-- Delete by Julian Norton from The Noun Project -->
+  <!-- Box by Michael Rowe from The Noun Project -->
   <title>dmpster</title>
 </head>
 <body id="holder">
@@ -23,7 +26,7 @@
 <header>
   <h1>
     <a href="@routes.Application.index">dmpster<sup>beta</sup></a>
-    <!-- trashcan image by Christopher Lee, from The Noun Project -->
+    
     <img src="@routes.Assets.at("images/trashcan-top.svg")">
     <img src="@routes.Assets.at("images/trashcan-bottom.svg")">
   </h1>
@@ -31,21 +34,6 @@
 </header>
 <body>
 @content
-<article id="uploading" class="hidden">
-  <h1>
-    Uploading...
-    <br/>
-  </h1>
-</article>
-
-<section id="template-uploading" class="hidden">
-   <h1>
-   </h1>
-   <div id="progress">
-     <div class="bar" style="width: 0%;"></div>
-   </div>
- </section>
-</body>
 <!-- 
 <script>
 /*jslint unparam: true */
