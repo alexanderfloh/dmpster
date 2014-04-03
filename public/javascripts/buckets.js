@@ -23,7 +23,13 @@ var BucketList = React.createClass({
     var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
       var bucket = bucketAndDumps[0];
       var dumps = bucketAndDumps[1];
-      return (<Bucket key={bucket.id} name={bucket.name} tagging={bucket.tagging} dumps={dumps}></Bucket>);
+      return (<Bucket 
+          key={bucket.id} 
+          name={bucket.name} 
+          url={bucket.url} 
+          tagging={bucket.tagging} 
+          dumps={dumps}>
+        </Bucket>);
     });
     return (
       <div className="bucketList">
@@ -181,7 +187,9 @@ var Bucket = React.createClass({
     return (
       <article id={this.props.id}>
         <h1>
-          {this.props.name}<br/>
+          <a href={this.props.url}>
+            {this.props.name}<br/>
+          </a>
           <Tags 
           tags = {this.state.tags} 
           handleAddTag = {this.handleAddTag}
