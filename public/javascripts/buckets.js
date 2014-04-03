@@ -181,13 +181,12 @@ var Bucket = React.createClass({
     return (
       <article id={this.props.id}>
         <h1>
-          {this.props.name}
+          {this.props.name}<br/>
+          <Tags 
+          tags = {this.state.tags} 
+          handleAddTag = {this.handleAddTag}
+          handleRemoveTag = {this.handleRemoveTag} />
         </h1>
-        <Tags 
-            tags = {this.state.tags} 
-            handleAddTag = {this.handleAddTag}
-            handleRemoveTag = {this.handleRemoveTag} />
-        <br/>
         {dumpNodes}
       </article>
     );
@@ -247,6 +246,9 @@ var Tags = React.createClass({
   
   handleInputKeyPress: function(event) {
     if (event.keyCode == 13 || event.which == 13) {
+      var domNode = this.refs.tagInput.getDOMNode();
+      $(domNode).hideBalloon();
+      
       this.props.handleAddTag(this.state.value);
       this.setState({ 
         inputVisible: false,
@@ -256,6 +258,9 @@ var Tags = React.createClass({
   },
   
   handleInputBlur: function() {
+    var domNode = this.refs.tagInput.getDOMNode();
+    $(domNode).hideBalloon();
+    
     this.setState({
       inputVisible: false,
       value: ''
@@ -272,7 +277,24 @@ var Tags = React.createClass({
   
   componentDidUpdate: function() {
     if(this.state.inputVisible) {
-      this.refs.tagInput.getDOMNode().focus();
+      var domNode = this.refs.tagInput.getDOMNode(); 
+      domNode.focus();
+      
+      $.balloon.defaults.classname = 'balloon';
+      $.balloon.defaults.css = null;
+      var balloonContents = '<div>' +
+          '<h2>Special tags</h2>' +
+          '<ul>' +
+            '<li class="keep-forever">keep forever</li>' + 
+            '<li class="marked-for-deletion">marked for deletion</li>' +
+          '</ul>' +
+        '</div>';
+      
+      $(domNode).showBalloon({ 
+        contents: balloonContents,
+        position: 'right',
+        classname: 'balloon'
+      });
     }
   },
   
