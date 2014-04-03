@@ -4,9 +4,21 @@
 <html>
 <head>
   <link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
-  <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/jquery-1.7.1.js")" type="text/javascript"></script>
   <script src="@routes.Assets.at("javascripts/jquery.balloon.js")"></script>
+  <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+  <script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget.js")"></script>
+  <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+  <script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/jquery.iframe-transport.js")"></script>
+  <!-- The basic File Upload plugin -->
+  <script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/jquery.fileupload.js")"></script>
+  
+  <script src="http://fb.me/react-with-addons-0.9.0.js"></script>
+  <script src="http://fb.me/JSXTransformer-0.9.0.js"></script>
   <link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
+  <!-- trashcan image by Christopher Lee, from The Noun Project -->
+  <!-- Delete by Julian Norton from The Noun Project -->
+  <!-- Box by Michael Rowe from The Noun Project -->
   <title>dmpster</title>
 </head>
 <body id="holder">
@@ -14,7 +26,7 @@
 <header>
   <h1>
     <a href="@routes.Application.index">dmpster<sup>beta</sup></a>
-    <!-- trashcan image by Christopher Lee, from The Noun Project -->
+    
     <img src="@routes.Assets.at("images/trashcan-top.svg")">
     <img src="@routes.Assets.at("images/trashcan-bottom.svg")">
   </h1>
@@ -22,93 +34,5 @@
 </header>
 <body>
 @content
-<article id="uploading" class="hidden">
-  <h1>
-    Uploading...
-    <br/>
-  </h1>
-</article>
-
-<section id="template-uploading" class="hidden">
-   <h1>
-   </h1>
-   <div id="progress">
-     <div class="bar" style="width: 0%;"></div>
-   </div>
- </section>
-</body>
-<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
-<script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget.js")"></script>
-<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/jquery.iframe-transport.js")"></script>
-<!-- The basic File Upload plugin -->
-<script src="@routes.Assets.at("jQuery-File-Upload-8.8.5/js/jquery.fileupload.js")"></script>
-<script>
-/*jslint unparam: true */
-/*global window, $ */
-$(function () {
-    'use strict';
-    // Change this to the location of your server-side upload handler:
-    var url = '/uploadAsync';
-    $('#holder').fileupload({
-        url: url,
-        dataType: 'json',
-        //sequentialUploads: true,
-        submit: function(e, data) {
-          var newUpload = $('#template-uploading').clone().removeClass('hidden').addClass('dmp');
-          data.context = newUpload;
-          newUpload.find('h1').text(data.files[0].name);
-          
-          var uploadingContainer = $('#uploading');
-          uploadingContainer.removeClass('hidden');
-          uploadingContainer.insertBefore('input#latest');
-          uploadingContainer.append(newUpload);
-          
-          $(window).on('beforeunload', function() {
-            return "There are files being uploaded to the server.";
-          });
-          return true;
-        },
-        progress: function(e, data) {
-          var progress = parseInt(data.loaded / data.total * 100, 10);
-            data.context.find('#progress .bar').css(
-                'width',
-                progress + '%'
-            );
-        },
-        done: function (e, data) {
-          data.context.fadeOut('slow').remove();
-          //console.log(data);
-          
-          console.log($('#holder').fileupload('active'))
-          if($('#holder').fileupload('active') === 1) {
-            $('#uploading').addClass('hidden');
-            $(window).off('beforeunload');
-          }
-        }
-    }).prop('disabled', !$.support.fileInput)
-        .parent().addClass($.support.fileInput ? undefined : 'disabled');
-    
-});
-
-$(function() {
-  $.balloon.defaults.classname = 'balloon';
-  $.balloon.defaults.css = null;
-  $('.tag-input').balloon({
-    position: 'right',
-    classname: 'balloon',     
-    contents: '<div>' 
-    + '<h2>Special tags</h2>'
-    + '<ul>'
-    +  '<li class="keep-forever">keep forever</li>' 
-    +  '<li class="marked-for-deletion">marked for deletion</li>'
-    +'</ul>'
-    +'</div>'
-  });
-});
-</script>
-
-
-
-<script src="@routes.Assets.at("javascripts/tagging.js")"></script>
+<a class="bottom-link" href="@routes.Admin.index">Administration area</a>
 </html>

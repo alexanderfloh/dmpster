@@ -70,7 +70,7 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
 
 class DummyParser extends DmpParser {
   protected def readFile = {
-    Thread.sleep(30 * 1000)
+    Thread.sleep(5 * 1000)
     Source.fromFile("dummy.txt").getLines.toList
   }
 }

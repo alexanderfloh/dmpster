@@ -1,30 +1,39 @@
 package controllers
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.json.Json._
-import models.Dump
-import scala.io.Source
-import play.api.libs.concurrent._
-import play.api.libs.concurrent.Execution.Implicits._
-import play.api.Play.current
-import utils.DmpParser
-import play.Logger
-import models.Tag
-import models.Bucket
-import scala.collection.immutable.ListMap
-import org.joda.time.DateTime
-import akka.pattern.ask
-import utils.Work
+import java.io.File
+
+import scala.Array.canBuildFrom
+import scala.annotation.implicitNotFound
 import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.Future
-import akka.util.Timeout
-import play.api.libs.Files.TemporaryFile
-import org.joda.time.format.DateTimeFormat
+import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
+
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+
+import akka.pattern.ask
+import akka.util.Timeout
+import akka.util.Timeout.durationToTimeout
+import models.Bucket
+import models.Dump
+import models.Tag
+import models.TagParser
+import play.Logger
+import play.api.Play
+import play.api.Play.current
+import play.api.libs.Files.TemporaryFile
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json.toJson
+import play.api.libs.json._
+import play.api.mvc.Action
+import play.api.mvc.Controller
+import play.api.mvc.MultipartFormData
+import play.api.mvc.Request
+import utils.Joda.dateTimeOrdering
+import utils.Work
 
 object Application extends Controller {
 
@@ -34,6 +43,19 @@ object Application extends Controller {
 
   def dmpster = Action {
     Ok(views.html.index(Dump.groupDumpsByBucket(Dump.all), Tag.all))
+  }
+
+  def bucketsJson = Action {
+    implicit val bucketWrites = Bucket.jsonWriter
+    implicit val dumpWrites = Dump.writeForIndex
+    
+    val grouped = Dump.groupDumpsByBucket2(Dump.all)
+    val contentJsonified = toJson(grouped.map { case (bucket, dumps) => 
+      Seq(toJson(bucket), toJson(dumps))
+    })
+    Ok(Json.obj(
+        "analyzing" -> analyzingJson,
+        "buckets" -> contentJsonified))
   }
 
   def newerThan(timestamp: Long) = Action {
@@ -77,6 +99,15 @@ object Application extends Controller {
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
     Ok(toJson(views.html.processing(files.map(_.getName)).body.trim))
   }
+  
+  def analyzingJson = {
+    val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
+    implicit val timeout = Timeout(5 seconds)
+    val jobs = analyzer ? utils.QueryRunningJobs
+    val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
+    
+    toJson(files.map(_.getName))
+  }
 
   def upload = Action(parse.multipartFormData) {
     request =>
@@ -103,7 +134,7 @@ object Application extends Controller {
 
   def extractTagsFrom(request: MultiPartRequest) = {
     request.body.dataParts.get("tags").map { tags =>
-      tags.head.split(",").map { case Tag(t) => t }
+      tags.head.split(",").map { case TagParser(t) => t }
     }
   }
 
@@ -113,7 +144,7 @@ object Application extends Controller {
 
     val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
     val subDir = createDumpSubDirName
-    val relFilePath = s"${subDir}\\${dmp.filename}"
+    val relFilePath = s"${subDir}${File.separator}${dmp.filename}"
     val dir = new File(dmpPath, subDir)
     dir.mkdirs()
     val newFile = new File(dir, dmp.filename)

@@ -6,11 +6,16 @@ import anorm._
 import anorm.SqlParser._
 import language.postfixOps
 import java.net.URLEncoder
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
 
 trait Taggable {
   val url: String
   val id: Long
   def tags: List[Tag]
+
+  def addTagUrl = s"dmpster/$url/$id/addTag/"
+  def removeTagUrl = s"dmpster/$url/$id/removeTag/"
 }
 
 case class Tag(id: Long, name: String) {
@@ -67,9 +72,13 @@ object Tag {
       }
   }
 
+  val nameOnlyFormat = Writes[Tag] (t => Json.obj("name" -> t.name))
+}
+
+object TagParser {
   def unapply(tagName: String) = {
     val trimmed = tagName.trim
-    if (!trimmed.isEmpty) Some(findOrCreate(trimmed))
+    if (!trimmed.isEmpty) Some(Tag.findOrCreate(trimmed))
     else None
   }
 }

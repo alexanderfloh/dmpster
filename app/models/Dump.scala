@@ -11,22 +11,26 @@ import scala.collection.immutable.ListMap
 import language.postfixOps
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTimeConstants
+import play.api.libs.json.Json
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import scala.util.parsing.json.JSONObject
 
 case class Dump(
   id: Long,
   bucket: Bucket,
-  relFilePath : String,
+  relFilePath: String,
   content: String,
   timestamp: DateTime) extends Taggable {
 
   val url = "dmp"
 
-  /** 
-   * Reference for 'now' instant in time. 
-   * The intention for this is to be able to provide a custom implementation in unit tests. 
+  /**
+   * Reference for 'now' instant in time.
+   * The intention for this is to be able to provide a custom implementation in unit tests.
    */
   protected def now = DateTime.now
-  
+
   private def firstDayOfNewness = {
     now.getDayOfWeek() match {
       case DateTimeConstants.MONDAY => now.minusDays(3).withTimeAtStartOfDay
@@ -39,15 +43,17 @@ case class Dump(
   def ageInDays = Days.daysBetween(timestamp, now).getDays
 
   def tags = Tag.forDump(this)
-  
+
   val filename = new java.io.File(relFilePath).getName;
-  
+
   private def isFromToday = now.withTimeAtStartOfDay.isBefore(timestamp)
 
   def dateFormatted = {
     if (isFromToday) "today " + timestamp.toString(DateTimeFormat.forPattern("HH:mm"))
     else timestamp.toString(DateTimeFormat.forPattern("YYYY-MM-dd HH:mm"))
   }
+
+  def ageLabel = s"added $dateFormatted - $ageInDays day${if (ageInDays != 1) "s"} old"
 }
 
 object Dump {
@@ -127,6 +133,23 @@ object Dump {
     ListMap(sortedDumpsByBucket.toList.sortBy { case ((bucket, newest), dumps) => newest.timestamp }: _*)
   }
 
+  def groupDumpsByBucket2(dumps: List[Dump]) = {
+    import utils.Joda._
+
+    val dumpsByBucket = dumps.groupBy(_.bucket)
+    val sortedDumpsByBucket = dumpsByBucket.toList.map {
+      case (bucket, dumps) => {
+        val sortedDumps = dumps.sortBy(_.timestamp)
+        (bucket, sortedDumps.toSeq)
+      }
+    }
+    val allSorted = sortedDumpsByBucket.sortBy {
+      case (bucket, List(newest, _*)) =>
+        newest.timestamp
+    }
+    allSorted.toSeq
+  }
+
   val dump = {
     get[Long]("id") ~
       get[Long]("bucketId") ~
@@ -136,5 +159,19 @@ object Dump {
         case id ~ bucketId ~ filename ~ content ~ timestamp =>
           Dump(id, Bucket.byId(bucketId).get, filename, content, new DateTime(timestamp))
       }
+  }
+
+  val writeForIndex = Writes[Dump] { d =>
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> d.id,
+      "filename" -> d.filename,
+      "isNew" -> d.isNew,
+      "ageLabel" -> d.ageLabel,
+      "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}",
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(d.tags),
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl))
   }
 }

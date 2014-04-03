@@ -263,7 +263,7 @@ article {
 
 .tag {
   display: inline-block;
-  margin: 2px 0;
+  margin: 2px;
   position: relative;
   color: white;
   padding: 3px 5px;
@@ -367,6 +367,19 @@ article {
       background-color: @tag-archive;
   }
   }
+}
+
+.bottom-link {
+  text-align: center;
+  text-decoration: none;
+  font-size: 75%;
+  color: black;
+        
+  &:hover {
+    text-decoration: underline;
+  }
+  width: 100%;
+  display: block;
 }
 
 .processing {

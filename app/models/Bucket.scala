@@ -5,6 +5,7 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 import language.postfixOps
+import play.api.libs.json._
 
 case class Bucket(
   id: Long,
@@ -59,5 +60,17 @@ object Bucket {
         case id ~ name => Bucket(id, name)
       }
   }
+
+  val jsonWriter = Writes[Bucket](b => {
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> b.id,
+      "name" -> b.name,
+      "url" -> s"dmpster/bucket/${b.id}",
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(b.tags),
+        "addTagUrl" -> b.addTagUrl,
+        "removeTagUrl" -> b.removeTagUrl))
+  })
 
 }
