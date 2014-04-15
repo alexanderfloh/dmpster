@@ -43,7 +43,7 @@ object Dmp extends Controller {
     Logger.info(s"serving dump $fileToServe")
 
     if (fileToServe.exists) {
-      Ok.sendFile(fileToServe, inline = true).withHeaders(CACHE_CONTROL -> "max-age=3600")
+      Ok.sendFile(fileToServe).withHeaders(CACHE_CONTROL -> "max-age=3600")
     } else {
       NotFound
     }
