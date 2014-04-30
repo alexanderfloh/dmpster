@@ -100,14 +100,6 @@ object Application extends Controller {
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
-  def analyzing = Action {
-    val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
-    implicit val timeout = Timeout(5 seconds)
-    val jobs = analyzer ? utils.QueryRunningJobs
-    val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
-    Ok(toJson(views.html.processing(files.map(_.getName)).body.trim))
-  }
-  
   def analyzingJson = {
     val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
     implicit val timeout = Timeout(5 seconds)
