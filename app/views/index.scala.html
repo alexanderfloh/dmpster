@@ -7,12 +7,7 @@
       <option>@t.name</option>
     }
   </datalist>
-  <input id="latest" type="hidden" value="@{groupedDumps.headOption.map{
-      case ((_, newest), _) => newest.timestamp.getMillis
-    }.getOrElse(0)
-  }"/>
 
- @* @buckets(groupedDumps.map{ case((bucket, newest), dmps) => (bucket, dmps) }) *@
   <div id="content"></div>
   <script type="text/jsx" src="@routes.Assets.at("javascripts/buckets.js")"></script>
 

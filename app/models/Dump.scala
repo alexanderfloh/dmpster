@@ -174,4 +174,17 @@ object Dump {
         "addTagUrl" -> d.addTagUrl,
         "removeTagUrl" -> d.removeTagUrl))
   }
+
+  val writeForDetails = Writes[Dump] { d =>
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> d.id,
+      "filename" -> d.filename,
+      "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}",
+      "content" -> d.content,
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(d.tags),
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl))
+  }
 }

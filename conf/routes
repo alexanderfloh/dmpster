@@ -17,6 +17,7 @@ GET		/dmpster/bucket/:id					controllers.Application.viewBucket(id: Long)
 GET     /dmpster/admin                      controllers.Admin.index
 
 GET     /dmpster/buckets.json               controllers.Application.bucketsJson
+GET     /dmpster/dmp/:id/detailsJson        controllers.Application.detailsJson(id: Long)
 
 POST	/upload								controllers.Application.upload
 POST    /uploadAsync                        controllers.Application.uploadAsync

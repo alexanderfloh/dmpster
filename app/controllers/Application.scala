@@ -57,6 +57,14 @@ object Application extends Controller {
         "analyzing" -> analyzingJson,
         "buckets" -> contentJsonified))
   }
+  
+  def detailsJson(id: Long) = Action {
+    implicit val dumpWrites = Dump.writeForDetails
+    val optResult = for {
+      dump <- Dump.byId(id)
+    } yield Ok(toJson(dump))
+    optResult.getOrElse(BadRequest(s"Dump ${id} not found"))
+  }
 
   def newerThan(timestamp: Long) = Action {
     import utils.Joda._

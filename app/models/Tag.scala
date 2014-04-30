@@ -14,8 +14,8 @@ trait Taggable {
   val id: Long
   def tags: List[Tag]
 
-  def addTagUrl = s"dmpster/$url/$id/addTag/"
-  def removeTagUrl = s"dmpster/$url/$id/removeTag/"
+  def addTagUrl = s"/dmpster/$url/$id/addTag/"
+  def removeTagUrl = s"/dmpster/$url/$id/removeTag/"
 }
 
 case class Tag(id: Long, name: String) {

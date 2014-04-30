@@ -1,18 +1,20 @@
 @(dump: Dump) 
 @main {
-<article>
-  <h1>@dump.filename</h1>
   
-  <section class="details">
-    <h1>
-      <a href="@routes.Dmp.at(dump.relFilePath)" download>
-        <img src="@routes.Assets.at("images/download.svg")" title="download @dump.filename"></img>
-      </a>
-      @listTags(dump)
-    </h1>
-    <pre>
-@dump.content
-    </pre>
-  </section>
-</article>
+<datalist class="hidden" id="tags">
+    @dump.tags.map{ t => 
+      <option>@t.name</option>
+    }
+  </datalist>
+<div id="content"></div>
+
+<script type="text/jsx" src="@routes.Assets.at("javascripts/details.js")"></script>
+<script type="text/jsx">
+/** @@jsx React.DOM */
+
+React.renderComponent(
+  <DetailsContainer url="/dmpster/dmp/@dump.id/detailsJson" pollInterval={2000}/>,
+  document.getElementById('content')
+);
+</script>
 }
