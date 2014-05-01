@@ -3,26 +3,27 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET    /                                        controllers.Application.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
-GET		/dmps/*file					controllers.Dmp.at(file)
+GET    /assets/*file                            controllers.Assets.at(path="/public", file)
+GET    /dmps/*file                              controllers.Dmp.at(file)
 
-GET		/dmpster							controllers.Application.dmpster
-GET		/dmpster/newerThan/:timestamp		controllers.Application.newerThan(timestamp: Long)
-GET		/dmpster/dmp/:id/details			controllers.Application.viewDetails(id: Long)
-GET		/dmpster/bucket/:id					controllers.Application.viewBucket(id: Long)
-GET     /dmpster/admin                      controllers.Admin.index
+GET    /dmpster                                 controllers.Application.dmpster
+GET    /dmpster/newerThan/:timestamp            controllers.Application.newerThan(timestamp: Long)
+GET    /dmpster/dmp/:id/details                 controllers.Application.viewDetails(id: Long)
+GET    /dmpster/bucket/:id                      controllers.Application.viewBucket(id: Long)
+GET    /dmpster/admin                           controllers.Admin.index
 
-GET     /dmpster/buckets.json               controllers.Application.bucketsJson
-GET     /dmpster/dmp/:id/detailsJson        controllers.Application.detailsJson(id: Long)
+GET    /dmpster/buckets.json                    controllers.Application.bucketsJson
+GET    /dmpster/dmp/:id/detailsJson             controllers.Application.detailsJson(id: Long)
+GET    /dmpster/bucket/:id/Json                 controllers.Application.bucketJson(id: Long)
 
-POST	/upload								controllers.Application.upload
-POST    /uploadAsync                        controllers.Application.uploadAsync
-POST	/dmpster/dmp/:id/delete				controllers.Application.deleteBucket(id: Long)
-POST    /dmpster/dmp/:id/addTag/:tagName 	controllers.Application.addTagToDmp(id: Long, tagName: String)
-POST    /dmpster/dmp/:id/removeTag/:tagName controllers.Application.removeTagFromDmp(id: Long, tagName: String)
-POST    /dmpster/bucket/:id/addTag/:tagName 	controllers.Application.addTagToBucket(id: Long, tagName: String)
-POST    /dmpster/bucket/:id/removeTag/:tagName 	controllers.Application.removeTagFromBucket(id: Long, tagName: String)
-POST    /dmpster/admin/cleanupNow           controllers.Admin.cleanUpNow
+POST   /upload                                  controllers.Application.upload
+POST   /uploadAsync                             controllers.Application.uploadAsync
+POST   /dmpster/dmp/:id/delete                  controllers.Application.deleteBucket(id: Long)
+POST   /dmpster/dmp/:id/addTag/:tagName         controllers.Application.addTagToDmp(id: Long, tagName: String)
+POST   /dmpster/dmp/:id/removeTag/:tagName      controllers.Application.removeTagFromDmp(id: Long, tagName: String)
+POST   /dmpster/bucket/:id/addTag/:tagName      controllers.Application.addTagToBucket(id: Long, tagName: String)
+POST   /dmpster/bucket/:id/removeTag/:tagName   controllers.Application.removeTagFromBucket(id: Long, tagName: String)
+POST   /dmpster/admin/cleanupNow                controllers.Admin.cleanUpNow

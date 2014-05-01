@@ -99,6 +99,18 @@ object Application extends Controller {
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
+  
+  def bucketJson(id: Long) = Action {
+    implicit val bucketWrites = Bucket.jsonWriter
+    implicit val dumpWrites = Dump.writeForIndex
+    
+    val result = for {
+      bucket <- Bucket.byId(id)
+      dumps = Dump.byBucket(bucket)
+    } yield Ok(Json.obj("bucket" -> toJson(bucket), "dumps" -> toJson(dumps)))
+
+    result.getOrElse(NotFound(s"Bucket ${id} not found"))
+  }
 
   def analyzingJson = {
     val analyzer = Akka.system.actorSelection("/user/analyzeMaster")

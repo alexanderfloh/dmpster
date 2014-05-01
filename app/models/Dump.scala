@@ -168,7 +168,7 @@ object Dump {
       "filename" -> d.filename,
       "isNew" -> d.isNew,
       "ageLabel" -> d.ageLabel,
-      "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}",
+      "dmpUrl" -> s"/dmps/${d.relFilePath.replace("\\", "/")}",
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(d.tags),
         "addTagUrl" -> d.addTagUrl,
@@ -180,7 +180,7 @@ object Dump {
     Json.obj(
       "id" -> d.id,
       "filename" -> d.filename,
-      "dmpUrl" -> s"dmps/${d.relFilePath.replace("\\", "/")}",
+      "dmpUrl" -> s"/dmps/${d.relFilePath.replace("\\", "/")}",
       "content" -> d.content,
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(d.tags),
