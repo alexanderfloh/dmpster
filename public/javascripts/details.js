@@ -43,7 +43,7 @@ var Details = React.createClass({
       
       <section className="details">
         <h1>
-          <a href="downloadPath" download>
+          <a href={this.props.details.dmpUrl} download={this.props.details.filename}>
             <img src="/assets/images/download.svg" title={"download "+ this.props.details.filename}></img>
           </a>
           <Tags 
