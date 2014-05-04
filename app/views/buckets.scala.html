@@ -1,6 +1,0 @@
-@(groupedDumps: Map[Bucket, List[Dump]]) 
-@import helper._ 
-
-@groupedDumps.map { case(bucket, dmps) =>
-  @views.html.bucket(bucket, dmps)
-}

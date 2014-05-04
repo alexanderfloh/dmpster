@@ -42,46 +42,29 @@ object Application extends Controller {
   }
 
   def dmpster = Action {
-    Ok(views.html.index(Dump.groupDumpsByBucket(Dump.all), Tag.all))
+    Ok(views.html.index(Tag.all))
   }
 
   def bucketsJson = Action {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
-    
-    val grouped = Dump.groupDumpsByBucket2(Dump.all)
-    val contentJsonified = toJson(grouped.map { case (bucket, dumps) => 
-      Seq(toJson(bucket), toJson(dumps))
+
+    val grouped = Dump.groupDumpsByBucket(Dump.all)
+    val contentJsonified = toJson(grouped.map {
+      case (bucket, dumps) =>
+        Seq(toJson(bucket), toJson(dumps))
     })
     Ok(Json.obj(
-        "analyzing" -> analyzingJson,
-        "buckets" -> contentJsonified))
+      "analyzing" -> analyzingJson,
+      "buckets" -> contentJsonified))
   }
-  
+
   def detailsJson(id: Long) = Action {
     implicit val dumpWrites = Dump.writeForDetails
     val optResult = for {
       dump <- Dump.byId(id)
     } yield Ok(toJson(dump))
     optResult.getOrElse(BadRequest(s"Dump ${id} not found"))
-  }
-
-  def newerThan(timestamp: Long) = Action {
-    import utils.Joda._
-
-    val time = new DateTime(timestamp)
-    val newDumps = Dump.newerThan(time)
-    val groupedByBucket = newDumps.groupBy(_.bucket)
-    val allDumpsByBucket = groupedByBucket.map {
-      case (bucket, _) =>
-        (bucket, Dump.byBucket(bucket).sortBy(_.timestamp))
-    }
-    val json = toJson(allDumpsByBucket.map {
-      case (bucket, dumps) =>
-        (bucket.id.toString, views.html.bucket(bucket, dumps).body)
-    })
-
-    Ok(json)
   }
 
   def viewDetails(id: Long) = Action {
@@ -99,11 +82,11 @@ object Application extends Controller {
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
-  
+
   def bucketJson(id: Long) = Action {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
-    
+
     val result = for {
       bucket <- Bucket.byId(id)
       dumps = Dump.byBucket(bucket)
@@ -117,7 +100,7 @@ object Application extends Controller {
     implicit val timeout = Timeout(5 seconds)
     val jobs = analyzer ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
-    
+
     toJson(files.map(_.getName))
   }
 
@@ -150,7 +133,7 @@ object Application extends Controller {
     }
   }
 
-  def moveFile(dmp: FilePart) = {
+  private def moveFile(dmp: FilePart) = {
     Logger.info(s"moving file ${dmp.filename}")
     import java.io.File
 
@@ -199,7 +182,7 @@ object Application extends Controller {
 
     Dump.byId(id).map(dump => {
       if (!Tag.forDump(dump).exists(_.name == tagName)) Dump.addTag(dump, tag)
-      Ok(views.html.listTags(dump))
+      Ok("tag added")
     }).getOrElse(NotFound(s"Invalid dump id ${id}"))
   }
 
@@ -207,7 +190,7 @@ object Application extends Controller {
     Tag.findByName(tagName).flatMap(tag => {
       Dump.byId(id).map(dump => {
         Dump.removeTag(dump, tag)
-        Ok(views.html.listTags(dump))
+        Ok("tag removed")
       })
     }).getOrElse(NotFound("Invalid dump id or tag"))
   }
@@ -215,12 +198,10 @@ object Application extends Controller {
   def addTagToBucket(id: Long, tagName: String) = Action {
     val tag = Tag.findOrCreate(tagName)
     val result = for { bucket <- Bucket.byId(id) } yield {
-      if (Tag.forBucket(bucket).exists(_.name == tagName))
-        Ok(views.html.listTags(bucket))
-      else {
+      if (!Tag.forBucket(bucket).exists(_.name == tagName)) {
         Bucket.addTag(bucket, tag)
-        Ok(views.html.listTags(bucket))
       }
+      Ok("tag added")
     }
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
@@ -229,11 +210,9 @@ object Application extends Controller {
     val tag = Tag.findOrCreate(tagName)
     val result = for (bucket <- Bucket.byId(id)) yield {
       Bucket.removeTag(bucket, tag)
-      Ok(views.html.listTags(bucket))
+      Ok("tag removed")
     }
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
-
-  def deleteBucket(id: Long) = TODO
 
 }

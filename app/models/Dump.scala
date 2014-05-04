@@ -124,30 +124,16 @@ object Dump {
     import utils.Joda._
 
     val dumpsByBucket = dumps.groupBy(_.bucket)
-    val sortedDumpsByBucket = dumpsByBucket.map {
-      case (bucket, dumps) => {
-        val sortedDumps = dumps.sortBy(_.timestamp)
-        ((bucket, sortedDumps.head), sortedDumps)
-      }
-    }
-    ListMap(sortedDumpsByBucket.toList.sortBy { case ((bucket, newest), dumps) => newest.timestamp }: _*)
-  }
-
-  def groupDumpsByBucket2(dumps: List[Dump]) = {
-    import utils.Joda._
-
-    val dumpsByBucket = dumps.groupBy(_.bucket)
     val sortedDumpsByBucket = dumpsByBucket.toList.map {
       case (bucket, dumps) => {
         val sortedDumps = dumps.sortBy(_.timestamp)
-        (bucket, sortedDumps.toSeq)
+        (bucket, sortedDumps)
       }
     }
     val allSorted = sortedDumpsByBucket.sortBy {
-      case (bucket, List(newest, _*)) =>
-        newest.timestamp
+      case (bucket, List(newest, _*)) => newest.timestamp
     }
-    allSorted.toSeq
+    allSorted
   }
 
   val dump = {
