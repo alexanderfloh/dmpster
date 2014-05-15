@@ -7,6 +7,7 @@ import play.api.libs.iteratee._
 import Play.current
 import java.io._
 import java.net.URLDecoder
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 /**
  * Controller that serves static resources from an external folder.
@@ -43,7 +44,7 @@ object Dmp extends Controller {
     Logger.info(s"serving dump $fileToServe")
 
     if (fileToServe.exists) {
-      Ok.sendFile(fileToServe).withHeaders(CACHE_CONTROL -> "max-age=3600")
+      Ok.chunked(Enumerator.fromFile(fileToServe)).withHeaders(CACHE_CONTROL -> "max-age=3600")
     } else {
       NotFound
     }
