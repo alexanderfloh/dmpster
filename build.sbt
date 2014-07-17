@@ -15,3 +15,4 @@ libraryDependencies ++= Seq(
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
 includeFilter in (Assets, LessKeys.less) := "styles.less"
+

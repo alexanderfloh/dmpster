@@ -9,12 +9,10 @@
 <div id="content"></div>
 
 <script src="@routes.Assets.at("jsx/details.js")"></script>
-<script type="text/jsx">
-/** @@jsx React.DOM */
-
+<script>
 React.renderComponent(
-  <DetailsContainer url="/dmpster/dmp/@dump.id/detailsJson" pollInterval={2000}/>,
-  document.getElementById('content')
-);
+  DetailsContainer(
+    { url:"/dmpster/dmp/@dump.id/detailsJson", pollInterval:2000 }), 
+  document.getElementById('content'));
 </script>
 }
