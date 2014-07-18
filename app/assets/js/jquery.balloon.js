@@ -8,7 +8,7 @@
  * @author: Hayato Takenaka (http://urin.take-uma.net)
  * @version: 0.3.0 - 2012/02/25
 **/
-;(function($) {
+define(['jquery'], function($) {
 	//-----------------------------------------------------------------------------
 	// Private
 	//-----------------------------------------------------------------------------
@@ -20,9 +20,9 @@
 		var idx = {
 			pos: {
 				o: position,                                          // origin
-				f: (position % 2 == 0) ? position + 1 : position - 1, // faced
-				p1: (position % 2 == 0) ? position : position - 1,
-				p2: (position % 2 == 0) ? position + 1 : position,
+				f: (position % 2 === 0) ? position + 1 : position - 1, // faced
+				p1: (position % 2 === 0) ? position : position - 1,
+				p2: (position % 2 === 0) ? position + 1 : position,
 				c1: (position < 2) ? 2 : 0,
 				c2: (position < 2) ? 3 : 1
 			},
@@ -55,14 +55,14 @@
 					this.$.css("border-" + pos.toLowerCase() + "-width", value + "px");
 					this["border" + pos] = value;
 					return (this.isActive) ? digitalize(this, isVertical) : this;
-				}
+				};
 			},
 			setPosition: function(pos, isVertical) {
 				return function(value) {
 					this.$.css(pos.toLowerCase(), value + "px");
 					this[pos.toLowerCase()] = value;
 					return (this.isActive) ? digitalize(this, isVertical) : this;
-				}
+				};
 			}
 		};
 
@@ -80,12 +80,12 @@
 		};
 		for(var i = 0; i < Meta.pos.length; i++) {
 			NumericalBoxElement.prototype["setBorder" + Meta.pos.camel[i]] = Methods.setBorder(Meta.pos.camel[i], (i < 2));
-			if(i % 2 == 0)
+			if(i % 2 === 0)
 				NumericalBoxElement.prototype["set" + Meta.pos.camel[i]] = Methods.setPosition(Meta.pos.camel[i], (i < 2));
 		}
 
 		function digitalize(box, isVertical) {
-			if(isVertical == undefined) { digitalize(box, true); return digitalize(box, false); }
+			if(isVertical === undefined) { digitalize(box, true); return digitalize(box, false); }
 			var m = Meta.getRelativeNames((isVertical) ? 0 : 2);
 			box[m.size.p] = box.$["outer" + m.camel.size.p]();
 			box[m.pos.f] = box[m.pos.o] + box[m.size.p];
@@ -105,12 +105,12 @@
 			initTipStyle = {position: "absolute", height: "0", width: "0", border: "solid 0 transparent"},
 			target = new NumericalBoxElement($target),
 			balloon = new NumericalBoxElement($balloon);
-		balloon.setTop(-options.offsetY
-			+ ((options.position && options.position.indexOf("top") >= 0) ? target.top - balloon.height
+		balloon.setTop(-options.offsetY +
+			((options.position && options.position.indexOf("top") >= 0) ? target.top - balloon.height
 			: ((options.position && options.position.indexOf("bottom") >= 0) ? target.bottom
 			: target.center.top - balloon.height / 2)));
-		balloon.setLeft(options.offsetX
-			+ ((options.position && options.position.indexOf("left") >= 0) ? target.left - balloon.width
+		balloon.setLeft(options.offsetX +
+			((options.position && options.position.indexOf("left") >= 0) ? target.left - balloon.width
 			: ((options.position && options.position.indexOf("right") >= 0) ? target.right
 			: target.center.left - balloon.width / 2)));
 		if(options.tipSize > 0) {
@@ -125,7 +125,7 @@
 				m = Meta.getRelativeNames(i);
 				if(balloon.center[m.pos.c1] >= target[m.pos.c1] &&
 					balloon.center[m.pos.c1] <= target[m.pos.c2]) {
-					if(i % 2 == 0) {
+					if(i % 2 === 0) {
 						if(balloon[m.pos.o] >= target[m.pos.o] && balloon[m.pos.f] >= target[m.pos.f]) break;
 					} else {
 						if(balloon[m.pos.o] <= target[m.pos.o] && balloon[m.pos.f] <= target[m.pos.f]) break;
@@ -172,7 +172,7 @@
 			var $target = $(this), t = this;
 			var $balloon = $target.unbind("mouseenter", arguments.callee)
 				.showBalloon(options).mouseenter(function(e) {
-					isValidTargetEvent($target, e) && $target.showBalloon();
+					if(isValidTargetEvent($target, e)) { $target.showBalloon(); }
 				}).data("balloon");
 			if($balloon) {
 				$balloon.mouseleave(function(e) {
@@ -182,7 +182,7 @@
 			}
 		}).mouseleave(function(e) {
 			var $target = $(this);
-			isValidTargetEvent($target, e) && $target.hideBalloon();
+			if(isValidTargetEvent($target, e)) { $target.hideBalloon(); }
 		});
 	};
 
@@ -194,13 +194,13 @@
 		options = this.data("options");
 		return this.each(function() {
 			$target = $(this);
-			(offTimer = $target.data("offTimer")) && clearTimeout(offTimer);
-			var contents = $.isFunction(options.contents)
-				? options.contents()
+			offTimer = $target.data("offTimer"); if(offTimer) { clearTimeout(offTimer); }
+			var contents = $.isFunction(options.contents) ?
+				options.contents()
 				: (options.contents || $target.attr("title"));
 			var isNew = !($balloon = $target.data("balloon"));
 			if(isNew) $balloon = $("<div>").append(contents);
-			if(!options.url && (!$balloon || $balloon.html() == "")) return;
+			if(!options.url && (!$balloon || $balloon.html() === "")) return;
 			if(!isNew && contents && contents != $balloon.html()) $balloon.empty().append(contents);
 			$target.removeAttr("title");
 			if(options.url) {
@@ -237,14 +237,14 @@
 		var options = this.data("options"), onTimer, offTimer;
 		return this.each(function() {
 			var $target = $(this);
-			(onTimer = $target.data("onTimer")) && clearTimeout(onTimer);
-			(offTimer = $target.data("offTimer")) && clearTimeout(offTimer);
+			onTimer = $target.data("onTimer"); if(onTimer) { clearTimeout(onTimer); }
+			offTimer = $target.data("offTimer"); if(offTimer) { clearTimeout(offTimer); }
 			$target.data("offTimer", setTimeout(function() {
 				var $balloon = $target.data("balloon");
 				if(options.hideAnimation) {
-					$balloon && options.hideAnimation.apply($balloon.stop(true, true), [options.hideDuration]);
+					if($balloon) { options.hideAnimation.apply($balloon.stop(true, true), [options.hideDuration]); }
 				} else {
-					$balloon && $balloon.stop(true, true).hide(options.hideDuration);
+					if($balloon) { $balloon.stop(true, true).hide(options.hideDuration); }
 				}
 			},
 			options.minLifetime));
@@ -272,4 +272,4 @@
 			}
 		}
 	};
-})(jQuery);
+});

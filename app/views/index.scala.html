@@ -9,8 +9,19 @@
   </datalist>
 
   <div id="content"></div>
+  @*
   <script src="@routes.Assets.at("jsx/bucket.js")"></script>
   <script src="@routes.Assets.at("jsx/buckets.js")"></script>
+  
+  React.renderComponent(
+  <Buckets url="dmpster/buckets.json" pollInterval={2000}/>,
+  document.getElementById('content')
+);
+  
 
+  *@
+  
+  @*
   <script src="@routes.Assets.at("javascripts/upload.js")"></script>
+  *@
 }
