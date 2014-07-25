@@ -1,10 +1,10 @@
-@(content: Html)
+@(jsFile: String)(content: Html)
 
 <!doctype html>
 <html>
 <head>
   <link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
-  <script data-main="@routes.Assets.at("js/main.js")" type="text/javascript" src="@routes.Assets.at("lib/requirejs/require.js")"></script>
+  <script data-main="@routes.Assets.at(jsFile)" type="text/javascript" src="@routes.Assets.at("lib/requirejs/require.js")"></script>
   
   <link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
   <!-- trashcan image by Christopher Lee, from The Noun Project -->

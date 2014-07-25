@@ -1,14 +1,15 @@
 
 requirejs.config({
   paths: {
-    'jquery': '../lib/jquery/jquery',
-    'jquery.ui.widget': '../jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget',
-    'jquery.fileupload': '../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
-    'react': '../lib/react/react-with-addons',
-    'tagging': '../jsx/tagging',
-    'tags': '../jsx/tags',
-    'Bucket': '../jsx/bucket',
-    'buckets': '../jsx/buckets',
+    'jquery': '../../lib/jquery/jquery',
+    'jquery.ui.widget': '../../jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget',
+    'jquery.fileupload': '../../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
+    'jquery.balloon': '../jquery.balloon',
+    'react': '../../lib/react/react-with-addons',
+    'tagging': '../../jsx/tagging',
+    'tags': '../../jsx/tags',
+    'Bucket': '../../jsx/bucket',
+    'buckets': '../../jsx/buckets',
   }
 });
 
@@ -36,7 +37,7 @@ require([
   ) {
   React.renderComponent(
         Buckets.Buckets(
-          { url:"dmpster/buckets.json", pollInterval:2000 }),
+          { url:"dmpster/buckets.json", pollInterval:5000 }),
         document.getElementById('content'));
   $(function() {
     var holder = $('body').get(0);

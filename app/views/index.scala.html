@@ -1,6 +1,6 @@
 @(allTags: Seq[Tag]) 
 
-@main {
+@main("js/index/main.js") {
 
   <datalist class="hidden" id="tags">
     @allTags.map{ t => 

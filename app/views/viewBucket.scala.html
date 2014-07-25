@@ -1,6 +1,6 @@
 @(bucket: Bucket, dumps: List[Dump], allTags: Seq[Tag]) 
 
-@main {
+@main("js/bucket/main.js") {
 
   <datalist class="hidden" id="tags">
     @allTags.map{ t => 
@@ -9,12 +9,11 @@
   </datalist>
 
   <div id="content"></div>
+  @*
   <script src="@routes.Assets.at("jsx/bucket.js")"></script>
   <script src="@routes.Assets.at("jsx/viewBucket.js")"></script>
+  *@
   <script>
-  React.renderComponent(
-    ViewBucket({url:"/dmpster/bucket/@bucket.id/Json", pollInterval:2000}),
-    document.getElementById('content')
-    );
+  var bucketId = @bucket.id;
   </script>  
 }
