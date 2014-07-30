@@ -1,6 +1,6 @@
 @(bucket: Bucket, dumps: List[Dump], allTags: Seq[Tag]) 
 
-@main("js/bucket/main.js") {
+@main("js/mainBucket.js") {
 
   <datalist class="hidden" id="tags">
     @allTags.map{ t => 
