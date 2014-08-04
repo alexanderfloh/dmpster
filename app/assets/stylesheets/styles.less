@@ -356,8 +356,8 @@ article {
     margin-top: 3px;
     color: white;
     padding: 3px 5px;
-  font-size: 12px;
-  font-weight: normal;
+    font-size: 12px;
+    font-weight: normal;
 
     &.marked-for-deletion {
       background-color: @tag-delete;
@@ -367,19 +367,6 @@ article {
       background-color: @tag-archive;
   }
   }
-}
-
-.bottom-link {
-  text-align: center;
-  text-decoration: none;
-  font-size: 75%;
-  color: black;
-
-  &:hover {
-    text-decoration: underline;
-  }
-  width: 100%;
-  display: block;
 }
 
 .processing {
@@ -420,4 +407,24 @@ pre {
   font-size: 12px;
   font-weight: normal;
   text-align: right;
+}
+
+.menu {
+  z-index: 9999;
+  background-color: black;
+  color: white;
+  padding: 5px 0 5px 25px;
+  a {
+    text-decoration: none;
+    color: white;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  .bottom-link {
+    float: right;
+    font-size: 0.8em;
+  }
 }

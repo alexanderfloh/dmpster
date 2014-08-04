@@ -28,6 +28,7 @@ define(function(require) {
         Buckets.Buckets(
           { url:"dmpster/buckets.json", pollInterval:5000 }),
         document.getElementById('content'));
+  
   $(function() {
     var holder = $('body').get(0);
     holder.ondragover = function() {
@@ -42,46 +43,38 @@ define(function(require) {
       $('#holder').removeClass('dragging');
     };
   });
-});
+  
+//Create a clone of the menu, right next to original.
+  $('.cloned').css('position','fixed').css('left','0').css('top','0');
 
-// require([
-//   'jquery',
-//   'jquery.ui.widget',
-//   'jquery.fileupload',
-//   'jquery.balloon',
-//   'react',
-//   'tagging',
-//   'tags',
-//   'Bucket',
-//   'buckets'
-//
-//   ], function (
-//   jQuery,
-//   jQueryUiWidget,
-//   jQueryFileUpload,
-//   jQueryBalloon,
-//   React,
-//   Tagging,
-//   Tags,
-//   Bucket,
-//   Buckets
-//   ) {
-//   React.renderComponent(
-//         Buckets.Buckets(
-//           { url:"dmpster/buckets.json", pollInterval:5000 }),
-//         document.getElementById('content'));
-//   $(function() {
-//     var holder = $('body').get(0);
-//     holder.ondragover = function() {
-//       $('#holder').addClass('dragging');
-//       event.preventDefault();
-//     };
-//     holder.ondragleave = function(dataTransfer) {
-//       $('#holder').removeClass('dragging');
-//       event.preventDefault();
-//     };
-//     holder.ondrop = function(e) {
-//       $('#holder').removeClass('dragging');
-//     };
-//   });
-// });
+  stickMenu();
+  jQuery( window ).resize(function() {stickMenu();});
+  jQuery( window ).scroll(function() {stickMenu();});
+
+
+  function stickMenu() {
+    
+    var orgElementPos = $('.original').offset();
+    orgElementTop = orgElementPos.top;
+
+    stickyTop = 0;
+
+    if ($(window).scrollTop() >= (orgElementTop - stickyTop)) {
+      // scrolled past the original position; now only show the cloned, sticky element.
+      
+      // Cloned element should always have same left position and width as original element.     
+      orgElement = $('.original');
+      coordsOrgElement = orgElement.offset();
+      leftOrgElement = coordsOrgElement.left;  
+      widthOrgElement = orgElement.width();
+           
+      $('.cloned').css('left',leftOrgElement+'px').css('top',stickyTop+'px').css('width',widthOrgElement+'px').show();
+      $('.original').css('visibility','hidden');
+    } else {
+      // not scrolled past the menu; only show the original menu.
+      $('.cloned').hide();
+      $('.original').css('visibility','visible');
+    }
+  }
+
+});

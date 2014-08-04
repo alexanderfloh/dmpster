@@ -23,7 +23,10 @@
   </h1>
   <span>drop DMP here to upload</span>
 </header>
-<body>
+<div class="menu original">&nbsp;<a class="bottom-link" href="@routes.Admin.index">Administration area</a></div>
+<div class="menu cloned" style="display:none">
+<a href="@routes.Application.index">dmpster</a>
+<a class="bottom-link" href="@routes.Admin.index">Administration area</a></div>
 @content
-<a class="bottom-link" href="@routes.Admin.index">Administration area</a>
+</body>
 </html>
