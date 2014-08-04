@@ -44,7 +44,7 @@ object Dmp extends Controller {
     Logger.info(s"serving dump $fileToServe")
 
     if (fileToServe.exists) {
-      Ok.chunked(Enumerator.fromFile(fileToServe)).withHeaders(CACHE_CONTROL -> "max-age=3600")
+      Ok.sendFile(fileToServe).withHeaders(CACHE_CONTROL -> "max-age=3600")
     } else {
       NotFound
     }

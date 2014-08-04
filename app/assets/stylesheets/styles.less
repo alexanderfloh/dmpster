@@ -60,7 +60,7 @@ body {
 
 @tag-default: #2980B9;
 @tag-hover: darken(@tag-default, 10%);
- 
+
 @tag-delete: #D35400;
 @tag-delete-hover: darken(@tag-delete, 10%);
 
@@ -152,7 +152,7 @@ article {
     .tag:first-of-type:not(.add) {
       margin-left: 15px;
     }
-    
+
     a {
       text-decoration: none;
       color: black;
@@ -173,14 +173,14 @@ article {
     border: 1px solid rgba(0, 0, 0, 0.07);
     margin-right: 20px;
     margin-bottom: 20px;
-    
+
     &.details { max-width: none; }
 
     h1 {
       a {
         text-decoration: none;
         color: white;
-        
+
         &:hover {
           text-decoration: underline;
         }
@@ -194,7 +194,7 @@ article {
             background-color: rgb(86, 175, 0);
           }
         }
-        
+
       }
 
       margin: -15px;
@@ -231,7 +231,7 @@ article {
         overflow: hidden;
       }
     }
-    
+
     .side-menu {
       display: none;
       position: absolute;
@@ -247,14 +247,14 @@ article {
         background-color: rgb(86, 175, 0);
       }
       img {
-          height: 25px;
-          padding: 5px;
+          //height: 25px;
+          //padding: 5px 0 5px 0;
         }
     }
   }
-  section:hover .side-menu { 
+  section:hover .side-menu {
     display: block;
-    z-index: 11;  
+    z-index: 11;
   }
   section:hover {
     z-index: 10;
@@ -270,7 +270,7 @@ article {
   font-size: 12px;
   font-weight: normal;
   background-color: @tag-default;
-  
+
   &:hover {
     cursor: pointer;
     background-color: @tag-hover;
@@ -279,7 +279,7 @@ article {
   &.add {
     text-decoration: none;
     background-color: @tag-add;
-    
+
     &:before {
       content: '+';
       font-weight: 900;
@@ -292,12 +292,12 @@ article {
       text-align: center;
       margin-right: 4px;
     }
-    
+
     &:hover {
       background-color: @tag-add-hover;
     }
   }
-  
+
   .remove-tag {
     position: absolute;
     width: 20px;
@@ -306,7 +306,7 @@ article {
     bottom: 0px;
     background-color: inherit;
     display: none;
-    
+
     img {
       height: 10px;
       padding: 4px;
@@ -315,26 +315,26 @@ article {
       }
     }
   }
-  
+
   &:hover .remove-tag {
     z-index: 11;
     display: inline-block;
   }
-  
+
   &.marked-for-deletion {
     background-color: @tag-delete;
     &:hover {
       background-color: @tag-delete-hover;
     }
-  } 
-  
+  }
+
   &.keep-forever {
     background-color: @tag-archive;
     &:hover {
       background-color: @tag-archive-hover;
     }
   }
-  
+
 }
 
 .balloon {
@@ -344,12 +344,12 @@ article {
   color: black;
   background-color: white;
   z-index: 32767;
-  
+
   h2 {
     font-size: 15px;
     text-align: center;
   }
-  
+
   li {
     text-align: left;
     margin-left: 5px;
@@ -358,11 +358,11 @@ article {
     padding: 3px 5px;
   font-size: 12px;
   font-weight: normal;
-    
+
     &.marked-for-deletion {
       background-color: @tag-delete;
-    } 
-  
+    }
+
     &.keep-forever {
       background-color: @tag-archive;
   }
@@ -374,7 +374,7 @@ article {
   text-decoration: none;
   font-size: 75%;
   color: black;
-        
+
   &:hover {
     text-decoration: underline;
   }
@@ -409,7 +409,7 @@ pre {
 .innerBar {
   display: inline-block;
   background-color: @tag-default;
-  
+
   margin: 0px 0px -2px;
   position: relative;
   height: 20px;

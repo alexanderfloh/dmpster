@@ -1,5 +1,5 @@
 @(dump: Dump) 
-@main {
+@main("js/mainDetails.js") {
   
 <datalist class="hidden" id="tags">
     @dump.tags.map{ t => 
@@ -8,13 +8,7 @@
   </datalist>
 <div id="content"></div>
 
-<script type="text/jsx" src="@routes.Assets.at("javascripts/details.js")"></script>
-<script type="text/jsx">
-/** @@jsx React.DOM */
-
-React.renderComponent(
-  <DetailsContainer url="/dmpster/dmp/@dump.id/detailsJson" pollInterval={2000}/>,
-  document.getElementById('content')
-);
+<script>
+var dumpId = @dump.id;
 </script>
 }

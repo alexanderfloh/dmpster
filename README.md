@@ -1,6 +1,6 @@
 #dmpster#
 ![dmpster screenshot](dmpster.png)
-_dmpster_ is a simple web app for storing `.dmp`-files. 
+_dmpster_ is a simple web app for storing `.dmp`-files.
 It also does an automated analysis of the `.dmp`-file (`!analyze - v`) to give you a quick overview what happend.
 
 #Features#
@@ -13,10 +13,12 @@ It also does an automated analysis of the `.dmp`-file (`!analyze - v`) to give y
 * File upload can be automated.
 
 #Installation#
-* Install Java
-* Install Debugging Tools for Windows
-* Install [play framework](http://downloads.typesafe.com/play/2.2.0/play-2.2.0.zip)
+* `choco install jdk8` - Install Java
+* `choco install windbg` - Install Debugging Tools for Windows
+* `choco install Play` - Install play framework
 * Check out the dmpster source in a local directory
 * adapt `conf/application.conf` and `conf/prod.conf` if necessary.
-* When running the first time, start `run-apply-evolution.cmd`, later you can start it with `run.cmd`.
+* run `activator clean stage` to build for local production mode
+* prepare environment with `SET JAVA_OPTS=-Dconfig.file=conf/prod.conf -Dhttp.port=80`
+* run `target\universal\stage\bin\dmpster.bat`
 * Done!

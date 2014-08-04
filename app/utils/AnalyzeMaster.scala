@@ -18,6 +18,8 @@ case class RunningJobs(jobs: List[File])
 case class FinishedWork(file: File)
 
 class AnalyzeMaster extends Actor {
+  val analyzingTimeout = Timeout(Play.current.configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
+  
   val activeWork = collection.mutable.ListBuffer[File]()
   
   val analyzerWorkers = Play.current.configuration.getInt("dmpster.analyzer.workers").getOrElse(2)
@@ -27,7 +29,7 @@ class AnalyzeMaster extends Actor {
     case work @ Work(file) => {
       Logger.info(s"adding $file to active work")
       activeWork.append(file)
-      implicit val timeout = Timeout(10 minutes)
+      implicit val t = analyzingTimeout
       val result = router ? work
       pipe(result) to sender
     }
