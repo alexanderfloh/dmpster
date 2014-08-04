@@ -6,6 +6,7 @@ libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache,
+  filters,
   "org.webjars" % "requirejs" % "2.1.14-1",
   "org.webjars" % "jquery" % "2.1.1",
   "org.webjars" % "jquery-ui" % "1.11.0",

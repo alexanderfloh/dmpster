@@ -38,7 +38,7 @@ define(['react', 'tagging', 'tags'], function(React, Tagging, Tags) {
         <section className={classes}>
         <h1>
         <a href={this.props.dump.dmpUrl} download={this.props.dump.filename}>
-        <img src="/assets/images/download.svg" title={'download ' + this.props.dump.filename}></img>
+        <img src="/assets/images/download.svg" title={'download ' + this.props.dump.filename} width="20px" height="20px"></img>
         </a>
         <a href={"/dmpster/dmp/" + this.props.dump.id + "/details"}>
         {this.props.dump.filename}
@@ -54,13 +54,13 @@ define(['react', 'tagging', 'tags'], function(React, Tagging, Tags) {
         className="remove-dump"
         href="javascript: void(0);"
         onClick={this.handleClickOnRemove} >
-        <img src="/assets/images/delete.svg" title="mark for deletion"></img>
+        <img src="/assets/images/delete.svg" title="mark for deletion" width="35px" height="35px"></img>
         </a>
         <a
         className="archive-dump"
         href="javascript: void(0);"
         onClick={this.handleClickOnArchive} >
-        <img src="/assets/images/archive.svg" title="keep forever"></img>
+        <img src="/assets/images/archive.svg" title="keep forever" width="35px" height="35px"></img>
         </a>
         </span>
         </section>
