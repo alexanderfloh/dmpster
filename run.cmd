@@ -1,4 +1,4 @@
 @echo off
 cmd /c kill.cmd
-
-activator start -Dconfig.resource=prod.conf -Dhttp.port=80
+SET JAVA_OPTS=-Dconfig.file=conf/prod.conf -Dhttp.port=9000
+activator start

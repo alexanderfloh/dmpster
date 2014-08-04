@@ -42,10 +42,10 @@ object Application extends Controller {
   }
 
   def dmpster = Action {
-    Ok(views.html.index(Tag.all))
+    Ok(views.html.index(Tag.all, bucketsAsJson.toString))
   }
-
-  def bucketsJson = Action {
+  
+  private def bucketsAsJson = {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
 
@@ -54,9 +54,13 @@ object Application extends Controller {
       case (bucket, dumps) =>
         Seq(toJson(bucket), toJson(dumps))
     })
-    Ok(Json.obj(
+    Json.obj(
       "analyzing" -> analyzingJson,
-      "buckets" -> contentJsonified))
+      "buckets" -> contentJsonified)
+  }
+
+  def bucketsJson = Action {
+    Ok(bucketsAsJson)
   }
 
   def detailsJson(id: Long) = Action {
@@ -148,15 +152,13 @@ object Application extends Controller {
   }
 
   private def handleUpload(request: MultiPartRequest) = {
-    Logger.info("upload")
     val futureResults = Future.sequence(request.body.files.map { dmp =>
-
       val (newFile, filename, relFilePath) = moveFile(dmp)
 
       Logger.info("parsing DMP")
       val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
-
-      val futureResult = ask(analyzer, Work(newFile))(30 minutes).mapTo[utils.Result]
+      implicit val analyzingTimeout = Timeout(Play.current.configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
+      val futureResult = ask(analyzer, Work(newFile)).mapTo[utils.Result]
 
       for {
         utils.Result(file, bucketName, content) <- futureResult
@@ -164,7 +166,8 @@ object Application extends Controller {
         dump = Dump.create(bucket, relFilePath, content)
 
       } yield {
-        extractTagsFrom(request).map { tags => tags.foreach(tagName => Dump.addTag(dump, tagName))
+        extractTagsFrom(request).map { tags => 
+          tags.foreach(tagName => Dump.addTag(dump, tagName))
         }.getOrElse(Logger.info("no tags provided"))
 
         toJson(Map {

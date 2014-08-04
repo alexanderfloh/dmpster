@@ -144,6 +144,9 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
 
         var Buckets = React.createClass({
           getInitialState: function() {
+            if(bucketsAsJson) {
+              return {dumps: bucketsAsJson.buckets, analyzingDumps: bucketsAsJson.analyzing};
+            }
             return {dumps: [], analyzingDumps: []};
           },
 

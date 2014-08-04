@@ -1,4 +1,4 @@
-@(allTags: Seq[Tag]) 
+@(allTags: Seq[Tag], json: String) 
 
 @main("js/mainIndex.js") {
 
@@ -7,7 +7,9 @@
       <option>@t.name</option>
     }
   </datalist>
-
+  <script>
+    var bucketsAsJson = @Html(json);
+  </script>
   <div id="content"></div>
   @*
   <script src="@routes.Assets.at("jsx/bucket.js")"></script>

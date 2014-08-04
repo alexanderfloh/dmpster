@@ -18,3 +18,9 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(Sb
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
 pipelineStages := Seq(rjs, digest, gzip)
+
+RjsKeys.modules := Seq(
+    WebJs.JS.Object("name" -> "mainIndex"),
+    WebJs.JS.Object("name" -> "mainDetails"),
+    WebJs.JS.Object("name" -> "mainBucket")
+)
