@@ -74,13 +74,14 @@ body {
 header {
   background-color: black;
   color: white;
-  padding: 75px 0 50px;
+  padding: 75px 0 5px;
   position: relative;
   h1 {
     font-weight: 900;
     font-size: 7em;
     text-align: center;
     margin-left: -150px;
+    padding: 0px 0 50px;
     position: relative;
     a {
       text-decoration: none;
@@ -97,13 +98,13 @@ header {
       position: absolute;
       left: 50%;
       margin-left: 240px;
-      bottom: -15px;
+      bottom: 20px;
       height: 150px;
       .transition (all 0.3s);
     }
   }
 
-  span {
+  .header-label {
     font-family: 'Gochi Hand', cursive;
     position: absolute;
     left: 50%;
@@ -118,6 +119,34 @@ header {
       top: 38px;
       .transform (rotate(-20deg));
     }
+  }
+
+  .menu {
+    z-index: 9999;
+    background-color: black;
+    color: white;
+    padding: 5px 0 5px 25px;
+    a {
+      text-decoration: none;
+      color: white;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .menu-right {
+      float: right;
+      display: block;
+      form {
+        display: inline-block;
+      }
+
+      .admin-link {
+        font-size: 0.8em;
+      }
+    }
+
   }
 }
 
@@ -407,24 +436,4 @@ pre {
   font-size: 12px;
   font-weight: normal;
   text-align: right;
-}
-
-.menu {
-  z-index: 9999;
-  background-color: black;
-  color: white;
-  padding: 5px 0 5px 25px;
-  a {
-    text-decoration: none;
-    color: white;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  
-  .bottom-link {
-    float: right;
-    font-size: 0.8em;
-  }
 }

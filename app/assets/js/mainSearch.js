@@ -26,7 +26,7 @@ define(function(require) {
 
   React.renderComponent(
         Buckets.Buckets(
-          { url:"dmpster/buckets.json", pollInterval:5000 }),
+          { url:"/dmpster/search.json/%5Basdf%5D", pollInterval:5000 }),
         document.getElementById('content'));
 
   $(function() {

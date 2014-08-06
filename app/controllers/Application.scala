@@ -44,7 +44,13 @@ object Application extends Controller {
   def dmpster = Action {
     Ok(views.html.index(Tag.all, bucketsAsJson.toString))
   }
-  
+
+  def search(search: String) = Action {
+    Ok(views.html.search(Tag.all, searchBucketsAsJson(search).toString))
+  }
+
+  val emptyResponse = Json.obj("analyzing" -> List[String](), "buckets" -> List[String]())
+
   private def bucketsAsJson = {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
@@ -61,6 +67,34 @@ object Application extends Controller {
 
   def bucketsJson = Action {
     Ok(bucketsAsJson)
+  }
+
+  private def searchBucketsAsJson(search: String) = {
+    if (search.length >= 3 && search.head == '[' && search.last == ']') {
+      val searchResult = Tag.findByName(search.drop(1).dropRight(1)).map { tag =>
+        val dumps = Dump.byTag(tag)
+        val grouped = Dump.groupDumpsByBucket(dumps)
+
+        implicit val bucketWrites = Bucket.jsonWriter
+        implicit val dumpWrites = Dump.writeForIndex
+
+        val contentJsonified = toJson(grouped.map {
+          case (bucket, dumps) =>
+            Seq(toJson(bucket), toJson(dumps))
+        })
+        Json.obj(
+          "analyzing" -> analyzingJson,
+          "buckets" -> contentJsonified)
+        
+      }.getOrElse(emptyResponse)
+      searchResult
+    } else {
+      emptyResponse
+    }
+  }
+
+  def searchBucketsJson(search: String) = Action {
+    Ok(searchBucketsAsJson(search))
   }
 
   def detailsJson(id: Long) = Action {
@@ -166,7 +200,7 @@ object Application extends Controller {
         dump = Dump.create(bucket, relFilePath, content)
 
       } yield {
-        extractTagsFrom(request).map { tags => 
+        extractTagsFrom(request).map { tags =>
           tags.foreach(tagName => Dump.addTag(dump, tagName))
         }.getOrElse(Logger.info("no tags provided"))
 

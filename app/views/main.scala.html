@@ -21,12 +21,9 @@
     <img src="@routes.Assets.at("images/trashcan-top.svg")">
     <img src="@routes.Assets.at("images/trashcan-bottom.svg")">
   </h1>
-  <span>drop DMP here to upload</span>
+  <span class="header-label">drop DMP here to upload</span>
+  @views.html.menu()
 </header>
-<div class="menu original">&nbsp;<a class="bottom-link" href="@routes.Admin.index">Administration area</a></div>
-<div class="menu cloned" style="display:none">
-<a href="@routes.Application.index">dmpster</a>
-<a class="bottom-link" href="@routes.Admin.index">Administration area</a></div>
 @content
 </body>
 </html>

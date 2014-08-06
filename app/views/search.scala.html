@@ -1,0 +1,14 @@
+@(allTags: Seq[Tag], json: String) 
+
+@main("js/mainSearch.js") {
+
+  <datalist class="hidden" id="tags">
+    @allTags.map{ t => 
+      <option>@t.name</option>
+    }
+  </datalist>
+  <script>
+    var bucketsAsJson = @Html(json);
+  </script>
+  <div id="content"></div>
+}
