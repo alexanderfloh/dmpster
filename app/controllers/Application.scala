@@ -46,7 +46,7 @@ object Application extends Controller {
   }
 
   def search(search: String) = Action {
-    Ok(views.html.search(Tag.all, searchBucketsAsJson(search).toString))
+    Ok(views.html.search(search, Tag.all, searchBucketsAsJson(search).toString))
   }
 
   val emptyResponse = Json.obj("analyzing" -> List[String](), "buckets" -> List[String]())
