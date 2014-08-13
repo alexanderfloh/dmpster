@@ -23,10 +23,11 @@ define(function(require) {
   Tags = require('tags'),
   Bucket = require('Bucket'),
   Buckets = require('buckets');
+  menu = require('menu');
 
   React.renderComponent(
         Buckets.Buckets(
-          { url:"/dmpster/search.json/%5Basdf%5D", pollInterval:5000 }),
+          { url:"/dmpster/search.json/" + searchString, pollInterval:5000 }),
         document.getElementById('content'));
 
   $(function() {

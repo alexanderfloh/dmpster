@@ -1,6 +1,6 @@
 @(search: String, allTags: Seq[Tag], json: String) 
 
-@main("js/mainSearch.js") {
+@main("js/mainSearch.js", Some(search)) {
 
   <datalist class="hidden" id="tags">
     @allTags.map{ t => 
@@ -9,6 +9,7 @@
   </datalist>
   <script>
     var bucketsAsJson = @Html(json);
+    var searchString = "@search";
   </script>
   <div id="content"></div>
 }

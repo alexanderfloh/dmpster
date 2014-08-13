@@ -1,4 +1,4 @@
-@(jsFile: String)(content: Html)
+@(jsFile: String, search: Option[String])(content: Html)
 
 <!doctype html>
 <html>
@@ -22,7 +22,7 @@
     <img src="@routes.Assets.at("images/trashcan-bottom.svg")">
   </h1>
   <span class="header-label">drop DMP here to upload</span>
-  @views.html.menu()
+  @views.html.menu(search)
 </header>
 @content
 </body>
