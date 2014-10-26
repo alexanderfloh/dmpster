@@ -23,18 +23,25 @@ function($) {
     if ($(window).scrollTop() >= (orgElementTop - stickyTop)) {
       // scrolled past the original position; now only show the cloned, sticky element.
 
-      // Cloned element should always have same left position and width as original element.
-      orgElement = $('.original');
-      coordsOrgElement = orgElement.offset();
-      leftOrgElement = coordsOrgElement.left;
-      widthOrgElement = orgElement.width();
+      if($('.original').css('visibility') === 'visible') {
+        // Cloned element should always have same left position and width as original element.
+        orgElement = $('.original');
+        coordsOrgElement = orgElement.offset();
+        leftOrgElement = coordsOrgElement.left;
+        widthOrgElement = orgElement.width();
 
-      $('.cloned').css('left',leftOrgElement+'px').css('top',stickyTop+'px').css('width',widthOrgElement+'px').show();
-      $('.original').css('visibility','hidden');
+        var logo = $('.cloned > .logo');
+        logo.hide();
+        $('.cloned').css('left',leftOrgElement+'px').css('top',stickyTop+'px').css('width',widthOrgElement+'px').show();
+        $('.original').css('visibility','hidden');
+        logo.slideDown();
+      }
     } else {
       // not scrolled past the menu; only show the original menu.
-      $('.cloned').hide();
-      $('.original').css('visibility','visible');
+      if($('.cloned').is(':visible')) {
+        $('.cloned').hide();
+        $('.original').css('visibility','visible');
+      }
     }
   }
 }

@@ -70,7 +70,7 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
 
 class DummyParser extends DmpParser {
   protected def readFile = {
-    Thread.sleep(5 * 1000)
+    //Thread.sleep(5 * 1000)
     Source.fromFile("dummy.txt").getLines.toList
   }
 }
@@ -89,10 +89,10 @@ object DmpParser {
   lazy val scriptPathX64 = config.getString("dmpster.script.path.x64").getOrElse(scriptPath)
 
   def apply(file: java.io.File) = {
-    if (System.getProperty("os.name").toLowerCase.contains("win"))
-      new DmpParserImpl(file)
+    if (Play.current.configuration.getBoolean("dmpster.fake.analyzing").getOrElse(false))
+    	new DummyParser
     else
-      new DummyParser
+    	new DmpParserImpl(file)
   }
 
   def cdbForBitness(bitness: DumpBitness) = bitness match {
