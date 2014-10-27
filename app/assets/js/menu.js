@@ -30,17 +30,19 @@ function($) {
         leftOrgElement = coordsOrgElement.left;
         widthOrgElement = orgElement.width();
 
-        var logo = $('.cloned > .logo');
-        logo.hide();
         $('.cloned').css('left',leftOrgElement+'px').css('top',stickyTop+'px').css('width',widthOrgElement+'px').show();
         $('.original').css('visibility','hidden');
-        logo.slideDown();
+        var logo = $('.cloned > .logo');
+        logo.animate({ marginLeft: '0' }, 500);
       }
     } else {
       // not scrolled past the menu; only show the original menu.
       if($('.cloned').is(':visible')) {
-        $('.cloned').hide();
-        $('.original').css('visibility','visible');
+        $('.cloned > .logo').animate({ marginLeft: '-5em' }, 50, 'swing', function() {
+          $('.cloned').hide();
+          $('.original').css('visibility','visible');
+        });
+
       }
     }
   }
