@@ -24,6 +24,7 @@ case class Dump(
   timestamp: DateTime) extends Taggable {
 
   val url = "dmp"
+  def fullUrl = s"/dmpster/$url/$id/details"
 
   /**
    * Reference for 'now' instant in time.

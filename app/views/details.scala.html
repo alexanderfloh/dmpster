@@ -1,8 +1,13 @@
-@(dump: Dump) 
-@main("js/mainDetails.js", None) {
-  
+@(bucket: Bucket, dump: Dump)
+@main("js/mainDetails.js",
+  List(
+    (bucket.name, bucket.fullUrl),
+    (dump.filename, dump.fullUrl)
+  ),
+  None) {
+
 <datalist class="hidden" id="tags">
-    @dump.tags.map{ t => 
+    @dump.tags.map{ t =>
       <option>@t.name</option>
     }
   </datalist>

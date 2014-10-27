@@ -1,9 +1,9 @@
-@(bucket: Bucket, dumps: List[Dump], allTags: Seq[Tag]) 
+@(bucket: Bucket, dumps: List[Dump], allTags: Seq[Tag])
 
-@main("js/mainBucket.js", None) {
+@main("js/mainBucket.js", List(), None) {
 
   <datalist class="hidden" id="tags">
-    @allTags.map{ t => 
+    @allTags.map{ t =>
       <option>@t.name</option>
     }
   </datalist>
@@ -15,5 +15,5 @@
   *@
   <script>
   var bucketId = @bucket.id;
-  </script>  
+  </script>
 }

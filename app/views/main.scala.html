@@ -1,11 +1,11 @@
-@(jsFile: String, search: Option[String])(content: Html)
+@(jsFile: String, breadCrumbs: List[(String, String)], search: Option[String])(content: Html)
 
 <!doctype html>
 <html>
 <head>
   <link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
   <script data-main="@routes.Assets.versioned(jsFile)" type="text/javascript" src="@routes.Assets.versioned("lib/requirejs/require.js")"></script>
-  
+
   <link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
   <!-- trashcan image by Christopher Lee, from The Noun Project -->
   <!-- Delete by Julian Norton from The Noun Project -->
@@ -17,12 +17,12 @@
 <header>
   <h1>
     <a href="@routes.Application.index">dmpster<sup>beta</sup></a>
-    
+
     <img src="@routes.Assets.at("images/trashcan-top.svg")">
     <img src="@routes.Assets.at("images/trashcan-bottom.svg")">
   </h1>
   <span class="header-label">drop DMP here to upload</span>
-  @views.html.menu(search)
+  @views.html.menu(breadCrumbs, search)
 </header>
 @content
 </body>

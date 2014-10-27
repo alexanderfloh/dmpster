@@ -108,7 +108,7 @@ object Application extends Controller {
   def viewDetails(id: Long) = Action {
     val optResult = for {
       dump <- Dump.byId(id)
-    } yield Ok(views.html.details(dump))
+    } yield Ok(views.html.details(dump.bucket, dump))
     optResult.getOrElse(BadRequest(s"Dump ${id} not found"))
   }
 

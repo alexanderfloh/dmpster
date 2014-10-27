@@ -16,6 +16,7 @@ trait Taggable {
 
   def addTagUrl = s"/dmpster/$url/$id/addTag/"
   def removeTagUrl = s"/dmpster/$url/$id/removeTag/"
+  def fullUrl: String
 }
 
 case class Tag(id: Long, name: String) {

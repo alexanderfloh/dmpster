@@ -1,9 +1,9 @@
-@(search: String, allTags: Seq[Tag], json: String) 
+@(search: String, allTags: Seq[Tag], json: String)
 
-@main("js/mainSearch.js", Some(search)) {
+@main("js/mainSearch.js", List(), Some(search)) {
 
   <datalist class="hidden" id="tags">
-    @allTags.map{ t => 
+    @allTags.map{ t =>
       <option>@t.name</option>
     }
   </datalist>

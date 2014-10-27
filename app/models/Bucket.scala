@@ -12,6 +12,7 @@ case class Bucket(
   name: String) extends Taggable {
 
   val url = "bucket"
+  def fullUrl = s"/dmpster/$url/$id"
 
   def tags = Tag.forBucket(this)
 }

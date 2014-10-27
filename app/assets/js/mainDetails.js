@@ -23,7 +23,8 @@ require([
   'tags',
   'Bucket',
   'buckets',
-  'details'
+  'details',
+  'menu'
 
   ], function (
   jQuery,
@@ -35,7 +36,8 @@ require([
   Tags,
   Bucket,
   Buckets,
-  DetailsContainer
+  DetailsContainer,
+  Menu
   ) {
   React.renderComponent(
     DetailsContainer(

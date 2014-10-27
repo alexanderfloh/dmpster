@@ -1,14 +1,14 @@
 @* admin Template File *@
 @(totalSpace: Long, freeSpace: Long, formattedTotal: String, formattedFree: String)
 
-@main("js/mainIndex.js", None) {
-  
+@main("js/mainIndex.js", List(("Administration", "/dmpster/admin")), None) {
+
   <article>
   <section>
   <span class="diskFreeWidget">
 	  <div class="outerBar">
 	    <span class="innerBar" style="width:@(100 - (freeSpace / (totalSpace / 100)))%"></span>
-	    
+
 	  </div>
 	  <div class="diskFreeCaption">
 	  @formattedFree free of @formattedTotal
@@ -17,7 +17,7 @@
   </span>
   </section>
   </article>
-  
+
   <article>
   <section>
 	  <form method="post" action='@routes.Admin.cleanUpNow'>
@@ -25,5 +25,5 @@
 	  </form>
   </section>
   </article>
-  
+
 }
