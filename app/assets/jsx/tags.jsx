@@ -13,7 +13,6 @@ define(['react', 'jquery'], function(React, $) {
     },
 
     handleInputKeyDown: function(event) {
-      console.log(event);
       if (event.keyCode == 13 || event.which == 13) {
         var domNode = this.refs.tagInput.getDOMNode();
         $(domNode).hideBalloon();
