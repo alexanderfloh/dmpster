@@ -12,7 +12,8 @@ define(['react', 'jquery'], function(React, $) {
       };
     },
 
-    handleInputKeyPress: function(event) {
+    handleInputKeyDown: function(event) {
+      console.log(event);
       if (event.keyCode == 13 || event.which == 13) {
         var domNode = this.refs.tagInput.getDOMNode();
         $(domNode).hideBalloon();
@@ -84,9 +85,8 @@ define(['react', 'jquery'], function(React, $) {
           ref="tagInput"
           className="tag-input"
           list="tags"
-          placeholder="  add a
-          tag&hellip; "
-          onKeyPress={this.handleInputKeyPress}
+          placeholder="  add a tag&hellip; "
+          onKeyDown={this.handleInputKeyDown}
           onChange={this.handleInputChange}
           onBlur={this.handleInputBlur} >
           </input>

@@ -32,11 +32,11 @@ define(function(require) {
 
   $(function() {
     var holder = $('body').get(0);
-    holder.ondragover = function() {
+    holder.ondragover = function(event) {
       $('#holder').addClass('dragging');
       event.preventDefault();
     };
-    holder.ondragleave = function(dataTransfer) {
+    holder.ondragleave = function(event) {
       $('#holder').removeClass('dragging');
       event.preventDefault();
     };
