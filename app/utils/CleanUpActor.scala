@@ -8,6 +8,7 @@ import Play.current
 import models.Dump
 import models.Tag
 import models.Bucket
+import play.cache.Cache
 
 case class CleanUp()
 
@@ -25,6 +26,7 @@ class CleanUpActor extends Actor {
       deleteMarkedDumps
       markOldDumps
       limitNumberOfDumpsPerBucket
+      Cache.remove("bucketsAsJson")
     }
   }
 

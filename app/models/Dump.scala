@@ -54,7 +54,7 @@ case class Dump(
     else timestamp.toString(DateTimeFormat.forPattern("YYYY-MM-dd HH:mm"))
   }
 
-  def ageLabel = s"added $dateFormatted - $ageInDays day${if (ageInDays != 1) "s"} old"
+  def ageLabel = s"added $dateFormatted - $ageInDays day${if (ageInDays != 1) "s" else ""} old"
 }
 
 object Dump {

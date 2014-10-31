@@ -5,6 +5,7 @@ import scala.collection.JavaConversions._
 import play.api.Play
 import scala.sys.process.ProcessBuilder
 import play.api.Logger
+import scala.util.Random
 
 trait DumpBitness
 case object X86Dump extends DumpBitness
@@ -69,9 +70,18 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
 }
 
 class DummyParser extends DmpParser {
+  val rand = new Random
   protected def readFile = {
     //Thread.sleep(5 * 1000)
     Source.fromFile("dummy.txt").getLines.toList
+  }
+  
+  override def parse: (String, String) = {
+    val lines = readFile
+    val bucketName = lines.find(_.startsWith("FAILURE_BUCKET_ID:"))
+      .map(_.split(" ").last)
+      .getOrElse("unknown bucket")
+    (s"$bucketName ${rand.nextInt(100).toString}", lines.mkString("\n"))
   }
 }
 

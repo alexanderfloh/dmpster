@@ -1,7 +1,6 @@
 package controllers
 
 import java.io.File
-
 import scala.Array.canBuildFrom
 import scala.annotation.implicitNotFound
 import scala.concurrent.Await
@@ -9,10 +8,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
-
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.Timeout.durationToTimeout
@@ -34,8 +31,12 @@ import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import utils.Joda.dateTimeOrdering
 import utils.Work
+import play.api.cache.Cached
+import play.cache.Cache
 
 object Application extends Controller {
+  
+  val bucketsAsJsonKey = "bucketsAsJson"
 
   def index = Action {
     Redirect(routes.Application.dmpster)
@@ -65,8 +66,10 @@ object Application extends Controller {
       "buckets" -> contentJsonified)
   }
 
-  def bucketsJson = Action {
-    Ok(bucketsAsJson)
+  def bucketsJson = Cached(bucketsAsJsonKey) {
+    Action {
+      Ok(bucketsAsJson)
+    }
   }
 
   private def searchBucketsAsJson(search: String) = {
@@ -85,7 +88,7 @@ object Application extends Controller {
         Json.obj(
           "analyzing" -> analyzingJson,
           "buckets" -> contentJsonified)
-        
+
       }.getOrElse(emptyResponse)
       searchResult
     } else {
@@ -185,6 +188,10 @@ object Application extends Controller {
     (newFile, dmp.filename, relFilePath)
   }
 
+  private def invalidateCache() = {
+    Cache.remove(bucketsAsJsonKey)
+  }
+  
   private def handleUpload(request: MultiPartRequest) = {
     val futureResults = Future.sequence(request.body.files.map { dmp =>
       val (newFile, filename, relFilePath) = moveFile(dmp)
@@ -204,6 +211,7 @@ object Application extends Controller {
           tags.foreach(tagName => Dump.addTag(dump, tagName))
         }.getOrElse(Logger.info("no tags provided"))
 
+        invalidateCache()
         toJson(Map {
           "name" -> toJson(filename)
           "url" -> toJson(s"/dmpster/dmp/${dump.id}/details")
@@ -219,6 +227,7 @@ object Application extends Controller {
 
     Dump.byId(id).map(dump => {
       if (!Tag.forDump(dump).exists(_.name == tagName)) Dump.addTag(dump, tag)
+      invalidateCache()
       Ok("tag added")
     }).getOrElse(NotFound(s"Invalid dump id ${id}"))
   }
@@ -227,6 +236,7 @@ object Application extends Controller {
     Tag.findByName(tagName).flatMap(tag => {
       Dump.byId(id).map(dump => {
         Dump.removeTag(dump, tag)
+        invalidateCache()
         Ok("tag removed")
       })
     }).getOrElse(NotFound("Invalid dump id or tag"))
@@ -237,6 +247,7 @@ object Application extends Controller {
     val result = for { bucket <- Bucket.byId(id) } yield {
       if (!Tag.forBucket(bucket).exists(_.name == tagName)) {
         Bucket.addTag(bucket, tag)
+        invalidateCache()
       }
       Ok("tag added")
     }
@@ -247,6 +258,7 @@ object Application extends Controller {
     val tag = Tag.findOrCreate(tagName)
     val result = for (bucket <- Bucket.byId(id)) yield {
       Bucket.removeTag(bucket, tag)
+      invalidateCache()
       Ok("tag removed")
     }
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
