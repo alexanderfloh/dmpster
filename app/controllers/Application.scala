@@ -32,10 +32,11 @@ import play.api.mvc.Request
 import utils.Joda.dateTimeOrdering
 import utils.Work
 import play.api.cache.Cached
-import play.cache.Cache
+import play.api.cache.Cache
+import play.mvc.Result
 
 object Application extends Controller {
-  
+
   val bucketsAsJsonKey = "bucketsAsJson"
 
   def index = Action {
@@ -66,9 +67,11 @@ object Application extends Controller {
       "buckets" -> contentJsonified)
   }
 
-  def bucketsJson = Cached(bucketsAsJsonKey) {
+  def bucketsJson = {
     Action {
-      Ok(bucketsAsJson)
+      Ok(Cache.getOrElse[JsObject](bucketsAsJsonKey, 120) {
+        bucketsAsJson
+      })
     }
   }
 
@@ -191,11 +194,12 @@ object Application extends Controller {
   private def invalidateCache() = {
     Cache.remove(bucketsAsJsonKey)
   }
-  
+
   private def handleUpload(request: MultiPartRequest) = {
     val futureResults = Future.sequence(request.body.files.map { dmp =>
       val (newFile, filename, relFilePath) = moveFile(dmp)
 
+      invalidateCache()
       Logger.info("parsing DMP")
       val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
       implicit val analyzingTimeout = Timeout(Play.current.configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
