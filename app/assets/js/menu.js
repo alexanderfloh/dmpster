@@ -17,7 +17,7 @@ function($) {
   jQuery( window ).resize(function() {stickMenu();});
   jQuery( window ).scroll(function() {stickMenu();});
 
-  $( "form" ).on( "submit", function(event) {
+  $( "#search-form" ).on( "submit", function(event) {
     event.preventDefault();
     var searchText = $('#search').val();
     window.location.href = '/dmpster/search/' + encodeURIComponent(searchText);
