@@ -142,6 +142,31 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           }
         });
 
+        var QuickFilterBox = React.createClass({
+          getInitialState: function() {
+            return { searchTerm: "", onChange: undefined }
+          },
+
+          handleInputChange: function(event) {
+            var onChangeHandler = this.props.onChange;
+            if (onChangeHandler) {
+              onChangeHandler(event.target.value);
+            }
+          },
+
+          render: function() {
+            return (
+              <div>
+                <input
+                  type="text"
+                  placeholder="filter dumps"
+                  onChange={this.handleInputChange}>
+                </input>
+              </div>
+            );
+          }
+        });
+
         var Buckets = React.createClass({
           getInitialState: function() {
             if(bucketsAsJson) {
@@ -167,9 +192,15 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
             this.loadBucketsFromServer();
             setInterval(this.loadBucketsFromServer, this.props.pollInterval);
           },
+
+          filterChanged: function(filterTerm) {
+            console.log("FILTER: " + filterTerm);
+          },
+
           render: function() {
             return (
               <div className="buckets">
+              <QuickFilterBox onChange={this.filterChanged}/>
               <BucketList dumps={this.state.dumps} analyzingDumps={this.state.analyzingDumps} />
               </div>
             );
