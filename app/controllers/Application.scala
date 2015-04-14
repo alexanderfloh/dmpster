@@ -34,6 +34,8 @@ import utils.Work
 import play.api.cache.Cached
 import play.api.cache.Cache
 import play.mvc.Result
+import scala.xml.PrettyPrinter
+import scala.xml.PCData
 
 object Application extends Controller {
 
@@ -50,7 +52,47 @@ object Application extends Controller {
   def search(search: String) = Action {
     Ok(views.html.search(search, Tag.all, searchBucketsAsJson(search).toString))
   }
+  
+  def rssDumps = Action { request =>
+    
+    // TODO: Add tags to feed entries
+    // TODO: use time of latest dump for <updated> tag 
+    
+    val baseUrl = "http://" + request.host;
+    val feedUrl = baseUrl + request.uri;
+    
+    val feedXml =
+      <feed xmlns="http://www.w3.org/2005/Atom">
+      <author>
+        <name>dmpster</name>
+      </author>
+      <title>All Dumps</title>
+      <id>{feedUrl}</id>
+      <link href={feedUrl} rel="self" type="application/atom+xml"/>
+      <updated>{ "2003-12-14T10:20:09Z" }</updated>
+      {
+	    Dump.all.map(d => {
+	      val dumpDetailsUrl = baseUrl + "/dmpster/dmp/" + d.id + "/details"
 
+	      val entryContent = <p><a href={dumpDetailsUrl}>{d.filename}</a> ({d.timestamp}) Tags: TODO</p>.toString;
+	      
+	      <entry>
+	      <id>{dumpDetailsUrl}</id>
+	      <title>{d.filename}</title>
+	      <updated>{d.timestamp}</updated>
+	      <link href={dumpDetailsUrl}></link>
+	      <summary>{d.filename + " (" + d.timestamp + ")"}</summary>
+	      <content type="html">{new PCData(entryContent)}</content>
+	      </entry>})
+      }
+      </feed>;
+    
+    val prettyPrinter = new scala.xml.PrettyPrinter(100, 2)
+    val feedFormatted = prettyPrinter.format(feedXml);
+    
+    Ok(feedFormatted).as("application/atom+xml")
+  }
+  
   val emptyResponse = Json.obj("analyzing" -> List[String](), "buckets" -> List[String]())
 
   private def bucketsAsJson = {
