@@ -55,11 +55,15 @@ object Application extends Controller {
   
   def rssDumps = Action { request =>
     
-    // TODO: Add tags to feed entries
-    // TODO: use time of latest dump for <updated> tag 
-    
     val baseUrl = "http://" + request.host;
     val feedUrl = baseUrl + request.uri;
+    val dumps = Dump.all;
+    
+    val updatedTime =
+      if (dumps.isEmpty)
+        new DateTime()
+      else
+        dumps.map(d => d.timestamp).reduceLeft((lhs, rhs) => (if (lhs.compareTo(rhs) > 0) lhs else rhs))
     
     val feedXml =
       <feed xmlns="http://www.w3.org/2005/Atom">
@@ -69,15 +73,28 @@ object Application extends Controller {
       <title>All Dumps</title>
       <id>{feedUrl}</id>
       <link href={feedUrl} rel="self" type="application/atom+xml"/>
-      <updated>{ "2003-12-14T10:20:09Z" }</updated>
+      <updated>{updatedTime}</updated>
       {
-	    Dump.all.map(d => {
+	    dumps.map(d => {
 	      val dumpDetailsUrl = baseUrl + "/dmpster/dmp/" + d.id + "/details"
 
-	      val entryContent = <p><a href={dumpDetailsUrl}>{d.filename}</a> ({d.timestamp}) Tags: TODO</p>.toString;
+	      val tagsAsText = d.tags.map(tag => tag.name ).mkString(", ");
+	      
+	      val timeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+	      val formattedTimestamp = timeFormatter.print(d.timestamp);
+	      
+	      val entryContent =
+	        <html>
+	    	  	<body>
+	    	  		<h1><a href={dumpDetailsUrl}>{d.filename}</a></h1>
+	      			<p>{formattedTimestamp}</p>
+	    	  		<p>Tags: { tagsAsText }</p>
+	    	  		<p><pre>{d.content}</pre></p>
+	    	  	</body>
+	    	</html>.toString;
 	      
 	      <entry>
-	      <id>{dumpDetailsUrl}</id>
+	      <id>{dumpDetailsUrl + "__" + d.timestamp.toString()}</id>
 	      <title>{d.filename}</title>
 	      <updated>{d.timestamp}</updated>
 	      <link href={dumpDetailsUrl}></link>
