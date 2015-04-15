@@ -82,11 +82,12 @@ object Application extends Controller {
 	      
 	      val timeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 	      val formattedTimestamp = timeFormatter.print(d.timestamp);
+	      val bucketName = d.bucket.name;
 	      
 	      val entryContent =
 	        <html>
 	    	  	<body>
-	    	  		<h1><a href={dumpDetailsUrl}>{d.filename}</a></h1>
+	    	  		<h1>{bucketName}<br/><a href={dumpDetailsUrl}>{d.filename}</a></h1>
 	      			<p>{formattedTimestamp}</p>
 	    	  		<p>Tags: { tagsAsText }</p>
 	    	  		<p><pre>{d.content}</pre></p>
@@ -98,7 +99,7 @@ object Application extends Controller {
 	      <title>{d.filename}</title>
 	      <updated>{d.timestamp}</updated>
 	      <link href={dumpDetailsUrl}></link>
-	      <summary>{d.filename + " (" + d.timestamp + ")"}</summary>
+	      <summary>{d.filename + " (" + d.timestamp + ")  \n" +  bucketName}</summary>
 	      <content type="html">{new PCData(entryContent)}</content>
 	      </entry>})
       }
