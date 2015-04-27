@@ -58,6 +58,8 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
+@green: rgb(86, 175, 0);
+
 @tag-default: #2980B9;
 @tag-hover: darken(@tag-default, 10%);
 
@@ -144,13 +146,30 @@ header {
     .menu-right {
       float: right;
       display: block;
-      margin-right: 1em;
       form {
         display: inline-block;
       }
 
+      .rss-link {
+        background: url(/assets/images/rss.svg) no-repeat center center;
+        background-size: contain;
+        padding-top: 0.2em;
+        padding-left: 1em;
+        &:hover {
+          background-color: @green;
+          text-decoration: none;
+        }
+      }
+
       .admin-link {
-        font-size: 0.8em;
+        background: url(/assets/images/wrench.svg) no-repeat center center;
+        background-size: contain;
+        padding-top: 0.2em;
+        padding-left: 1em;
+        &:hover {
+          background-color: @green;
+          text-decoration: none;
+        }
       }
     }
 
@@ -227,7 +246,7 @@ article {
           //padding: 5px;
           margin-right: 5px;
           &:hover {
-            background-color: rgb(86, 175, 0);
+            background-color: @green;
           }
         }
 
@@ -253,7 +272,7 @@ article {
       &:before {
         content: "new";
         color: white;
-        background-color: rgb(86, 175, 0);
+        background-color: @green;
         font-weight: bold;
         font-size: 0.8em;
         padding: 4px 0;
@@ -415,7 +434,7 @@ article {
 
 .bar {
   height: 18px;
-  background: rgb(86, 175, 0);
+  background: @green;
 }
 
 pre {

@@ -13,6 +13,7 @@
       <input type="text" id="search" value="@{search.getOrElse("")}"></input>
     </form>
     *@
-    <a class="admin-link" href="@routes.Admin.index">Administration area</a>
+    <a class="rss-link" id="rss" href="@routes.Application.rssDumps">&nbsp;</a>
+    <a class="admin-link" id="admin" href="@routes.Admin.index">&nbsp;</a>
   </span>
 </div>
