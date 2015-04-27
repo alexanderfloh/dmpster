@@ -9,15 +9,29 @@ import play.api.libs.concurrent.Akka
 import akka.actor.Props
 import utils.{ CleanUpActor, CleanUp }
 import java.text.DecimalFormat
+import java.io.File
+import models.Dump
 
 object Admin extends Controller {
   def index = Action {
     val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
-    val filePath = new java.io.File(dmpPath)
+    val filePath = new File(dmpPath)
     val totalSpace = filePath.getTotalSpace
     val freeSpace = filePath.getFreeSpace
+    
+    val referencedFiles = Dump.all.map(_.fullUrl)
+    
+    def getActualFiles(filePath: File): List[File] = {
+      val all = filePath.listFiles().toList
+      val files = all.filterNot(_.isDirectory)
+      val dirs = all.filter(_.isDirectory)
+      val subfiles = dirs.flatMap(getActualFiles(_))
+      files ++ subfiles
+    }
+    
+    val danglingFiles = getActualFiles(filePath).map(_.getCanonicalPath).filterNot { f => referencedFiles.contains(f) }
 
-    Ok(views.html.admin(totalSpace, freeSpace, formatFileSize(totalSpace), formatFileSize(freeSpace)))
+    Ok(views.html.admin(totalSpace, freeSpace, formatFileSize(totalSpace), formatFileSize(freeSpace), danglingFiles))
   }
 
   def cleanUpNow = Action {

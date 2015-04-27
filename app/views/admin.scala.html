@@ -1,10 +1,11 @@
 @* admin Template File *@
-@(totalSpace: Long, freeSpace: Long, formattedTotal: String, formattedFree: String)
+@(totalSpace: Long, freeSpace: Long, formattedTotal: String, formattedFree: String, danglingFiles: List[String])
 
 @main("js/mainIndex.js", List(("Administration", "/dmpster/admin")), None) {
 
   <article>
   <section>
+  <h1>Available Disk Space</h1>
   <span class="diskFreeWidget">
 	  <div class="outerBar">
 	    <span class="innerBar" style="width:@(100 - (freeSpace / (totalSpace / 100)))%"></span>
@@ -17,9 +18,19 @@
   </span>
   </section>
   </article>
+  
+  <article>
+  <section>
+  <h1>Dangling Files</h1>
+  @danglingFiles.map{f =>
+  	<div>@f</div>
+  }
+  </section>
+  </article>
 
   <article>
   <section>
+  <h1>Perform manual Clean Up</h1>
 	  <form method="post" action='@routes.Admin.cleanUpNow'>
 	    <input type='submit' value="Clean up now"></button>
 	  </form>
