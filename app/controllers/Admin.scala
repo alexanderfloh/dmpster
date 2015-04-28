@@ -19,7 +19,7 @@ object Admin extends Controller {
     val totalSpace = filePath.getTotalSpace
     val freeSpace = filePath.getFreeSpace
     
-    val referencedFiles = Dump.all.map(_.fullUrl)
+    val referencedFiles = Dump.all.map(_.relFilePath)
     
     def getActualFiles(filePath: File): List[File] = {
       val all = filePath.listFiles().toList
@@ -28,8 +28,8 @@ object Admin extends Controller {
       val subfiles = dirs.flatMap(getActualFiles(_))
       files ++ subfiles
     }
-    
-    val danglingFiles = getActualFiles(filePath).map(_.getCanonicalPath).filterNot { f => referencedFiles.contains(f) }
+    val referencedFilesAbsolute = referencedFiles.map(f => new File(filePath, f)).map(_.getPath)
+    val danglingFiles = getActualFiles(filePath).map(_.getPath).filterNot { f => referencedFilesAbsolute.contains(f) }
 
     Ok(views.html.admin(totalSpace, freeSpace, formatFileSize(totalSpace), formatFileSize(freeSpace), danglingFiles))
   }
