@@ -12,7 +12,6 @@ GET    /assets/*file                            controllers.Assets.versioned(pat
 GET    /dmps/*file                              controllers.Dmp.at(file)
 
 GET    /dmpster                                 controllers.Application.dmpster
-GET    /dmpster/                                controllers.Application.dmpster
 GET    /dmpster/dmp/:id/details                 controllers.Application.viewDetails(id: Long)
 GET    /dmpster/bucket/:id                      controllers.Application.viewBucket(id: Long)
 GET    /dmpster/admin                           controllers.Admin.index
