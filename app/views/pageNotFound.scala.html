@@ -1,0 +1,26 @@
+@(path: String)
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="@routes.Assets.at("stylesheets/styles.css")">
+  
+  <link rel="icon" href="@routes.Assets.at("images/favicon.ico")" type="image/x-icon" />
+  <!-- trashcan image by Christopher Lee, from The Noun Project -->
+  <!-- Delete by Julian Norton from The Noun Project -->
+  <!-- Box by Michael Rowe from The Noun Project -->
+  <!-- Wrench by Nathan Borror from the Noun Project -->
+  <title>dmpster</title>
+</head>
+
+<body>
+<div id="trashCan">
+	<span id="qmark1">?</span>
+	<span id="qmark2">?</span>
+	<span id="qmark3">?</span>
+	&nbsp;
+</div>
+<div id="errorCodeAndName"><span id="errorCode">404</span><span id="errorName">Page not Found</span></div>
+<div id="errorDescription">The page <em>@path</em> was not found.</div>
+
+</body>
+</html>

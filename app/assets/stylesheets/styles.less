@@ -463,3 +463,61 @@ pre {
   font-weight: normal;
   text-align: right;
 }
+
+#errorCodeAndName {
+  text-align: center;
+  line-height: 1.5;
+}
+
+#errorCode {
+  color: lighten(black, 30%);
+  font-size: 5em;
+  font-weight: bold;
+  padding: 0.2em;
+}
+
+#errorDescription {
+  text-align: center;
+  em {
+    font-weight: bold;
+  }
+}
+
+#trashCan {
+  text-align: center;
+  font-size: 15em;
+  position: relative;
+  margin-top: 1em;
+  margin-left: 30%;
+  margin-right: 30%;
+  min-width: 1em;
+
+  background: url(/assets/images/trashcan.svg) no-repeat center center;
+  background-size: contain;
+
+  #qmark1 {
+    font-size: 0.5em;
+    color: lighten(black, 50%);
+    .transform (rotate(-30deg));
+    position: absolute;
+    left: 20%;
+  }
+
+  #qmark2 {
+    font-size: 0.8em;
+    color: lighten(black, 80%);
+    .transform (rotate(5deg));
+    position: absolute;
+    left: 40%;
+    top: -70%;
+  }
+
+  #qmark3 {
+    font-size: 0.6em;
+    color: lighten(black, 60%);
+    .transform (rotate(35deg));
+    position: absolute;
+    right: 10%;
+    top: -20px;
+  }
+}
