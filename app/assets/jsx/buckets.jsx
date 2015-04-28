@@ -20,17 +20,70 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
       }
     },
 
-    render: function() {
-      var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
+    filterBucketAndDumps: function(bucketAndDumps) {
+
+      var that = this;
+
+      function matchesFilterTerm(s) {
+        return s.toLowerCase().indexOf(that.props.filterTerm.toLowerCase()) !== -1;
+      }
+
+      function filterTags(tagList) {
+        var grepResult = $.grep(tagList, function(tag) {
+          return matchesFilterTerm(tag.name);
+        });
+        return grepResult.length > 0;
+      }
+      
+      function filterBucket(bucket) {
+        return matchesFilterTerm(bucket.name) || filterTags(bucket.tagging.tags);
+      }
+
+      function filterSingleDump(dump) {
+        console.log(JSON.stringify(dump));
+        return matchesFilterTerm(dump.filename) ||
+               filterTags(dump.tagging.tags);
+      }
+
+      function filterDumps(dumps) {
+        return dumps.filter(filterSingleDump);
+      }
+
+      if (!this.props.filterTerm) {
+        return bucketAndDumps;
+      }
+      else {
         var bucket = bucketAndDumps[0];
         var dumps = bucketAndDumps[1];
-        return (<Bucket
-          key={bucket.id}
-          name={bucket.name}
-          url={bucket.url}
-          tagging={bucket.tagging}
-          dumps={dumps}>
-          </Bucket>);
+        var filteredBucketAndDumps = null;
+        if (filterBucket(bucket)) {
+          filteredBucketAndDumps = [bucket, dumps];
+        }
+        else {
+          var filteredDumps = filterDumps(dumps);
+          if (filteredDumps.length > 0) {
+            filteredBucketAndDumps = [bucket, filteredDumps];
+          }
+        }
+        return filteredBucketAndDumps; 
+      }
+    },
+
+    render: function() {
+      var that = this;
+      var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
+          var filteredBucketAndDumps = that.filterBucketAndDumps(bucketAndDumps);
+          if (filteredBucketAndDumps) {
+            var bucket = filteredBucketAndDumps[0];
+            var dumps = filteredBucketAndDumps[1];
+            return (<Bucket
+              key={bucket.id}
+              name={bucket.name}
+              url={bucket.url}
+              tagging={bucket.tagging}
+              dumps={dumps}>
+              </Bucket>);
+          }
         });
         return (
           <div className="bucketList">
@@ -142,12 +195,33 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           }
         });
 
+        var QuickFilterBox = React.createClass({
+          handleInputChange: function(event) {
+            var onChangeHandler = this.props.onChange;
+            if (onChangeHandler) {
+              onChangeHandler(event.target.value);
+            }
+          },
+
+          render: function() {
+            return (
+              <div className="quick-filter-box">
+                <input
+                  type="text"
+                  placeholder="filter dumps"
+                  onChange={this.handleInputChange}>
+                </input>
+              </div>
+            );
+          }
+        });
+
         var Buckets = React.createClass({
           getInitialState: function() {
             if(bucketsAsJson) {
               return {dumps: bucketsAsJson.buckets, analyzingDumps: bucketsAsJson.analyzing};
             }
-            return {dumps: [], analyzingDumps: []};
+            return {dumps: [], analyzingDumps: [], filterTerm: ''};
           },
 
           loadBucketsFromServer: function() {
@@ -167,10 +241,17 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
             this.loadBucketsFromServer();
             setInterval(this.loadBucketsFromServer, this.props.pollInterval);
           },
+
+          filterChanged: function(filterTerm) {
+            this.state.filterTerm = filterTerm;
+            this.setState(this.state);
+          },
+
           render: function() {
             return (
               <div className="buckets">
-              <BucketList dumps={this.state.dumps} analyzingDumps={this.state.analyzingDumps} />
+              <QuickFilterBox onChange={this.filterChanged}/>
+              <BucketList dumps={this.state.dumps} filterTerm={this.state.filterTerm} analyzingDumps={this.state.analyzingDumps} />
               </div>
             );
           }
