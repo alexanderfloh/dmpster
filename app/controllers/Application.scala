@@ -108,7 +108,7 @@ object Application extends Controller {
     val prettyPrinter = new scala.xml.PrettyPrinter(100, 2)
     val feedFormatted = prettyPrinter.format(feedXml);
     
-    Ok(feedFormatted).as("application/atom+xml")
+    Ok(feedFormatted).as("application/rss+xml, application/rdf+xml, application/atom+xml, application/xml, text/xml")
   }
   
   val emptyResponse = Json.obj("analyzing" -> List[String](), "buckets" -> List[String]())
