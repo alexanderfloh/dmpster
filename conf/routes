@@ -22,7 +22,7 @@ GET    /dmpster/bucket/:id/Json                 controllers.Application.bucketJs
 GET    /dmpster/search.json/:search             controllers.Application.searchBucketsJson(search: String)
 GET    /dmpster/search/:search                  controllers.Application.search(search: String)
 
-GET    /rss/dumps                               controllers.Application.rssDumps
+GET    /rss/dumps                               controllers.Rss.dumps
 
 POST   /upload                                  controllers.Application.upload
 POST   /uploadAsync                             controllers.Application.uploadAsync

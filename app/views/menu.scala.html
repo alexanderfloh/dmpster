@@ -3,7 +3,7 @@
 <div class="menu">
   
   <a href="@routes.Application.index" class="logo">dmpster</a>
-  <a class="index-link" href="@routes.Application.index">&nbsp;</a>
+  <a class="index-link" title="dmpster" href="@routes.Application.index">&nbsp;</a>
   @breadCrumbs.map { case (caption, url) =>
     &nbsp;&raquo;&nbsp;
     <a href="@url" class="breadcrumb">@caption</a>
@@ -14,7 +14,7 @@
       <input type="text" id="search" value="@{search.getOrElse("")}"></input>
     </form>
     *@
-    <a class="rss-link" id="rss" href="@routes.Application.rssDumps">&nbsp;</a>
-    <a class="admin-link" id="admin" href="@routes.Admin.index">&nbsp;</a>
+    <a class="rss-link" id="rss" title="RSS feed" href="@routes.Rss.dumps">&nbsp;</a>
+    <a class="admin-link" id="admin" title="Administration" href="@routes.Admin.index">&nbsp;</a>
   </span>
 </div>
