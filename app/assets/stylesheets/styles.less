@@ -136,6 +136,17 @@ header {
         text-decoration: underline;
       }
     }
+    .index-link {
+      background: url(/assets/images/trashcan-white.svg) no-repeat center center;
+      background-size: contain;
+      padding-top: 0.2em;
+      padding-left: 1em;
+      &:hover {
+        background-color: @green;
+        text-decoration: none;
+      }
+    }
+
     .logo {
       margin-left: -5em;
     }
@@ -463,6 +474,8 @@ pre {
   font-weight: normal;
   text-align: right;
 }
+
+// stuff for the 404 page
 
 #errorCodeAndName {
   text-align: center;
