@@ -5,23 +5,34 @@ import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
 import java.util.Date
+import scala.language.postfixOps
 import org.joda.time.DateTime
-import org.joda.time.Days
-import scala.collection.immutable.ListMap
-import language.postfixOps
-import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTimeConstants
+import org.joda.time.Days
+import org.joda.time.format.DateTimeFormat
+import anorm.NamedParameter.symbol
+import anorm.SQL
+import anorm.SqlParser.get
+import anorm.sqlToSimple
+import play.api.Play.current
+import play.api.db.DB
 import play.api.libs.json.Json
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import scala.util.parsing.json.JSONObject
+import play.api.libs.json.Json.toJsFieldJsValueWrapper
+import play.api.libs.json.Writes
+import utils.Joda.dateTimeOrdering
+import java.io.File
 
+/**
+ * @param pathInStorageDirectory The relative path of the dump file within the storage directory, e.g. `2015-04-27_21-33-00_424/somedmp.dmp`
+ */
 case class Dump(
   id: Long,
   bucket: Bucket,
-  relFilePath: String,
+  pathInStorageDirectory: String,
   content: String,
   timestamp: DateTime) extends Taggable {
+
+  val filename = new File(pathInStorageDirectory).getName;
 
   val url = "dmp"
   def fullUrl = s"/dmpster/$url/$id/details"
@@ -35,7 +46,7 @@ case class Dump(
   private def firstDayOfNewness = {
     now.getDayOfWeek() match {
       case DateTimeConstants.MONDAY => now.minusDays(3).withTimeAtStartOfDay
-      case _ => now.minusDays(1).withTimeAtStartOfDay
+      case _                        => now.minusDays(1).withTimeAtStartOfDay
     }
   }
 
@@ -44,8 +55,6 @@ case class Dump(
   def ageInDays = Days.daysBetween(timestamp, now).getDays
 
   def tags = Tag.forDump(this)
-
-  val filename = new java.io.File(relFilePath).getName;
 
   private def isFromToday = now.withTimeAtStartOfDay.isBefore(timestamp)
 
@@ -98,7 +107,7 @@ object Dump {
           'timestamp -> timestamp.toDate)
         .executeInsert() match {
           case Some(id) => Dump(id, bucket, relFilePath, content, timestamp)
-          case None => throw new Exception("unable to insert dump into db")
+          case None     => throw new Exception("unable to insert dump into db")
         }
     }
   }
@@ -155,7 +164,7 @@ object Dump {
       "filename" -> d.filename,
       "isNew" -> d.isNew,
       "ageLabel" -> d.ageLabel,
-      "dmpUrl" -> s"/dmps/${d.relFilePath.replace("\\", "/")}",
+      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(d.tags),
         "addTagUrl" -> d.addTagUrl,
@@ -167,7 +176,7 @@ object Dump {
     Json.obj(
       "id" -> d.id,
       "filename" -> d.filename,
-      "dmpUrl" -> s"/dmps/${d.relFilePath.replace("\\", "/")}",
+      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
       "content" -> d.content,
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(d.tags),

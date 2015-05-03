@@ -39,8 +39,8 @@ class CleanUpActor extends Actor {
     import java.io.File
     import java.nio.file.Paths
 
-    new File(dmpPath, dump.relFilePath).delete
-    var currentRelDir = Paths.get(dump.relFilePath).getParent()
+    new File(dmpPath, dump.pathInStorageDirectory).delete
+    var currentRelDir = Paths.get(dump.pathInStorageDirectory).getParent()
     while (currentRelDir != null) {
       new File(dmpPath, currentRelDir.toString()).delete
       currentRelDir = currentRelDir.getParent()

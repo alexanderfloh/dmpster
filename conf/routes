@@ -24,8 +24,9 @@ GET    /dmpster/search/:search                  controllers.Application.search(s
 
 GET    /rss/dumps                               controllers.Rss.dumps
 
-POST   /upload                                  controllers.Application.upload
-POST   /uploadAsync                             controllers.Application.uploadAsync
+POST   /upload                                  controllers.Upload.upload
+POST   /uploadAsync                             controllers.Upload.uploadAsync
+
 POST   /dmpster/dmp/:id/addTag/:tagName         controllers.Application.addTagToDmp(id: Long, tagName: String)
 POST   /dmpster/dmp/:id/removeTag/:tagName      controllers.Application.removeTagFromDmp(id: Long, tagName: String)
 POST   /dmpster/bucket/:id/addTag/:tagName      controllers.Application.addTagToBucket(id: Long, tagName: String)

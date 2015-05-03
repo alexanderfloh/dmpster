@@ -19,7 +19,7 @@ object Admin extends Controller {
     val totalSpace = filePath.getTotalSpace
     val freeSpace = filePath.getFreeSpace
     
-    val referencedFiles = Dump.all.map(_.relFilePath)
+    val referencedFiles = Dump.all.map(_.pathInStorageDirectory)
     
     def getActualFiles(filePath: File): List[File] = {
       val all = filePath.listFiles().toList
