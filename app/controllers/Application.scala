@@ -31,6 +31,7 @@ import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import utils.Work
 import utils.BucketsAsJsonCacheAccess
+import models.BucketHit
 
 object Application extends Controller {
 
@@ -130,6 +131,12 @@ object Application extends Controller {
     } yield Ok(Json.obj("bucket" -> toJson(bucket), "dumps" -> toJson(dumps)))
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
+  }
+  
+  def bucketHitsJson(id: Long) = Action {
+    Ok(toJson(BucketHit.byBucket(id).foldLeft(Json.obj()){
+      case (json, (time, count)) => json + (time.toString, toJson(count)) 
+    }))
   }
 
   def analyzingJson = {

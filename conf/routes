@@ -17,6 +17,7 @@ GET    /dmpster/bucket/:id                      controllers.Application.viewBuck
 GET    /dmpster/admin                           controllers.Admin.index
 
 GET    /dmpster/buckets.json                    controllers.Application.bucketsJson
+GET	   /dmpster/bucket/:id/hits.json			controllers.Application.bucketHitsJson(id: Long)
 GET    /dmpster/dmp/:id/detailsJson             controllers.Application.detailsJson(id: Long)
 GET    /dmpster/bucket/:id/Json                 controllers.Application.bucketJson(id: Long)
 GET    /dmpster/search.json/:search             controllers.Application.searchBucketsJson(search: String)

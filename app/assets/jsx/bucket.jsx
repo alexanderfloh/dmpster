@@ -1,13 +1,37 @@
 /** @jsx React.DOM */
 
-define(['react', 'tagging', 'tags'], function(React, Tagging, Tags) {
+define(['react', 'tagging', 'tags', 'd3', 'calHeatmap'],
+  function(React, Tagging, Tags, d3, CalHeatMap) {
+
   var Bucket = React.createClass({
     mixins: [Tagging],
+
+    componentWillMount: function() {
+      var that = this;
+      var d3_ = d3;
+      var heatMap = CalHeatMap;
+      var cal = new heatMap();
+      $.ajax({
+        url: '/dmpster/bucket/' + that.props.key + '/hits.json',
+
+      }).done(function(data){
+        cal.init({
+          data: data,
+          itemSelector: '#cal-heatmap' + that.props.key,
+          domain: 'month',
+          range : 3,
+          start: new Date().setMonth(new Date().getMonth() - 2),
+          displayLegend: false,
+          scale: [0, 1, 10, 20]
+        });
+      });
+    },
 
     render: function() {
       var dumpNodes = this.props.dumps.map(function(dump) {
         return <Dump key={dump.id} dump={dump} tagging={dump.tagging}></Dump>;
       });
+      var chartId = "cal-heatmap" + this.props.key;
       return (
         <article id={this.props.id}>
         <h1>
@@ -19,6 +43,7 @@ define(['react', 'tagging', 'tags'], function(React, Tagging, Tags) {
         handleAddTag = {this.handleAddTag}
         handleRemoveTag = {this.handleRemoveTag} />
         </h1>
+        <div id={chartId}></div>
         {dumpNodes}
         </article>
       );
