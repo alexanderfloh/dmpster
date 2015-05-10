@@ -6,9 +6,6 @@ requirejs.config({
     'react': '../lib/react/react-with-addons',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
-    'Bucket': '../jsx/bucket',
-    'buckets': '../jsx/buckets',
-    'view-bucket': '../jsx/viewBucket',
     'details': '../jsx/details'
   }
 });
@@ -21,8 +18,6 @@ require([
   'react',
   'tagging',
   'tags',
-  'Bucket',
-  'buckets',
   'details',
   'menu'
 
@@ -34,8 +29,6 @@ require([
   React,
   Tagging,
   Tags,
-  Bucket,
-  Buckets,
   DetailsContainer,
   Menu
   ) {

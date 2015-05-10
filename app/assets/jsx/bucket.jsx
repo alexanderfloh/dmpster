@@ -7,34 +7,44 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap'],
     mixins: [Tagging],
 
     componentWillMount: function() {
-      var that = this;
-      var cal = new CalHeatMap();
-      $.ajax({
-        url: '/dmpster/bucket/' + that.props.key + '/hits.json',
+      if(this.props.key) {
+        var that = this;
+        var cal = new CalHeatMap();
+        $.ajax({
+          url: '/dmpster/bucket/' + that.props.key + '/hits.json',
 
-      }).done(function(data){
-        cal.init({
-          data: data,
-          itemSelector: '#cal-heatmap' + that.props.key,
-          domain: 'month',
-          range : 3,
-          start: new Date().setMonth(new Date().getMonth() - 2),
-          displayLegend: false,
-          scale: [0, 1, 10, 20]
+        }).done(function(data){
+          cal.init({
+            data: data,
+            itemSelector: '#cal-heatmap' + that.props.key,
+            domain: 'month',
+            range : 3,
+            start: new Date().setMonth(new Date().getMonth() - 2),
+            displayLegend: false,
+            scale: [0, 1, 10, 20]
+          });
         });
-      });
+      }
     },
 
     render: function() {
       var dumpNodes = this.props.dumps.map(function(dump) {
         return <Dump key={dump.id} dump={dump} tagging={dump.tagging}></Dump>;
       });
+      var nameParts;
+      if(this.props.name) {
+        nameParts = this.props.name.split('!').map(function(part) {
+          return <span key={part}>{part} </span>;
+        });
+      } else {
+        nameParts = "";
+      }
       var chartId = "cal-heatmap" + this.props.key;
       return (
         <article id={this.props.id}>
         <h1>
         <a href={this.props.url}>
-        {this.props.name}<br/>
+        {nameParts}<br/>
         </a>
         <Tags
         tags = {this.state.tags}

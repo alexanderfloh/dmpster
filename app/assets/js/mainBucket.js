@@ -4,6 +4,8 @@ requirejs.config({
     'jquery.ui.widget': '../jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget',
     'jquery.fileupload': '../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
     'react': '../lib/react/react-with-addons',
+    'd3': '../lib/d3/d3',
+    'calHeatmap': '../js/cal-heatmap',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
     'Bucket': '../jsx/bucket',
@@ -19,10 +21,12 @@ require([
   'jquery.fileupload',
   'jquery.balloon',
   'react',
+  'd3',
+  'calHeatmap',
   'tagging',
   'tags',
   'Bucket',
-  'buckets',
+
   'view-bucket'
 
   ], function (
@@ -31,10 +35,11 @@ require([
   jQueryFileUpload,
   jQueryBalloon,
   React,
+  d3,
+  CalHeatMap,
   Tagging,
   Tags,
   Bucket,
-  Buckets,
   ViewBucket
   ) {
   React.renderComponent(
