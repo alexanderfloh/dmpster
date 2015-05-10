@@ -5,7 +5,7 @@ requirejs.config({
     'jquery.fileupload': '../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
     'react': '../lib/react/react-with-addons',
     'd3': '../lib/d3/d3',
-    'calHeatmap': '../cal-heatmap/cal-heatmap',
+    'calHeatmap': '../js/cal-heatmap',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
     'Bucket': '../jsx/bucket',
@@ -16,6 +16,7 @@ requirejs.config({
 });
 
 define([
+  'require',
   'jquery',
   'jquery.ui.widget',
   'jquery.fileupload',
@@ -29,6 +30,7 @@ define([
   'buckets',
   'menu'],
   function(
+    require,
     jQuery,
     jQueryUiWidget,
     jQueryFileUpload,
@@ -41,7 +43,7 @@ define([
     Bucket,
     Buckets,
     menu
-    ) {
+  ) {
     React.renderComponent(
       Buckets.Buckets(
         { url:"dmpster/buckets.json", pollInterval: 5 * 1000 }),

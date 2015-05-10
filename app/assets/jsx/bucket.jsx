@@ -1,16 +1,14 @@
 /** @jsx React.DOM */
 
-define(['react', 'tagging', 'tags', 'd3', 'calHeatmap'],
-  function(React, Tagging, Tags, d3, CalHeatMap) {
+define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap'],
+  function(require, React, Tagging, Tags, d3, CalHeatMap) {
 
   var Bucket = React.createClass({
     mixins: [Tagging],
 
     componentWillMount: function() {
       var that = this;
-      var d3_ = d3;
-      var heatMap = CalHeatMap;
-      var cal = new heatMap();
+      var cal = new CalHeatMap();
       $.ajax({
         url: '/dmpster/bucket/' + that.props.key + '/hits.json',
 
@@ -44,7 +42,9 @@ define(['react', 'tagging', 'tags', 'd3', 'calHeatmap'],
         handleRemoveTag = {this.handleRemoveTag} />
         </h1>
         <div id={chartId}></div>
+        <div className="dump-container">
         {dumpNodes}
+        </div>
         </article>
       );
     }

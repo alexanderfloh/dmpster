@@ -5,7 +5,7 @@ requirejs.config({
     'jquery.fileupload': '../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
     'react': '../lib/react/react-with-addons',
     'd3': '../lib/d3/d3',
-    'calHeatmap': '../cal-heatmap/cal-heatmap',
+    'calHeatmap': '../js/cal-heatmap',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
     'Bucket': '../jsx/bucket',

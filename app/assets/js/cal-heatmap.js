@@ -5,8 +5,8 @@
  *  Licensed under the MIT license
  *  Copyright 2014 Wan Qi Chen
  */
-
-var d3 = typeof require === "function" ? require("d3") : window.d3;
+define('calHeatmap', ['require', 'd3'], function(require, d3) {
+//var d3 = typeof require === "function" ? require("d3") : window.d3;
 
 var CalHeatMap = function() {
 	"use strict";
@@ -3436,14 +3436,16 @@ function arrayEquals(arrayA, arrayB) {
 /**
  * AMD Loader
  */
-if (typeof define === "function" && define.amd) {
-	define(["d3"], function() {
-		"use strict";
-
-		return CalHeatMap;
-	});
-} else if (typeof module === "object" && module.exports) {
-	module.exports = CalHeatMap;
-} else {
-	window.CalHeatMap = CalHeatMap;
-}
+//if (typeof define === "function" && define.amd) {
+//	define(["d3"], function() {
+//		"use strict";
+//
+//		return CalHeatMap;
+//	});
+//} else if (typeof module === "object" && module.exports) {
+//	module.exports = CalHeatMap;
+//} else {
+//	window.CalHeatMap = CalHeatMap;
+//}
+return CalHeatMap;
+});
