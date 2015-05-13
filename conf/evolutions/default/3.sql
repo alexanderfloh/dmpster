@@ -7,7 +7,7 @@ CREATE TABLE bucket_hits (
     dumpId integer,
     bucketId integer NOT NULL,
     timestamp TIMESTAMP
-);
+) AS SELECT nextval('bucket_hit_id_seq'), dump.id AS dumpId, dump.bucketId, dump.timestamp FROM dump;
 
 
 
