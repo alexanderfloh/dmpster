@@ -78,7 +78,7 @@ define(['react', 'jquery'], function(React, $) {
       });
       if(this.state.inputVisible) {
         return (
-          <span id="tags">
+          <span id="tags" className="tag-container">
           {tagNodes}
           <input type="text"
           ref="tagInput"
@@ -94,13 +94,13 @@ define(['react', 'jquery'], function(React, $) {
       } else {
         return(
           <span
-          id="tags">
+          id="tags" className="tag-container">
           {tagNodes}
           <a
           href="javascript:void(0);"
           className="tag add"
           onClick={this.handleAddTagClick}>
-          add a tag&hellip;
+          add a tag
           </a>
           </span>
         );

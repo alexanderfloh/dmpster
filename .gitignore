@@ -11,6 +11,7 @@ dist
 /.idea_modules
 /.classpath
 /.project
+/.sbtserver
 /RUNNING_PID
 /.settings
 /.target
@@ -20,3 +21,5 @@ dist
 /out.txt
 /README
 .DS_Store
+project/.sbtserver.lock
+project/.sbtserver

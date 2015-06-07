@@ -26,7 +26,7 @@
 
 .cal-heatmap-container .graph-subdomain-group rect:hover
 {
-	stroke: #000;
+	stroke: #555;
 	stroke-width: 1px
 }
 
@@ -57,38 +57,50 @@ Remove comment to apply this style to date with value equal to 0
 
 .cal-heatmap-container .q1
 {
-	background-color: #dae289;
-	fill: #dae289
+	//background-color: #dae289;
+	//fill: #dae289;
+	background-color: hsla(204, 20%, 44%, 1);
+	fill: hsla(204, 20%, 44%, 1);
 }
 
 .cal-heatmap-container .q2
 {
-	background-color: #cedb9c;
-	fill: #9cc069
+	//background-color: #cedb9c;
+	//fill: #9cc069;
+	background-color: hsla(204, 30%, 44%, 1);
+	fill: hsla(204, 50%, 44%, 1);
 }
 
 .cal-heatmap-container .q3
 {
-	background-color: #b5cf6b;
-	fill: #669d45
+	//background-color: #b5cf6b;
+	//fill: #669d45;
+	background-color: hsla(204, 40%, 44%, 1);
+	fill: hsla(204, 40%, 44%, 1);
 }
 
 .cal-heatmap-container .q4
 {
-	background-color: #637939;
-	fill: #637939
+	//background-color: #637939;
+	//fill: #637939;
+	background-color: hsla(204, 50%, 44%, 1);
+	fill: hsla(204, 50%, 44%, 1);
 }
 
 .cal-heatmap-container .q5
 {
-	background-color: #3b6427;
-	fill: #3b6427
+	//background-color: #3b6427;
+	//fill: #3b6427;
+	background-color: hsla(204, 64%, 44%, 1);
+	fill: hsla(204, 64%, 44%, 1);
 }
 
-.cal-heatmap-container rect.highlight
+.cal-heatmap-container rect.highlight:not(.now)
 {
-	stroke:#444;
-	stroke-width:1
+	stroke:#eee;
+	stroke-width:1;
+	background-color: #fff;
+	fill: #fff;
 }
 
 .cal-heatmap-container text.highlight
@@ -98,7 +110,7 @@ Remove comment to apply this style to date with value equal to 0
 
 .cal-heatmap-container rect.now
 {
-	stroke: red
+	stroke: hsla(204, 64%, 44%, 1);
 }
 
 .cal-heatmap-container text.now

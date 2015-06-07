@@ -22,6 +22,7 @@ GET    /dmpster/dmp/:id/detailsJson             controllers.Application.detailsJ
 GET    /dmpster/bucket/:id/Json                 controllers.Application.bucketJson(id: Long)
 GET    /dmpster/search.json/:search             controllers.Application.searchBucketsJson(search: String)
 GET    /dmpster/search/:search                  controllers.Application.search(search: String)
+GET    /dmpster/buckets_newest.json				controllers.Application.bucketsNewestJson
 
 GET    /rss/dumps                               controllers.Rss.dumps
 

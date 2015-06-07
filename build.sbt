@@ -26,3 +26,5 @@ RjsKeys.modules := Seq(
     WebJs.JS.Object("name" -> "mainDetails"),
     WebJs.JS.Object("name" -> "mainBucket")
 )
+
+fork in run := true

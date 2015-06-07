@@ -62,6 +62,12 @@ object Application extends Controller {
       "analyzing" -> analyzingJson,
       "buckets" -> contentJsonified)
   }
+  
+  def bucketsNewestJson = {
+    Action {
+      Ok(BucketHit.newest().toString())
+    }
+  }
 
   def bucketsJson = {
     Action {

@@ -67,6 +67,7 @@ table {
 @import url(http://fonts.googleapis.com/css?family=Source+Code+Pro);
 body {
   font-family: 'Open Sans', sans-serif;
+  background-color: #bbb;
 }
 
 @green: rgb(86, 175, 0);
@@ -208,18 +209,20 @@ header {
 }
 
 article {
-  padding-left: 4em;
-  padding-top: 2em;
+  padding: 2em 2em 2em 4em;
   margin: 1em 1em;
   background: #fff;
-  border: 1px solid #BBB;
-  .light-shadow;
+  //border: 1px solid #BBB;
+  //.light-shadow;
+  display: flex;
+  flex-flow: row wrap;
 
   > h1 {
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 20px;
     position: relative;
+    overflow-wrap: break-word;
     &:before {
       content: "";
       background-image: url(../images/trashcan.svg);
@@ -238,62 +241,99 @@ article {
 
     a {
       text-decoration: none;
-      color: black;
+      color: #555;
       &:hover {
         text-decoration: underline;
       }
     }
   }
 
+  .dump-container {
+    //display: inline-block;
+    flex: 1 45%;
+    //background-color: #eee;
+  }
+
+  .notes {
+    //background-color: #eee;
+    //display: inline-block;
+    flex: 1 45%;
+    padding: 0.5em;
+    font-size: 0.9em;
+    line-height: 1.2;
+    margin: 0 1em;
+    overflow-wrap: break-word;
+  }
+
+  .heatmap {
+    //flex: 1 45%;
+    margin: 0 1em;
+    padding: 0.5em;
+  }
+
   section {
-    background-color: rgba(0, 0, 0, 0.05);
-    display: inline-block;
+    //background-color: rgba(0, 0, 0, 0.05);
     max-width: 95%;
     position: relative;
     padding: 15px;
     min-width: 250px;
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    margin-right: 20px;
-    margin-bottom: 20px;
+    //border: 1px solid rgba(0, 0, 0, 0.07);
+    //margin-right: 20px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+
 
     &.details { max-width: none; }
+    &.archived .archive-dump img {
+      //background-color: hsla(91, 60%, 80%, 1);
+      border-right: 2px solid @green;
+    }
+    &.delete .remove-dump img {
+      //background-color: hsla(24, 60%, 80%, 1);
+      border-right: 2px solid @tag-delete;
+    }
 
     h1 {
+      margin: -15px;
+      margin-bottom: 5px;
+      padding: 10px;
+      //background-color: #ddd;
+      //background-color: rgba(0, 0, 0, 0.66);
+
+      font-weight: bold;
       a {
         text-decoration: none;
-        color: white;
+        color: #555;
 
         &:hover {
           text-decoration: underline;
         }
 
-        img {
-          // download dmp
-          height: 20px;
-          //padding: 5px;
-          margin-right: 5px;
-          &:hover {
-            background-color: @green;
-          }
-        }
+        // img {
+        //   // download dmp
+        //   height: 20px;
+        //   //padding: 5px;
+        //   margin-right: 5px;
+        //   &:hover {
+        //     background-color: @green;
+        //   }
+        // }
 
       }
 
-      margin: -15px;
-      margin-bottom: 10px;
-      padding: 10px;
-      background-color: rgba(0, 0, 0, 0.66);
-      color: white;
-      font-weight: bold;
+
     }
 
     time {
       opacity: 0.5;
-      position: absolute;
+      display: block;
+      padding-bottom: 15px;
+      //display: none;
+      //position: absolute;
       font-size: 0.6em;
-      bottom: 5px;
-      right: 5px;
+      //bottom: 5px;
+      //right: 5px;
     }
 
     &.new {
@@ -316,68 +356,84 @@ article {
     }
 
     .side-menu {
-      display: none;
+      //display: none;
       position: absolute;
-      background: rgba(255, 255, 255, 0.6);
-      width: 35px;
+      margin-right: 2px;
+      //background: rgba(255, 255, 255, 0.6);
+      //background: #eee;
+      width: 25px;
+
       height: 100%;
       right: 0px;
       bottom: 0px;
       .remove-dump img:hover {
-        background-color: rgb(211, 84, 0);
+        border-right: 4px solid @tag-delete;
+        //background-color: rgb(211, 84, 0);
+
       }
       .archive-dump img:hover {
-        background-color: rgb(86, 175, 0);
+        border-right: 4px solid @green;
+        //background-color: rgb(86, 175, 0);
       }
       img {
+        height: 25px;
+        //background-color: #666;
           //height: 25px;
           //padding: 5px 0 5px 0;
+          &:hover {
+            background-color: #eee;
+            border-right: 4px solid @tag-default;
+          }
         }
     }
   }
-  section:hover .side-menu {
-    display: block;
-    z-index: 11;
-  }
-  section:hover {
-    z-index: 10;
-  }
+}
+
+.tag-container {
+  display: inline-block;
+  //padding: 1em;
 }
 
 .tag {
   display: inline-block;
-  margin: 2px;
-  position: relative;
-  color: white;
+  margin-right: 4px;
+  //position: relative;
+  color: #666;
   padding: 3px 5px;
   font-size: 12px;
   font-weight: normal;
-  background-color: @tag-default;
+  //background-color: @tag-default;
+  //background-color: hsla(204, 60%, 80%, 1);
+  background-color: #ddd;
 
   &:hover {
     cursor: pointer;
-    background-color: @tag-hover;
+    //background-color: @tag-hover;
+    background-color: #ccc;
   }
 
   &.add {
-    text-decoration: none;
-    background-color: @tag-add;
+    //text-decoration: none;
+    //background-color: @tag-add;
+    background-color: transparent;
+    color: @tag-add;
 
     &:before {
       content: '+';
       font-weight: 900;
-      color: white;
-      background-color: @tag-add-plus;
+      //color: white;
+      //background-color: @tag-add-plus;
+
       display: inline-block;
       width: 12px;
       height: 12px;
       border-radius: 6px;
       text-align: center;
-      margin-right: 4px;
+      //margin-right: 4px;
     }
 
     &:hover {
-      background-color: @tag-add-hover;
+      //background-color: @tag-add-hover;
     }
   }
 
@@ -405,14 +461,16 @@ article {
   }
 
   &.marked-for-deletion {
-    background-color: @tag-delete;
+    //background-color: @tag-delete;
+    background-color: hsla(24, 60%, 80%, 1);
     &:hover {
       background-color: @tag-delete-hover;
     }
   }
 
   &.keep-forever {
-    background-color: @tag-archive;
+    //background-color: @tag-archive;
+    background-color: hsla(91, 60%, 80%, 1);
     &:hover {
       background-color: @tag-archive-hover;
     }

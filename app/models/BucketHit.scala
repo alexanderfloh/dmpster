@@ -22,6 +22,10 @@ object BucketHit {
     }}
   }
   
+  def newest() = DB.withConnection { implicit c => 
+    SQL"SELECT * FROM bucket_hits GROUP BY bucketId, id ORDER BY timestamp DESC" as (bucketHit *)
+  }
+  
   def bucketHit = {
     get[Long]("id") ~
       get[Long]("bucketId") ~
