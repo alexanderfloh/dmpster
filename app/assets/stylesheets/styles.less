@@ -19,7 +19,7 @@ body {
 }
 
 ol , ul {
-  list-style: none
+//  list-style: none
 }
 
 blockquote , q {
@@ -263,6 +263,12 @@ article {
     line-height: 1.2;
     margin: 0 1em;
     overflow-wrap: break-word;
+    textarea {
+      width: 100%;
+    }
+    code {
+      font-family: 'Source Code Pro', sans-serif;
+    }
   }
 
   .heatmap {
@@ -397,7 +403,7 @@ article {
 .tag {
   display: inline-block;
   margin-right: 4px;
-  //position: relative;
+  position: relative;
   color: #666;
   padding: 3px 5px;
   font-size: 12px;
@@ -448,6 +454,7 @@ article {
 
     img {
       height: 10px;
+      width: 10px;
       padding: 4px;
       &:hover {
         background-color: rgba(255, 255, 255, 0.4)

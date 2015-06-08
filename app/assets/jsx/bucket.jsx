@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap'],
-  function(require, React, Tagging, Tags, d3, CalHeatMap) {
+define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
+  function(require, React, Tagging, Tags, d3, CalHeatMap, marked) {
 
   var Bucket = React.createClass({
     mixins: [Tagging],
@@ -56,6 +56,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap'],
         nameParts = "";
       }
       var chartId = "cal-heatmap" + this.props.key;
+
       return (
         <article id={this.props.id}>
         <h1>
@@ -72,19 +73,33 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap'],
           <div id={chartId} className="heatmap"></div>
         {dumpNodes}
         </div>
-        <div className="notes">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum lacinia sapien, dictum fringilla quam cursus id. Donec ornare nisl at felis pretium hendrerit. Sed in malesuada enim. Proin eros ipsum, consectetur ut ipsum a, condimentum cursus urna. Suspendisse viverra diam et mi iaculis, a eleifend velit maximus. Fusce pulvinar molestie est, a porta orci tempus sit amet. Morbi urna ipsum, laoreet ut tellus eu, gravida euismod augue. Aliquam tristique magna id turpis sodales tempor. Nulla tristique tristique mauris. Nulla facilisi. Fusce eget enim molestie dolor tincidunt laoreet. Quisque mollis pellentesque ultricies. Praesent ut ultrices tortor. Nulla pharetra augue non lacus bibendum aliquet vel quis ligula. Vivamus dui turpis, dignissim eget tincidunt sed, porta eget ipsum. Aenean nibh libero, aliquam eget pellentesque eu, vestibulum non justo.
-Pellentesque finibus urna vel mi euismod pretium. Vivamus vel mollis eros, at ultrices magna. Maecenas venenatis mollis purus, eget laoreet nisi ultrices id. Etiam sed arcu vel mi commodo semper et nec quam. Donec euismod vestibulum turpis, aliquet ullamcorper orci vestibulum eget. Morbi in velit venenatis, ultrices enim quis, aliquet urna. Cras vehicula enim at mauris efficitur, ut ullamcorper nisi ullamcorper.
-
-<pre>Nunc velit lectus, ornare non purus vestibulum, sollicitudin dignissim lectus.</pre> Proin et mauris sollicitudin, porta turpis id, imperdiet nulla. Ut orci lorem, convallis in laoreet non, gravida non lorem. Maecenas id ornare nisl. Duis feugiat laoreet nulla, quis porta diam mattis non. Sed egestas risus at dolor placerat lacinia. Morbi nec iaculis odio.
-
-Proin id turpis lacus. Donec lacinia et arcu ut dapibus. Proin eu rhoncus arcu, id vestibulum neque. Donec volutpat tempus urna eget luctus. In lobortis eleifend mi et dapibus. Suspendisse aliquet tincidunt ante, eu sagittis turpis porttitor accumsan. Quisque malesuada at nulla in luctus. In semper id ligula eget accumsan. Duis blandit egestas lobortis.
-
-Donec placerat quis massa ut condimentum. Duis est metus, interdum quis velit sit amet, porta euismod nunc. Sed id metus enim. Suspendisse non erat at metus sollicitudin luctus. Phasellus pulvinar sem libero, sit amet consectetur orci aliquam sit amet. Cras pretium eu nisi vel vestibulum. Vestibulum eget tellus sit amet velit sagittis ultrices nec sed ex. Phasellus a nisl et odio sagittis consequat vitae vel metus. Vivamus efficitur ut lacus ut luctus. Fusce id consequat felis. Fusce aliquam ullamcorper sem gravida condimentum. In ac sem a tellus ultricies volutpat. Aenean auctor justo id urna scelerisque, eu accumsan leo malesuada.
-
-
-        </div>
+        <Notes />
         </article>
+      );
+    }
+  });
+
+  var Notes = React.createClass({
+    getInitialState: function() {
+      return {value: '#Hello! \n This is _italic_ and __bold__.\n\n    here be code.\n    lots of code.'};
+    },
+
+    handleChange: function(event) {
+      this.setState({value: event.target.value});
+    },
+
+    render: function() {
+      var value = this.state.value;
+      var rawMarkup = marked(value, {sanitize: true});
+
+      return (
+        <div className="notes">
+          <form>
+            <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
+            <input type="submit" />
+          </form>
+          <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
+        </div>
       );
     }
   });
