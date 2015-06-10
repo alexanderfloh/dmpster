@@ -58,7 +58,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
       var chartId = "cal-heatmap" + this.props.key;
 
       return (
-        <article id={this.props.id}>
+        <article id={this.props.key}>
         <h1>
         <a href={this.props.url}>
         {nameParts}<br/>
@@ -73,7 +73,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
           <div id={chartId} className="heatmap"></div>
         {dumpNodes}
         </div>
-        <Notes />
+        <Notes bucketId={this.props.key} notes={this.props.notes}/>
         </article>
       );
     }
@@ -81,11 +81,20 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
   var Notes = React.createClass({
     getInitialState: function() {
-      return {value: '#Hello! \n This is _italic_ and __bold__.\n\n    here be code.\n    lots of code.'};
+      return {value: this.props.notes};
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+      this.setState({value: nextProps.notes});
     },
 
     handleChange: function(event) {
       this.setState({value: event.target.value});
+    },
+
+    submitChange: function(event) {
+      $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes', {notes: this.state.value});
+      event.preventDefault();
     },
 
     render: function() {
@@ -94,9 +103,9 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
       return (
         <div className="notes">
-          <form>
+          <form onSubmit={this.submitChange}>
             <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
-            <input type="submit" />
+            <input type="submit"/>
           </form>
           <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
         </div>

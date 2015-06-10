@@ -62,7 +62,7 @@ object Application extends Controller {
       "analyzing" -> analyzingJson,
       "buckets" -> contentJsonified)
   }
-  
+
   def bucketsNewestJson = {
     Action {
       Ok(BucketHit.newest().toString())
@@ -103,6 +103,17 @@ object Application extends Controller {
     Ok(searchBucketsAsJson(search))
   }
 
+  def updateBucketNotes(id: Long) = Action { request =>
+    request.body.asFormUrlEncoded.map(m => {
+      val notes = m("notes")
+      Logger.info(notes.toString)
+      Bucket.updateNotes(id, notes.headOption.getOrElse(""))
+      Ok("")
+    }).getOrElse {
+      BadRequest("no notes specified")
+    }
+  }
+
   def detailsJson(id: Long) = Action {
     implicit val dumpWrites = Dump.writeForDetails
     val optResult = for {
@@ -138,10 +149,10 @@ object Application extends Controller {
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
-  
+
   def bucketHitsJson(id: Long) = Action {
-    Ok(toJson(BucketHit.byBucket(id).foldLeft(Json.obj()){
-      case (json, (time, count)) => json + (time.toString, toJson(count)) 
+    Ok(toJson(BucketHit.byBucket(id).foldLeft(Json.obj()) {
+      case (json, (time, count)) => json + (time.toString, toJson(count))
     }))
   }
 

@@ -33,4 +33,5 @@ POST   /dmpster/dmp/:id/addTag/:tagName         controllers.Application.addTagTo
 POST   /dmpster/dmp/:id/removeTag/:tagName      controllers.Application.removeTagFromDmp(id: Long, tagName: String)
 POST   /dmpster/bucket/:id/addTag/:tagName      controllers.Application.addTagToBucket(id: Long, tagName: String)
 POST   /dmpster/bucket/:id/removeTag/:tagName   controllers.Application.removeTagFromBucket(id: Long, tagName: String)
+POST   /dmpster/bucket/:id/updateNotes          controllers.Application.updateBucketNotes(id: Long)
 POST   /dmpster/admin/cleanupNow                controllers.Admin.cleanUpNow

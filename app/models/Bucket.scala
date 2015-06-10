@@ -55,6 +55,11 @@ object Bucket {
       SQL("delete from bucketToTag where bucketId = {bucketId} and tagId = {tagId}")
         .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
     }
+  
+  def updateNotes(id: Long, text: String) =
+    DB.withConnection { implicit c => 
+      SQL"update bucket set notes=$text where id=$id".executeUpdate
+  }
 
   def bucket = {
     get[Long]("id") ~
