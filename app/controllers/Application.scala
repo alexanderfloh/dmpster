@@ -108,6 +108,7 @@ object Application extends Controller {
       val notes = m("notes")
       Logger.info(notes.toString)
       Bucket.updateNotes(id, notes.headOption.getOrElse(""))
+      BucketsAsJsonCacheAccess.invalidateCache()
       Ok("")
     }).getOrElse {
       BadRequest("no notes specified")

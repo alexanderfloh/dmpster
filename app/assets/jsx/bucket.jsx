@@ -81,35 +81,89 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
   var Notes = React.createClass({
     getInitialState: function() {
-      return {value: this.props.notes};
+      return {
+        value: this.props.notes,
+        editing: false
+      };
     },
 
     componentWillReceiveProps: function(nextProps) {
-      this.setState({value: nextProps.notes});
+      if(this.state.editing) {
+        //TODO: handle conflict
+      }
+      else {
+        this.setState({
+          value: nextProps.notes,
+          editing: this.state.editing
+          });
+      }
     },
 
     handleChange: function(event) {
-      this.setState({value: event.target.value});
+      this.setState({
+        value: event.target.value,
+        editing: this.state.editing
+        });
+    },
+
+    handleEditClick: function(event) {
+      this.setState({
+        value: this.state.value,
+        editing: true
+      });
     },
 
     submitChange: function(event) {
       $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes', {notes: this.state.value});
       event.preventDefault();
+      this.setState({
+        value: this.state.value,
+        editing: false
+      })
     },
 
     render: function() {
       var value = this.state.value;
       var rawMarkup = marked(value, {sanitize: true});
 
-      return (
-        <div className="notes">
-          <form onSubmit={this.submitChange}>
-            <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
-            <input type="submit"/>
-          </form>
-          <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
-        </div>
-      );
+      if(this.state.editing) {
+        return (
+          <div className="notes">
+            <form onSubmit={this.submitChange}>
+              <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
+              <input type="submit"/>
+            </form>
+            <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
+          </div>
+        );
+      }
+      else if (!this.props.notes) {
+        return (
+          <div className="notes">
+            <div className="edit-bar">
+            <a
+              href="javascript:void(0);"
+              onClick={this.handleEditClick}>
+              add notes
+            </a>
+            </div>
+          </div>
+        );
+      }
+      else {
+        return (
+          <div className="notes">
+            <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
+            <div className="edit-bar">
+            <a
+              href="javascript:void(0);"
+              onClick={this.handleEditClick}>
+              edit
+            </a>
+            </div>
+          </div>
+        );
+      }
     }
   });
 
