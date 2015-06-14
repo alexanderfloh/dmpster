@@ -6,7 +6,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
   var Bucket = React.createClass({
     mixins: [Tagging],
 
-    componentWillMount: function() {
+    componentDidMount: function() {
       if(this.props.key) {
         var that = this;
         var dt = new Date();
@@ -25,20 +25,20 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
 
         var cal = new CalHeatMap();
+        cal.init({
+          itemSelector: '#cal-heatmap' + that.props.key,
+          domain: 'month',
+          range : 3,
+          start: new Date().setMonth(new Date().getMonth() - 2),
+          displayLegend: false,
+          legend: [1, 5, 10, 15],
+          highlight: futureDaysInMonth
+        });
         $.ajax({
           url: '/dmpster/bucket/' + that.props.key + '/hits.json',
 
         }).done(function(data){
-          cal.init({
-            data: data,
-            itemSelector: '#cal-heatmap' + that.props.key,
-            domain: 'month',
-            range : 3,
-            start: new Date().setMonth(new Date().getMonth() - 2),
-            displayLegend: false,
-            scale: [0, 1, 10, 20],
-            highlight: futureDaysInMonth
-          });
+          cal.update(data);
         });
       }
     },
@@ -64,7 +64,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
         {nameParts}<br/>
         </a>
         <Tags
-        tags = {this.state.tags}
+        tags = {this.getTags()}
         handleAddTag = {this.handleAddTag}
         handleRemoveTag = {this.handleRemoveTag} />
         </h1>
@@ -115,11 +115,19 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
     submitChange: function(event) {
       $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes', {notes: this.state.value});
-      event.preventDefault();
       this.setState({
         value: this.state.value,
         editing: false
-      })
+      });
+      event.preventDefault();
+    },
+
+    handleCancel: function(event) {
+      this.setState({
+        value: this.state.value,
+        editing: false
+      });
+      event.preventDefault();
     },
 
     render: function() {
@@ -132,6 +140,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
             <form onSubmit={this.submitChange}>
               <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
               <input type="submit"/>
+              <button onClick={this.HandleCancel}>Cancel</button>
             </form>
             <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
           </div>
@@ -139,12 +148,12 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
       }
       else if (!this.props.notes) {
         return (
-          <div className="notes">
+          <div className="notes-empty">
             <div className="edit-bar">
             <a
               href="javascript:void(0);"
               onClick={this.handleEditClick}>
-              add notes
+              click to add notes
             </a>
             </div>
           </div>
@@ -172,10 +181,10 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
     render: function() {
       var cx = React.addons.classSet;
-      var tagNames = this.state.tags.map(function(elem) {
+      var tagNames = this.getTags().map(function(elem) {
         return elem.name;
       });
-      var tagsFiltered = this.state.tags.filter(function(elem){
+      var tagsFiltered = this.getTags().filter(function(elem){
         return elem.name !== 'keep forever' && elem.name !== 'marked for deletion';
       });
       var classes = cx({
@@ -200,17 +209,18 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
         <a href={this.props.dump.dmpUrl} download={this.props.dump.filename}>
         <img src="/assets/images/download.svg" title={'download ' + this.props.dump.filename} ></img>
         </a>
-        <a
-        className="remove-dump"
-        href="javascript: void(0);"
-        onClick={this.handleClickOnRemove} >
-        <img src="/assets/images/delete.svg" title="mark for deletion"></img>
-        </a>
+
         <a
         className="archive-dump"
         href="javascript: void(0);"
         onClick={this.handleClickOnArchive} >
         <img src="/assets/images/archive.svg" title="keep forever"></img>
+        </a>
+        <a
+        className="remove-dump"
+        href="javascript: void(0);"
+        onClick={this.handleClickOnRemove} >
+        <img src="/assets/images/delete.svg" title="mark for deletion"></img>
         </a>
         </div>
         </section>

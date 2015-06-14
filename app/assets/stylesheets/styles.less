@@ -256,7 +256,7 @@ article {
     //background-color: #eee;
   }
 
-  .notes {
+  .notes, .notes-empty {
     //background-color: #eee;
     //display: inline-block;
     flex: 1 45%;
@@ -268,8 +268,31 @@ article {
     textarea {
       width: 100%;
     }
-    code {
-      font-family: 'Source Code Pro', sans-serif;
+    // code {
+    //   font-family: 'Source Code Pro', sans-serif;
+    // }
+
+    .edit-bar {
+      //border-top: 1px solid #ccc;
+      padding-top: 5px;
+      margin-top: 25px;
+      a {
+        color: #aaa;
+        font-size: 0.9em;
+        //text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+  }
+
+  .notes-empty {
+    align-self: center;
+    text-align: center;
+    .edit-bar a {
+      font-size: 1.2em;
     }
   }
 
@@ -288,7 +311,7 @@ article {
     overflow: hidden;
     //border: 1px solid rgba(0, 0, 0, 0.07);
     //margin-right: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     border-bottom: 1px solid #ccc;
 
 
@@ -345,31 +368,42 @@ article {
     }
 
     &.new {
-      &:before {
-        content: "new";
-        color: white;
+      //border-left: 4px solid @green;
+      h1 {
         background-color: @green;
-        font-weight: bold;
-        font-size: 0.8em;
-        padding: 4px 0;
-        text-align: center;
-        position: absolute;
-        width: 150px;
-        .transform (rotate(45deg));
-        right: -51px;
-        top: 12px;
-        z-index: 10;
-        overflow: hidden;
+        a{
+          color: white;
+        }
       }
+      // &:before {
+      //   content: "new";
+      //   color: white;
+      //   background-color: @green;
+      //   font-weight: bold;
+      //   font-size: 0.8em;
+      //   padding: 4px 0;
+      //   text-align: center;
+      //   position: absolute;
+      //   width: 150px;
+      //   .transform (rotate(-90deg));
+      //   //right: -51px;
+      //   //top: 12px;
+      //   left: -10px;
+      //   top: 50%;
+      //   z-index: 10;
+      //   //overflow: hidden;
+      // }
     }
 
     .side-menu {
       //display: none;
       position: absolute;
-      margin-right: 2px;
+      padding-right: 4px;
+      padding-left: 4px;
       //background: rgba(255, 255, 255, 0.6);
       //background: #eee;
       width: 25px;
+      background: white;
 
       height: 100%;
       right: 0px;
@@ -384,7 +418,9 @@ article {
         //background-color: rgb(86, 175, 0);
       }
       img {
+        padding: 3px 0px;
         height: 25px;
+        border-right: 4px solid white;
         //background-color: #666;
           //height: 25px;
           //padding: 5px 0 5px 0;
