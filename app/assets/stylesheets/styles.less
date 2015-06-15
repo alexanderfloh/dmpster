@@ -224,6 +224,7 @@ article {
     position: relative;
     overflow-wrap: break-word;
     flex: 1 100%;
+    color: #555;
 
     &:before {
       content: "";
@@ -315,7 +316,9 @@ article {
     border-bottom: 1px solid #ccc;
 
 
-    &.details { max-width: none; }
+    &.details {
+      max-width: none;
+    }
     &.archived .archive-dump img {
       //background-color: hsla(91, 60%, 80%, 1);
       border-right: 2px solid @green;
@@ -332,6 +335,7 @@ article {
       //background-color: #ddd;
       //background-color: rgba(0, 0, 0, 0.66);
 
+      color: #555;
       font-weight: bold;
       a {
         text-decoration: none;
@@ -430,6 +434,10 @@ article {
           }
         }
     }
+    pre {
+      overflow: hidden;
+      overflow-wrap: break-word;
+    }
   }
 }
 
@@ -506,16 +514,18 @@ article {
   }
 
   &.marked-for-deletion {
-    //background-color: @tag-delete;
-    background-color: hsla(24, 60%, 80%, 1);
+    background-color: @tag-delete;
+    //background-color: hsla(24, 60%, 80%, 1);
+    color: white;
     &:hover {
       background-color: @tag-delete-hover;
     }
   }
 
   &.keep-forever {
-    //background-color: @tag-archive;
-    background-color: hsla(91, 60%, 80%, 1);
+    background-color: @tag-archive;
+    color: white;
+    //background-color: hsla(91, 60%, 80%, 1);
     &:hover {
       background-color: @tag-archive-hover;
     }
