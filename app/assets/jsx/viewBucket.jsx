@@ -3,7 +3,7 @@
 define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
   var ViewBucket = React.createClass({
     getInitialState: function() {
-      return {bucket: {tagging: {tags: []}}, dumps: []};
+      return {bucket: {tagging: {tags: []}, notes:''}, dumps: []};
     },
 
     loadBucketsFromServer: function() {
@@ -31,6 +31,7 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
         name={this.state.bucket.name}
         url={this.state.bucket.url}
         tagging={this.state.bucket.tagging}
+        notes={this.state.bucket.notes}
         dumps={this.state.dumps} />
         </div>
       );
