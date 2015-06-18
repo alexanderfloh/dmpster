@@ -26,7 +26,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
 
         var cal = new CalHeatMap();
         cal.init({
-          itemSelector: '#cal-heatmap' + that.props.key,
+          itemSelector: '#cal-heatmap' + that.props.id,
           domain: 'month',
           range : 3,
           start: new Date().setMonth(new Date().getMonth() - 2),
@@ -35,7 +35,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
           highlight: futureDaysInMonth
         });
         $.ajax({
-          url: '/dmpster/bucket/' + that.props.key + '/hits.json',
+          url: '/dmpster/bucket/' + that.props.id + '/hits.json',
 
         }).done(function(data){
           cal.update(data);
@@ -55,10 +55,10 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
       } else {
         nameParts = "";
       }
-      var chartId = "cal-heatmap" + this.props.key;
+      var chartId = "cal-heatmap" + this.props.id;
 
       return (
-        <article id={this.props.key}>
+        <article id={this.props.id}>
         <h1>
         <a href={this.props.url}>
         {nameParts}<br/>
@@ -73,7 +73,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
           <div id={chartId} className="heatmap"></div>
         {dumpNodes}
         </div>
-        <Notes bucketId={this.props.key} notes={this.props.notes}/>
+        <Notes bucketId={this.props.id} notes={this.props.notes}/>
         </article>
       );
     }

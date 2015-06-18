@@ -6,6 +6,7 @@ requirejs.config({
     'react': '../lib/react/react-with-addons',
     'd3': '../lib/d3/d3',
     'calHeatmap': '../js/cal-heatmap',
+    'marked': '../lib/marked/marked',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
     'Bucket': '../jsx/bucket',

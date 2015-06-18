@@ -32,8 +32,11 @@ require([
   DetailsContainer,
   Menu
   ) {
-  React.renderComponent(
-    DetailsContainer(
-      { url:"/dmpster/dmp/"+ dumpId + "/detailsJson", pollInterval:5000 }),
-    document.getElementById('content'));
+  React.render(
+    React.createElement(
+      DetailsContainer,
+      { url:"/dmpster/dmp/"+ dumpId + "/detailsJson", pollInterval:5000 }
+    ),
+    document.getElementById('content')
+  );
 });

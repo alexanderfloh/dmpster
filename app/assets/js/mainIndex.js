@@ -47,10 +47,16 @@ define([
     Buckets,
     menu
   ) {
-    React.renderComponent(
-      Buckets.Buckets(
-        { url:"dmpster/buckets.json", pollInterval: 5 * 1000 }),
-        document.getElementById('content'));
+    React.render(
+      React.createElement(
+        Buckets.Buckets,
+        {
+          url:"dmpster/buckets.json",
+          pollInterval: 5 * 1000
+        }
+      ),
+      document.getElementById('content')
+    );
 
         $(function() {
           var holder = $('body').get(0);

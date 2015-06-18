@@ -45,8 +45,11 @@ require([
   Bucket,
   ViewBucket
   ) {
-  React.renderComponent(
-    ViewBucket({url:"/dmpster/bucket/" + bucketId + "/Json", pollInterval:5000}),
+  React.render(
+    React.createElement(
+        ViewBucket,
+        {url:"/dmpster/bucket/" + bucketId + "/Json", pollInterval:5000}
+      ),
     document.getElementById('content')
     );
 });
