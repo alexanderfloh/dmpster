@@ -7,7 +7,7 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
     mixins: [Tagging],
 
     componentDidMount: function() {
-      if(this.props.key) {
+      if(this.props.id) {
         var that = this;
         var dt = new Date();
         var currentMonth = dt.getMonth();
