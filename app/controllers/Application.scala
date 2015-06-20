@@ -53,7 +53,7 @@ object Application extends Controller {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
 
-    val grouped = Dump.groupDumpsByBucket(Dump.all)
+    val grouped = Dump.forBuckets(Bucket.bucketsSortedByDate()) 
     val contentJsonified = toJson(grouped.map {
       case (bucket, dumps) =>
         Seq(toJson(bucket), toJson(dumps))

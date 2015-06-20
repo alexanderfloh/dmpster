@@ -19,5 +19,21 @@ class TestBucketGrouping extends Specification {
       Dump.groupDumpsByBucket(List(dump1, dump2, dump3)) must equalTo(List((bucket) -> List(dump2, dump1, dump3)))
     }
   }
+  
+  def time[R](block: => R) = {
+    val t0 = System.nanoTime()
+    val result = block    // call-by-name
+    val t1 = System.nanoTime()
+    (t1 - t0) / 1000000
+  }
+  
+  "Buckets" should {
+    "be grouped" in new WithApplication {
+      
+    	time { Dump.forBuckets(Bucket.bucketsSortedByDate()) } must be lessThan( 
+      time { Dump.groupDumpsByBucket(Dump.all) })
+      
+    }
+  }
 
 }

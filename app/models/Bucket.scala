@@ -55,10 +55,29 @@ object Bucket {
       SQL("delete from bucketToTag where bucketId = {bucketId} and tagId = {tagId}")
         .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
     }
-  
+
   def updateNotes(id: Long, text: String) =
-    DB.withConnection { implicit c => 
+    DB.withConnection { implicit c =>
       SQL"update bucket set notes=$text where id=$id".executeUpdate
+    }
+
+  def bucketsSortedByDate(limit: Option[Int] = None) = DB.withConnection { implicit c =>
+    limit.map(count => {
+      SQL"""
+      SELECT * 
+        FROM (SELECT bucketId, MAX(timestamp) FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC LIMIT $count) as hits
+        LEFT JOIN bucket
+        ON bucket.id = hits.bucketId
+       """.as(bucket *)      
+    }).getOrElse {
+      SQL"""
+      SELECT * 
+        FROM (SELECT bucketId, MAX(timestamp) FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC) as hits
+        LEFT JOIN bucket
+        ON bucket.id = hits.bucketId
+       """.as(bucket *)
+    }
+    
   }
 
   def bucket = {

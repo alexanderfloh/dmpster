@@ -89,6 +89,12 @@ object Dump {
     SQL("select * from dump where bucketId = {bucketId}")
       .on('bucketId -> bucket.id).as(dump *)
   }
+  
+  def forBuckets(buckets: List[Bucket]): List[(Bucket, List[Dump])] = DB.withConnection { implicit c =>
+    buckets.map(bucket => {
+      (bucket, SQL"select * from dump where bucketId = ${bucket.id}".as(dump *).toList)
+    })
+  }
 
   def byTag(tag: Tag) = DB.withConnection { implicit c =>
     SQL("select * from dumpToTag dtt inner join dump d on d.id = dtt.dumpId where dtt.tagId = {tagId}")
