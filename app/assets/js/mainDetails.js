@@ -6,9 +6,6 @@ requirejs.config({
     'react': '../lib/react/react-with-addons',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
-    'Bucket': '../jsx/bucket',
-    'buckets': '../jsx/buckets',
-    'view-bucket': '../jsx/viewBucket',
     'details': '../jsx/details'
   }
 });
@@ -21,8 +18,6 @@ require([
   'react',
   'tagging',
   'tags',
-  'Bucket',
-  'buckets',
   'details',
   'menu'
 
@@ -34,13 +29,14 @@ require([
   React,
   Tagging,
   Tags,
-  Bucket,
-  Buckets,
   DetailsContainer,
   Menu
   ) {
-  React.renderComponent(
-    DetailsContainer(
-      { url:"/dmpster/dmp/"+ dumpId + "/detailsJson", pollInterval:5000 }),
-    document.getElementById('content'));
+  React.render(
+    React.createElement(
+      DetailsContainer,
+      { url:"/dmpster/dmp/"+ dumpId + "/detailsJson", pollInterval:5000 }
+    ),
+    document.getElementById('content')
+  );
 });

@@ -81,7 +81,7 @@ class DummyParser extends DmpParser {
     val bucketName = lines.find(_.startsWith("FAILURE_BUCKET_ID:"))
       .map(_.split(" ").last)
       .getOrElse("unknown bucket")
-    (s"$bucketName ${rand.nextInt(100).toString}", lines.mkString("\n"))
+    (s"$bucketName ${rand.nextInt(5).toString}", lines.mkString("\n"))
   }
 }
 

@@ -1,17 +1,17 @@
 define("menu", ['jquery'],
 function($) {
   //Create a clone of the menu, right next to original.
-  $('.menu').addClass('original')
+  $('.menu').addClass('menu-original')
     .clone()
     .hide()
-    .insertAfter('.original')
+    .insertAfter('.menu-original')
     .addClass('cloned')
-    .removeClass('original')
+    .removeClass('menu-original')
     .css('position','fixed')
     .css('left','0')
     .css('top','0');
 
-  $('.original > .logo').hide();
+  $('.menu-original > .logo').hide();
 
   stickMenu();
   jQuery( window ).resize(function() {stickMenu();});
@@ -25,7 +25,9 @@ function($) {
 
   function stickMenu() {
 
-    var orgElementPos = $('.original').offset();
+    var orgElementPos = $('.menu-original').offset();
+    if(!orgElementPos) return;
+    
     orgElementTop = orgElementPos.top;
 
     stickyTop = 0;
@@ -34,9 +36,9 @@ function($) {
     if ($(window).scrollTop() >= (orgElementTop - stickyTop)) {
       // scrolled past the original position; now only show the cloned, sticky element.
 
-      if($('.original').css('visibility') === 'visible') {
+      if($('.menu-original').css('visibility') === 'visible') {
         // Cloned element should always have same left position and width as original element.
-        orgElement = $('.original');
+        orgElement = $('.menu-original');
         coordsOrgElement = orgElement.offset();
         leftOrgElement = coordsOrgElement.left;
         widthOrgElement = orgElement.width();
@@ -45,7 +47,7 @@ function($) {
           .css('top',stickyTop+'px')
           .css('width',widthOrgElement+'px')
           .show();
-        $('.original').css('visibility','hidden');
+        $('.menu-original').css('visibility','hidden');
         var logo = $('.cloned > .logo');
         logo.animate({ marginLeft: '0' }, 500);
       }
@@ -54,7 +56,7 @@ function($) {
       if($('.cloned').is(':visible')) {
         $('.cloned > .logo').animate({ marginLeft: '-5em' }, 100, 'swing', function() {
           $('.cloned').hide();
-          $('.original').css('visibility','visible');
+          $('.menu-original').css('visibility','visible');
         });
 
       }

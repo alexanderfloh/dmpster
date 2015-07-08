@@ -17,10 +17,12 @@ GET    /dmpster/bucket/:id                      controllers.Application.viewBuck
 GET    /dmpster/admin                           controllers.Admin.index
 
 GET    /dmpster/buckets.json                    controllers.Application.bucketsJson
+GET	   /dmpster/bucket/:id/hits.json			controllers.Application.bucketHitsJson(id: Long)
 GET    /dmpster/dmp/:id/detailsJson             controllers.Application.detailsJson(id: Long)
 GET    /dmpster/bucket/:id/Json                 controllers.Application.bucketJson(id: Long)
 GET    /dmpster/search.json/:search             controllers.Application.searchBucketsJson(search: String)
 GET    /dmpster/search/:search                  controllers.Application.search(search: String)
+GET    /dmpster/buckets_newest.json				controllers.Application.bucketsNewestJson
 
 GET    /rss/dumps                               controllers.Rss.dumps
 
@@ -31,4 +33,5 @@ POST   /dmpster/dmp/:id/addTag/:tagName         controllers.Application.addTagTo
 POST   /dmpster/dmp/:id/removeTag/:tagName      controllers.Application.removeTagFromDmp(id: Long, tagName: String)
 POST   /dmpster/bucket/:id/addTag/:tagName      controllers.Application.addTagToBucket(id: Long, tagName: String)
 POST   /dmpster/bucket/:id/removeTag/:tagName   controllers.Application.removeTagFromBucket(id: Long, tagName: String)
+POST   /dmpster/bucket/:id/updateNotes          controllers.Application.updateBucketNotes(id: Long)
 POST   /dmpster/admin/cleanupNow                controllers.Admin.cleanUpNow

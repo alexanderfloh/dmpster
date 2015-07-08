@@ -89,6 +89,12 @@ object Dump {
     SQL("select * from dump where bucketId = {bucketId}")
       .on('bucketId -> bucket.id).as(dump *)
   }
+  
+  def forBuckets(buckets: List[Bucket]): List[(Bucket, List[Dump])] = DB.withConnection { implicit c =>
+    buckets.map(bucket => {
+      (bucket, SQL"select * from dump where bucketId = ${bucket.id}".as(dump *).toList)
+    })
+  }
 
   def byTag(tag: Tag) = DB.withConnection { implicit c =>
     SQL("select * from dumpToTag dtt inner join dump d on d.id = dtt.dumpId where dtt.tagId = {tagId}")
@@ -97,18 +103,29 @@ object Dump {
 
   def create(bucket: Bucket, relFilePath: String, content: String): Dump = {
     val timestamp = DateTime.now
-    DB.withConnection { implicit c =>
-      SQL("insert into dump (bucketId, filename, content, timestamp) " +
-        "values ({bucketId}, {filename}, {content}, {timestamp})")
-        .on(
-          'bucketId -> bucket.id,
-          'filename -> relFilePath,
-          'content -> content,
-          'timestamp -> timestamp.toDate)
+    DB.withTransaction { implicit c =>
+      val dump = SQL"""
+        insert into dump (bucketId, filename, content, timestamp) 
+          values (${bucket.id}, $relFilePath, $content, ${timestamp.toDate})
+        """
+//        .on(
+//          'bucketId -> bucket.id,
+//          'filename -> relFilePath,
+//          'content -> content,
+//          'timestamp -> timestamp.toDate)
         .executeInsert() match {
           case Some(id) => Dump(id, bucket, relFilePath, content, timestamp)
           case None     => throw new Exception("unable to insert dump into db")
         }
+        SQL"""
+          insert into bucket_hits (dumpId, bucketId, timestamp)
+          values (${dump.id}, ${bucket.id}, ${timestamp.toDate})
+          """
+          .executeInsert() match {
+            case Some(id) => id
+            case None  => throw new Exception("unable to insert bucket hit into db")
+          }
+        dump
     }
   }
 

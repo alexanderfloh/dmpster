@@ -26,8 +26,10 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
         var dumps = bucketAndDumps[1];
         return (<Bucket
           key={bucket.id}
+          id={bucket.id}
           name={bucket.name}
           url={bucket.url}
+          notes={bucket.notes}
           tagging={bucket.tagging}
           dumps={dumps}>
           </Bucket>);

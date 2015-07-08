@@ -15,6 +15,7 @@ case class CleanUp()
 class CleanUpActor extends Actor {
 
   lazy val maxNumberOfDumpsPerBucket = Play.current.configuration.getInt("dmpster.max.number.of.dmps.per.bucket").getOrElse(5)
+  lazy val daysLifetime = Play.current.configuration.getInt("dmpster.dmp.days.lifetime").getOrElse(14)
 
   lazy val oldTag = Tag.findOrCreate("marked for deletion")
   lazy val keepForeverTag = Tag.findOrCreate("keep forever")
@@ -31,8 +32,8 @@ class CleanUpActor extends Actor {
   }
 
   def dateForOldness = Play.mode match {
-    case Mode.Dev => DateTime.now.minusMinutes(15)
-    case Mode.Prod => DateTime.now.minusDays(14)
+    case Mode.Dev => DateTime.now.minusDays(daysLifetime)
+    case Mode.Prod => DateTime.now.minusDays(daysLifetime)
   }
 
   def deleteSingleDump(dmpPath: String, dump: Dump) {

@@ -9,7 +9,8 @@ import play.api.libs.json._
 
 case class Bucket(
   id: Long,
-  name: String) extends Taggable {
+  name: String,
+  notes: String) extends Taggable {
 
   val url = "bucket"
   def fullUrl = s"/dmpster/$url/$id"
@@ -55,10 +56,35 @@ object Bucket {
         .on('bucketId -> bucket.id, 'tagId -> tag.id).executeUpdate
     }
 
+  def updateNotes(id: Long, text: String) =
+    DB.withConnection { implicit c =>
+      SQL"update bucket set notes=$text where id=$id".executeUpdate
+    }
+
+  def bucketsSortedByDate(limit: Option[Int] = None) = DB.withConnection { implicit c =>
+    limit.map(count => {
+      SQL"""
+      SELECT * 
+        FROM (SELECT bucketId, MAX(timestamp) FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC LIMIT $count) as hits
+        LEFT JOIN bucket
+        ON bucket.id = hits.bucketId
+       """.as(bucket *)      
+    }).getOrElse {
+      SQL"""
+      SELECT * 
+        FROM (SELECT bucketId, MAX(timestamp) FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC) as hits
+        LEFT JOIN bucket
+        ON bucket.id = hits.bucketId
+       """.as(bucket *)
+    }
+    
+  }
+
   def bucket = {
     get[Long]("id") ~
-      get[String]("name") map {
-        case id ~ name => Bucket(id, name)
+      get[String]("name") ~
+      get[String]("notes") map {
+        case id ~ name ~ notes => Bucket(id, name, notes)
       }
   }
 
@@ -67,6 +93,7 @@ object Bucket {
     Json.obj(
       "id" -> b.id,
       "name" -> b.name,
+      "notes" -> b.notes,
       "url" -> s"dmpster/bucket/${b.id}",
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(b.tags),

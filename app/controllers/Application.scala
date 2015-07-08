@@ -31,6 +31,7 @@ import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import utils.Work
 import utils.BucketsAsJsonCacheAccess
+import models.BucketHit
 
 object Application extends Controller {
 
@@ -52,7 +53,7 @@ object Application extends Controller {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
 
-    val grouped = Dump.groupDumpsByBucket(Dump.all)
+    val grouped = Dump.forBuckets(Bucket.bucketsSortedByDate()) 
     val contentJsonified = toJson(grouped.map {
       case (bucket, dumps) =>
         Seq(toJson(bucket), toJson(dumps))
@@ -60,6 +61,12 @@ object Application extends Controller {
     Json.obj(
       "analyzing" -> analyzingJson,
       "buckets" -> contentJsonified)
+  }
+
+  def bucketsNewestJson = {
+    Action {
+      Ok(BucketHit.newest().toString())
+    }
   }
 
   def bucketsJson = {
@@ -96,6 +103,18 @@ object Application extends Controller {
     Ok(searchBucketsAsJson(search))
   }
 
+  def updateBucketNotes(id: Long) = Action { request =>
+    request.body.asFormUrlEncoded.map(m => {
+      val notes = m("notes")
+      Logger.info(notes.toString)
+      Bucket.updateNotes(id, notes.headOption.getOrElse(""))
+      BucketsAsJsonCacheAccess.invalidateCache()
+      Ok("")
+    }).getOrElse {
+      BadRequest("no notes specified")
+    }
+  }
+
   def detailsJson(id: Long) = Action {
     implicit val dumpWrites = Dump.writeForDetails
     val optResult = for {
@@ -130,6 +149,12 @@ object Application extends Controller {
     } yield Ok(Json.obj("bucket" -> toJson(bucket), "dumps" -> toJson(dumps)))
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
+  }
+
+  def bucketHitsJson(id: Long) = Action {
+    Ok(toJson(BucketHit.byBucket(id).foldLeft(Json.obj()) {
+      case (json, (time, count)) => json + (time.toString, toJson(count))
+    }))
   }
 
   def analyzingJson = {

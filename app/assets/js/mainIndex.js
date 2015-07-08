@@ -4,6 +4,9 @@ requirejs.config({
     'jquery.ui.widget': '../jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget',
     'jquery.fileupload': '../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
     'react': '../lib/react/react-with-addons',
+    'd3': '../lib/d3/d3',
+    'calHeatmap': '../js/cal-heatmap',
+    'marked': '../lib/marked/marked',
     'tagging': '../jsx/tagging',
     'tags': '../jsx/tags',
     'Bucket': '../jsx/bucket',
@@ -13,36 +16,61 @@ requirejs.config({
   }
 });
 
-define(function(require) {
-  var jQuery = require('jquery'),
-  jQueryUiWidget = require('jquery.ui.widget'),
-  jQueryFileUpload = require('jquery.fileupload'),
-  jQueryBalloon = require('jquery.balloon'),
-  React = require('react'),
-  Tagging = require('tagging'),
-  Tags = require('tags'),
-  Bucket = require('Bucket'),
-  Buckets = require('buckets');
-  menu = require('menu');
+define([
+  'require',
+  'jquery',
+  'jquery.ui.widget',
+  'jquery.fileupload',
+  'jquery.balloon',
+  'react',
+  'd3',
+  'calHeatmap',
+  'marked',
+  'tagging',
+  'tags',
+  'Bucket',
+  'buckets',
+  'menu'],
+  function(
+    require,
+    jQuery,
+    jQueryUiWidget,
+    jQueryFileUpload,
+    jQueryBalloon,
+    React,
+    d3,
+    calHeatmap,
+    marked,
+    Tagging,
+    Tags,
+    Bucket,
+    Buckets,
+    menu
+  ) {
+    React.render(
+      React.createElement(
+        Buckets.Buckets,
+        {
+          url:"dmpster/buckets.json",
+          pollInterval: 5 * 1000
+        }
+      ),
+      document.getElementById('content')
+    );
 
-  React.renderComponent(
-        Buckets.Buckets(
-          { url:"dmpster/buckets.json", pollInterval: 5 * 1000 }),
-        document.getElementById('content'));
+        $(function() {
+          var holder = $('body').get(0);
+          holder.ondragover = function(event) {
+            $('#holder').addClass('dragging');
+            event.preventDefault();
+          };
+          holder.ondragleave = function(event) {
+            $('#holder').removeClass('dragging');
+            event.preventDefault();
+          };
+          holder.ondrop = function(e) {
+            $('#holder').removeClass('dragging');
+          };
+        });
 
-  $(function() {
-    var holder = $('body').get(0);
-    holder.ondragover = function(event) {
-      $('#holder').addClass('dragging');
-      event.preventDefault();
-    };
-    holder.ondragleave = function(event) {
-      $('#holder').removeClass('dragging');
-      event.preventDefault();
-    };
-    holder.ondrop = function(e) {
-      $('#holder').removeClass('dragging');
-    };
-  });
-
-});
+      });

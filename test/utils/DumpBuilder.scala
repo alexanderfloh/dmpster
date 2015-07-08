@@ -6,7 +6,7 @@ import models.Dump
 
 object DumpBuilder {
   def forDate(date: DateTime): Dump = {
-    val bucket = Bucket(1, "asdf")
+    val bucket = Bucket(1, "asdf", "some notes")
     Dump(1, bucket, "dump1.dmp", "a crash!", date)
   }
 
@@ -19,6 +19,6 @@ object DumpBuilder {
 
       override def now = customNow
     }
-    new CustomDump(1, Bucket(1, "asdf"), "dump1.dmp", "a crash!", date)
+    new CustomDump(1, Bucket(1, "asdf", "some notes"), "dump1.dmp", "a crash!", date)
   }
 }

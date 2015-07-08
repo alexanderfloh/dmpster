@@ -18,6 +18,7 @@ object Global extends WithFilters(new GzipFilter()) with GlobalSettings {
     def interval = Play.mode match {
       case Mode.Dev  => 1.minutes
       case Mode.Prod => 3.hours
+      case _ => 3.hours
     }
     Akka.system.scheduler.schedule(5.seconds, interval, actor, CleanUp)
 
