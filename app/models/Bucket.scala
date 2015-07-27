@@ -94,7 +94,7 @@ object Bucket {
       "id" -> b.id,
       "name" -> b.name,
       "notes" -> b.notes,
-      "url" -> s"dmpster/bucket/${b.id}",
+      "url" -> b.fullUrl,
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(b.tags),
         "addTagUrl" -> b.addTagUrl,
