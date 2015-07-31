@@ -1,12 +1,18 @@
 /** @jsx React.DOM */
 
-define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked'],
-  function(require, React, Tagging, Tags, d3, CalHeatMap, marked) {
+define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked', 'highlight'],
+  function(require, React, Tagging, Tags, d3, CalHeatMap, marked, highlight) {
 
   var Bucket = React.createClass({
     mixins: [Tagging],
 
     componentDidMount: function() {
+      marked.setOptions({
+        highlight: function (code) {
+          return highlight.highlightAuto(code).value;
+        }
+      });
+
       if(this.props.id) {
         var that = this;
         var dt = new Date();

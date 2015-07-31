@@ -1,55 +1,39 @@
-requirejs.config({
-  paths: {
-    'jquery': '../lib/jquery/jquery',
-    'jquery.ui.widget': '../jQuery-File-Upload-8.8.5/js/vendor/jquery.ui.widget',
-    'jquery.fileupload': '../jQuery-File-Upload-8.8.5/js/jquery.fileupload',
-    'react': '../lib/react/react-with-addons',
-    'd3': '../lib/d3/d3',
-    'calHeatmap': '../js/cal-heatmap',
-    'marked': '../lib/marked/marked',
-    'tagging': '../jsx/tagging',
-    'tags': '../jsx/tags',
-    'Bucket': '../jsx/bucket',
-    'buckets': '../jsx/buckets',
-    'view-bucket': '../jsx/viewBucket',
-    'details': '../jsx/details'
-  }
-});
+require(['./common',], function(common) {
+  require([
+    'jquery',
+    'jquery.ui.widget',
+    'jquery.fileupload',
+    'jquery.balloon',
+    'react',
+    'd3',
+    'calHeatmap',
+    'marked',
+    'tagging',
+    'tags',
+    'Bucket',
 
-require([
-  'jquery',
-  'jquery.ui.widget',
-  'jquery.fileupload',
-  'jquery.balloon',
-  'react',
-  'd3',
-  'calHeatmap',
-  'marked',
-  'tagging',
-  'tags',
-  'Bucket',
+    'view-bucket'
 
-  'view-bucket'
-
-  ], function (
-  jQuery,
-  jQueryUiWidget,
-  jQueryFileUpload,
-  jQueryBalloon,
-  React,
-  d3,
-  CalHeatMap,
-  marked,
-  Tagging,
-  Tags,
-  Bucket,
-  ViewBucket
-  ) {
-  React.render(
-    React.createElement(
-        ViewBucket,
-        {url:"/dmpster/bucket/" + bucketId + "/Json", pollInterval:5000}
-      ),
-    document.getElementById('content')
-    );
+    ], function (
+    jQuery,
+    jQueryUiWidget,
+    jQueryFileUpload,
+    jQueryBalloon,
+    React,
+    d3,
+    CalHeatMap,
+    marked,
+    Tagging,
+    Tags,
+    Bucket,
+    ViewBucket
+    ) {
+    React.render(
+      React.createElement(
+          ViewBucket,
+          {url:"/dmpster/bucket/" + bucketId + "/Json", pollInterval:5000}
+        ),
+      document.getElementById('content')
+      );
+  });
 });
