@@ -127,7 +127,10 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
                 <h1>
                 {dump}
                 </h1>
-                <img src="assets/images/spinner.gif" />
+                <div className="spinner">
+                  <div className="dot1"></div>
+                  <div className="dot2"></div>
+                </div>
                 </section>
               );
             });
