@@ -138,7 +138,18 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked', 'hi
 
     render: function() {
       var value = this.state.value;
-      var rawMarkup = marked(value, {sanitize: true});
+      var renderer = new marked.Renderer();
+
+      renderer.paragraph = function(text) {
+        // rally: https://rally1.rallydev.com/#/search?keywords=DE1234
+        return text.replace(/(DE[\s]*([\d]+))/gi,
+          function (match, p1, p2, offset, string) {
+            var result = 'DE' + p2;
+            return '<a href="https://rally1.rallydev.com/#/search?keywords=DE' + result + '" target="_blank">'+ result + '</a>';
+          });
+      };
+
+      var rawMarkup = marked(value, { sanitize: true, renderer: renderer });
 
       if(this.state.editing) {
         return (
