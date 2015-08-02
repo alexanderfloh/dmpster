@@ -15,6 +15,7 @@ requirejs.config({
     'view-bucket': '../jsx/viewBucket',
     'details': '../jsx/details',
     'calendar': '../jsx/calendar',
-    'notes': '../jsx/notes'
+    'notes': '../jsx/notes',
+    'dump': '../jsx/dump'
   }
 });

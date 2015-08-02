@@ -23,18 +23,23 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
       this.loadBucketsFromServer();
       setInterval(this.loadBucketsFromServer, this.props.pollInterval);
     },
+
     render: function() {
-      return (
-        <div className="buckets">
-        <Bucket
-        key={this.state.bucket.id}
-        name={this.state.bucket.name}
-        url={this.state.bucket.url}
-        tagging={this.state.bucket.tagging}
-        notes={this.state.bucket.notes}
-        dumps={this.state.dumps} />
-        </div>
-      );
+      if(this.state.bucket.id !== undefined) {
+        return (
+          <div className="buckets">
+          <Bucket
+          id={this.state.bucket.id}
+          name={this.state.bucket.name}
+          url={this.state.bucket.url}
+          tagging={this.state.bucket.tagging}
+          notes={this.state.bucket.notes}
+          dumps={this.state.dumps} />
+          </div>
+        );
+      } else {
+        return (<div className="buckets"></div>);
+      }
     }
   });
   return ViewBucket;
