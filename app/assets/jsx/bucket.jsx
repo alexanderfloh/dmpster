@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['react', 'tagging', 'tags', 'calendar', 'marked', 'highlight'],
-  function(React, Tagging, Tags, Calendar, marked, highlight) {
+define(['react', 'tagging', 'tags', 'calendar', 'notes'],
+  function(React, Tagging, Tags, Calendar, Notes) {
 
   var Bucket = React.createClass({
     mixins: [Tagging],
@@ -38,122 +38,6 @@ define(['react', 'tagging', 'tags', 'calendar', 'marked', 'highlight'],
           <Notes bucketId={this.props.id} notes={this.props.notes}/>
         </article>
       );
-    }
-  });
-
-  var Notes = React.createClass({
-    getInitialState: function() {
-      return {
-        value: this.props.notes,
-        editing: false
-      };
-    },
-
-    componentWillReceiveProps: function(nextProps) {
-      if(this.state.editing) {
-        //TODO: handle conflict
-      }
-      else {
-        this.setState({
-          value: nextProps.notes,
-          editing: this.state.editing
-          });
-      }
-    },
-
-    componentDidMount: function() {
-      marked.setOptions({
-        highlight: function (code) {
-          return highlight.highlightAuto(code).value;
-        }
-      });
-    },
-
-    handleChange: function(event) {
-      this.setState({
-        value: event.target.value,
-        editing: this.state.editing
-        });
-    },
-
-    handleEditClick: function(event) {
-      this.setState({
-        value: this.state.value,
-        editing: true
-      });
-    },
-
-    submitChange: function(event) {
-      $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes', {notes: this.state.value});
-      this.setState({
-        value: this.state.value,
-        editing: false
-      });
-      event.preventDefault();
-    },
-
-    handleCancel: function(event) {
-      this.setState({
-        value: this.state.value,
-        editing: false
-      });
-      event.preventDefault();
-    },
-
-    render: function() {
-      var value = this.state.value;
-      var renderer = new marked.Renderer();
-
-      renderer.paragraph = function(text) {
-        // rally: https://rally1.rallydev.com/#/search?keywords=DE1234
-        return text.replace(/(DE[\s]*([\d]+))/gi,
-          function (match, p1, p2, offset, string) {
-            var result = 'DE' + p2;
-            return '<a href="https://rally1.rallydev.com/#/search?keywords=DE' + result + '" target="_blank">'+ result + '</a>';
-          });
-      };
-
-      var rawMarkup = marked(value, { sanitize: true, renderer: renderer });
-
-      if(this.state.editing) {
-        return (
-          <div className="notes">
-            <form onSubmit={this.submitChange}>
-              <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
-              <input type="submit"/>
-              <button onClick={this.HandleCancel}>Cancel</button>
-            </form>
-            <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
-          </div>
-        );
-      }
-      else if (!this.props.notes) {
-        return (
-          <div className="notes-empty">
-            <div className="edit-bar">
-            <a
-              href="javascript:void(0);"
-              onClick={this.handleEditClick}>
-              click to add notes
-            </a>
-            </div>
-          </div>
-        );
-      }
-      else {
-        return (
-          <div className="notes">
-            <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
-            <div className="edit-bar">
-            <a
-              href="javascript:void(0);"
-              onClick={this.handleEditClick}>
-              edit
-            </a>
-            </div>
-          </div>
-        );
-      }
     }
   });
 
