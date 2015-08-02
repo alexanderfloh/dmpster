@@ -1,53 +1,10 @@
 /** @jsx React.DOM */
 
-define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked', 'highlight'],
-  function(require, React, Tagging, Tags, d3, CalHeatMap, marked, highlight) {
+define(['react', 'tagging', 'tags', 'calendar', 'marked', 'highlight'],
+  function(React, Tagging, Tags, Calendar, marked, highlight) {
 
   var Bucket = React.createClass({
     mixins: [Tagging],
-
-    componentDidMount: function() {
-      marked.setOptions({
-        highlight: function (code) {
-          return highlight.highlightAuto(code).value;
-        }
-      });
-
-      if(this.props.id) {
-        var that = this;
-        var dt = new Date();
-        var currentMonth = dt.getMonth();
-        var month = currentMonth;
-        var futureDaysInMonth = ['now'];
-        var daysOffset = 1;
-        dt.setDate(dt.getDate() + daysOffset++);
-
-        while(month === currentMonth) {
-          futureDaysInMonth.push(dt);
-          dt = new Date();
-          dt.setDate(dt.getDate() + daysOffset++);
-          month = dt.getMonth();
-        }
-
-
-        var cal = new CalHeatMap();
-        cal.init({
-          itemSelector: '#cal-heatmap' + that.props.id,
-          domain: 'month',
-          range : 3,
-          start: new Date().setMonth(new Date().getMonth() - 2),
-          displayLegend: false,
-          legend: [1, 5, 10, 15],
-          highlight: futureDaysInMonth
-        });
-        $.ajax({
-          url: '/dmpster/bucket/' + that.props.id + '/hits.json',
-
-        }).done(function(data){
-          cal.update(data);
-        });
-      }
-    },
 
     render: function() {
       var dumpNodes = this.props.dumps.map(function(dump) {
@@ -61,25 +18,24 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked', 'hi
       } else {
         nameParts = "";
       }
-      var chartId = "cal-heatmap" + this.props.id;
 
       return (
         <article id={this.props.id}>
-        <h1>
-        <a href={this.props.url}>
-        {nameParts}<br/>
-        </a>
-        <Tags
-        tags = {this.getTags()}
-        handleAddTag = {this.handleAddTag}
-        handleRemoveTag = {this.handleRemoveTag} />
-        </h1>
+          <h1>
+            <a href={this.props.url}>
+              {nameParts}<br/>
+            </a>
+            <Tags
+            tags = {this.getTags()}
+            handleAddTag = {this.handleAddTag}
+            handleRemoveTag = {this.handleRemoveTag} />
+          </h1>
 
-        <div className="dump-container">
-          <div id={chartId} className="heatmap"></div>
-        {dumpNodes}
-        </div>
-        <Notes bucketId={this.props.id} notes={this.props.notes}/>
+          <div className="dump-container">
+            <Calendar bucketId={this.props.id} />
+            {dumpNodes}
+          </div>
+          <Notes bucketId={this.props.id} notes={this.props.notes}/>
         </article>
       );
     }
@@ -103,6 +59,14 @@ define(['require', 'react', 'tagging', 'tags', 'd3', 'calHeatmap', 'marked', 'hi
           editing: this.state.editing
           });
       }
+    },
+
+    componentDidMount: function() {
+      marked.setOptions({
+        highlight: function (code) {
+          return highlight.highlightAuto(code).value;
+        }
+      });
     },
 
     handleChange: function(event) {

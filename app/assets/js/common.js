@@ -13,6 +13,7 @@ requirejs.config({
     'Bucket': '../jsx/bucket',
     'buckets': '../jsx/buckets',
     'view-bucket': '../jsx/viewBucket',
-    'details': '../jsx/details'
+    'details': '../jsx/details',
+    'calendar': '../jsx/calendar'
   }
 });
