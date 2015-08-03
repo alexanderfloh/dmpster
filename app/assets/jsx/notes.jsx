@@ -71,12 +71,11 @@ define(['react', 'marked', 'highlight'],
         var renderer = new marked.Renderer();
 
         renderer.paragraph = function(text) {
-          // rally: https://rally1.rallydev.com/#/search?keywords=DE1234
-          return text.replace(/(DE[\s]*([\d]+))/gi,
-            function (match, p1, p2, offset, string) {
-              var result = 'DE' + p2;
-              return '<a href="https://rally1.rallydev.com/#/search?keywords=DE' + result + '" target="_blank">'+ result + '</a>';
-            });
+          return (text
+            .replace(/(DE[\s]*([\d]+))/gi, '<a href="https://rally1.rallydev.com/#/search?keywords=DE$2" target="_blank">DE$2</a>')
+            .replace(/(RPI[\s]*([\d]+))/gi, '<a href="http://pivotalrpi/rpi.asp?w=1&bRPI=Display+RPI+Number&r=$2" target="_blank">RPI$2</a>')
+            .replace(/(rST[\s]*([\d]+))/gi, '<a href="http://lnz-phabricator.microfocus.com/rST$2" target="_blank">rST$2</a>')
+          );
         };
 
         var rawMarkup = marked(value, { sanitize: true, renderer: renderer });
