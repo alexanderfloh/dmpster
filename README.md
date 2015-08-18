@@ -1,7 +1,7 @@
 #dmpster#
 ![dmpster screenshot](dmpster.png)
 _dmpster_ is a simple web app for storing `.dmp`-files.
-It also does an automated analysis of the `.dmp`-file (`!analyze - v`) to give you a quick overview what happend.
+It also does an automated analysis of the `.dmp`-file (`!analyze -v`) to give you a quick overview what happend.
 
 #Features#
 * Easy file upload via drag and drop.
