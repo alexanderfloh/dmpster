@@ -21,6 +21,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(Sb
 
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
+excludeFilter in (Assets, JshintKeys.jshint) := GlobFilter("cal-heatmap.js") || GlobFilter("common.js") || GlobFilter("jquery.balloon.js")
+
 pipelineStages := Seq(rjs, digest, gzip)
 
 RjsKeys.modules := Seq(
