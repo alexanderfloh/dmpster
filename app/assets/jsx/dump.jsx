@@ -31,34 +31,34 @@ define(['react', 'tagging', 'tags'],
         });
         return (
           <section className={classes}>
-          <h1>
-          <a href={"/dmpster/dmp/" + this.props.dump.id + "/details"}>
-          {this.props.dump.filename}
-          </a>
-          </h1>
-          <time>{this.props.dump.ageLabel}</time>
-          <Tags
-          tags = {tagsFiltered}
-          handleAddTag = {this.handleAddTag}
-          handleRemoveTag = {this.handleRemoveTag} />
-          <div className="side-menu">
-          <a href={this.props.dump.dmpUrl} download={this.props.dump.filename}>
-          <img src="/assets/images/download.svg" title={'download ' + this.props.dump.filename} ></img>
-          </a>
+            <h1>
+              <a href={"/dmpster/dmp/" + this.props.dump.id + "/details"}>
+                {this.props.dump.filename}
+              </a>
+            </h1>
+            <time>{this.props.dump.ageLabel}</time>
+            <Tags
+            tags = {tagsFiltered}
+            handleAddTag = {this.handleAddTag}
+            handleRemoveTag = {this.handleRemoveTag} />
+            <div className="side-menu">
+              <a href={this.props.dump.dmpUrl} download={this.props.dump.filename}>
+                <img src="/assets/images/download.svg" title={'download ' + this.props.dump.filename} ></img>
+              </a>
 
-          <a
-          className="archive-dump"
-          href="javascript: void(0);"
-          onClick={this.handleClickOnArchive} >
-          <img src="/assets/images/archive.svg" title="keep forever"></img>
-          </a>
-          <a
-          className="remove-dump"
-          href="javascript: void(0);"
-          onClick={this.handleClickOnRemove} >
-          <img src="/assets/images/delete.svg" title="mark for deletion"></img>
-          </a>
-          </div>
+              <a
+              className="archive-dump"
+              href="javascript: void(0);"
+              onClick={this.handleClickOnArchive} >
+                <img src="/assets/images/archive.svg" title="keep forever"></img>
+              </a>
+              <a
+              className="remove-dump"
+              href="javascript: void(0);"
+              onClick={this.handleClickOnRemove} >
+                <img src="/assets/images/delete.svg" title="mark for deletion"></img>
+              </a>
+            </div>
           </section>
         );
       }
