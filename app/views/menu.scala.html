@@ -2,12 +2,15 @@
 @(breadCrumbs: List[(String, String)], search: Option[String])
 <div class="menu">
   
-  <a href="@routes.Application.index" class="logo">dmpster</a>
-  <a class="index-link" title="dmpster" href="@routes.Application.index">&nbsp;</a>
-  @breadCrumbs.map { case (caption, url) =>
-    &nbsp;&raquo;&nbsp;
-    <a href="@url" class="breadcrumb">@caption</a>
-  }
+  
+  <span class="menu-left">
+  	<a href="@routes.Application.index" class="logo">dmpster</a>
+  	<a class="index-link" title="dmpster" href="@routes.Application.index">&nbsp;</a>
+	@breadCrumbs.map { case (caption, url) =>
+	  &nbsp;&raquo;&nbsp;
+	  <a href="@url" class="breadcrumb">@caption</a>
+	}
+  </span>
   <span class="menu-right">
     @*
     <form id="search-form">

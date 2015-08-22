@@ -141,6 +141,10 @@ header {
     color: white;
     padding: 5px 5px 5px 5px;
     .dark-shadow;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+
     a {
       text-decoration: none;
       color: white;
@@ -154,6 +158,7 @@ header {
       background-size: contain;
       padding-top: 0.2em;
       padding-left: 1em;
+
       &:hover {
         background-color: @green;
         text-decoration: none;
@@ -161,14 +166,13 @@ header {
     }
 
     .logo {
-      margin-left: -5em;
+
     }
     .breadcrumb {
       font-size: 0.8em;
     }
 
     .menu-right {
-      float: right;
       display: block;
       form {
         display: inline-block;
@@ -176,6 +180,13 @@ header {
 
       .rss-link {
         background: url(/assets/images/rss.svg) no-repeat center center;
+      }
+
+      .admin-link {
+        background: url(/assets/images/wrench.svg) no-repeat center center;
+      }
+
+      .rss-link, .admin-link {
         background-size: contain;
         padding-top: 0.2em;
         padding-left: 1em;
@@ -185,16 +196,6 @@ header {
         }
       }
 
-      .admin-link {
-        background: url(/assets/images/wrench.svg) no-repeat center center;
-        background-size: contain;
-        padding-top: 0.2em;
-        padding-left: 1em;
-        &:hover {
-          background-color: @green;
-          text-decoration: none;
-        }
-      }
     }
 
   }
@@ -212,8 +213,6 @@ article {
   padding: 2em 2em 2em 4em;
   margin: 1em 1em;
   background: #fff;
-  //border: 1px solid #BBB;
-  //.light-shadow;
   display: flex;
   flex-flow: row wrap;
 
@@ -252,14 +251,10 @@ article {
   }
 
   .dump-container {
-    //display: inline-block;
     flex: 1 45%;
-    //background-color: #eee;
   }
 
   .notes, .notes-empty {
-    //background-color: #eee;
-    //display: inline-block;
     flex: 1 45%;
     padding: 0.5em;
     font-size: 0.9em;
@@ -269,18 +264,13 @@ article {
     textarea {
       width: 100%;
     }
-    // code {
-    //   font-family: 'Source Code Pro', sans-serif;
-    // }
 
     .edit-bar {
-      //border-top: 1px solid #ccc;
       padding-top: 5px;
       margin-top: 25px;
       a {
         color: #aaa;
         font-size: 0.9em;
-        //text-decoration: none;
         &:hover {
           text-decoration: underline;
         }
@@ -298,20 +288,16 @@ article {
   }
 
   .heatmap {
-    //flex: 1 45%;
     margin: 0 1em;
     padding: 0.5em;
   }
 
   section {
-    //background-color: rgba(0, 0, 0, 0.05);
     max-width: 95%;
     position: relative;
     padding: 15px;
     min-width: 250px;
     overflow: hidden;
-    //border: 1px solid rgba(0, 0, 0, 0.07);
-    //margin-right: 20px;
     margin-bottom: 15px;
     border-bottom: 1px solid #ccc;
 
@@ -332,9 +318,6 @@ article {
       margin: -15px;
       margin-bottom: 5px;
       padding: 10px;
-      //background-color: #ddd;
-      //background-color: rgba(0, 0, 0, 0.66);
-
       color: #555;
       font-weight: bold;
       a {
@@ -344,17 +327,6 @@ article {
         &:hover {
           text-decoration: underline;
         }
-
-        // img {
-        //   // download dmp
-        //   height: 20px;
-        //   //padding: 5px;
-        //   margin-right: 5px;
-        //   &:hover {
-        //     background-color: @green;
-        //   }
-        // }
-
       }
 
 
@@ -364,48 +336,22 @@ article {
       opacity: 0.5;
       display: block;
       padding-bottom: 15px;
-      //display: none;
-      //position: absolute;
       font-size: 0.6em;
-      //bottom: 5px;
-      //right: 5px;
     }
 
     &.new {
-      //border-left: 4px solid @green;
       h1 {
         background-color: @green;
         a{
           color: white;
         }
       }
-      // &:before {
-      //   content: "new";
-      //   color: white;
-      //   background-color: @green;
-      //   font-weight: bold;
-      //   font-size: 0.8em;
-      //   padding: 4px 0;
-      //   text-align: center;
-      //   position: absolute;
-      //   width: 150px;
-      //   .transform (rotate(-90deg));
-      //   //right: -51px;
-      //   //top: 12px;
-      //   left: -10px;
-      //   top: 50%;
-      //   z-index: 10;
-      //   //overflow: hidden;
-      // }
     }
 
     .side-menu {
-      //display: none;
       position: absolute;
       padding-right: 4px;
       padding-left: 4px;
-      //background: rgba(255, 255, 255, 0.6);
-      //background: #eee;
       width: 25px;
       background: white;
 
@@ -414,20 +360,15 @@ article {
       bottom: 0px;
       .remove-dump img:hover {
         border-right: 4px solid @tag-delete;
-        //background-color: rgb(211, 84, 0);
 
       }
       .archive-dump img:hover {
         border-right: 4px solid @green;
-        //background-color: rgb(86, 175, 0);
       }
       img {
         padding: 3px 0px;
         height: 25px;
         border-right: 4px solid white;
-        //background-color: #666;
-          //height: 25px;
-          //padding: 5px 0 5px 0;
           &:hover {
             background-color: #eee;
             border-right: 4px solid @tag-default;
@@ -454,27 +395,20 @@ article {
   padding: 3px 5px;
   font-size: 12px;
   font-weight: normal;
-  //background-color: @tag-default;
-  //background-color: hsla(204, 60%, 80%, 1);
   background-color: #ddd;
 
   &:hover {
     cursor: pointer;
-    //background-color: @tag-hover;
     background-color: #ccc;
   }
 
   &.add {
-    //text-decoration: none;
-    //background-color: @tag-add;
     background-color: transparent;
     color: @tag-add;
 
     &:before {
       content: '+';
       font-weight: 900;
-      //color: white;
-      //background-color: @tag-add-plus;
 
       display: inline-block;
       width: 12px;

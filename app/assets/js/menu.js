@@ -11,7 +11,7 @@ function($) {
     .css('left','0')
     .css('top','0');
 
-  $('.menu-original > .logo').hide();
+  $('.menu-original .logo').hide();
 
   stickMenu();
   jQuery( window ).resize(function() {stickMenu();});
@@ -27,7 +27,7 @@ function($) {
 
     var orgElementPos = $('.menu-original').offset();
     if(!orgElementPos) return;
-    
+
     orgElementTop = orgElementPos.top;
 
     stickyTop = 0;
@@ -48,13 +48,13 @@ function($) {
           .css('width',widthOrgElement+'px')
           .show();
         $('.menu-original').css('visibility','hidden');
-        var logo = $('.cloned > .logo');
+        var logo = $('.cloned .logo');
         logo.animate({ marginLeft: '0' }, 500);
       }
     } else {
       // not scrolled past the menu; only show the original menu.
       if($('.cloned').is(':visible')) {
-        $('.cloned > .logo').animate({ marginLeft: '-5em' }, 100, 'swing', function() {
+        $('.cloned .logo').animate({ marginLeft: '-5em' }, 100, 'swing', function() {
           $('.cloned').hide();
           $('.menu-original').css('visibility','visible');
         });
