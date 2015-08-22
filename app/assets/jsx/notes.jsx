@@ -11,7 +11,7 @@ define(['react', 'marked', 'highlight'],
       getInitialState: function() {
         return {
           value: this.props.notes,
-          editing: false
+          editing: false,
         };
       },
 
@@ -20,10 +20,13 @@ define(['react', 'marked', 'highlight'],
           //TODO: handle conflict
         }
         else {
-          this.setState({
-            value: nextProps.notes,
-            editing: this.state.editing
+          if(!this.state.pendingText || nextProps.notes === this.state.pendingText) {
+            this.setState({
+              value: nextProps.notes,
+              editing: this.state.editing,
+              pendingText: ''
             });
+          }
         }
       },
 
@@ -38,22 +41,28 @@ define(['react', 'marked', 'highlight'],
       handleChange: function(event) {
         this.setState({
           value: event.target.value,
-          editing: this.state.editing
+          editing: this.state.editing,
+          pendingText: this.state.pendingText
           });
       },
 
       handleEditClick: function(event) {
         this.setState({
           value: this.state.value,
-          editing: true
+          editing: true,
+          pendingText: this.state.pendingText
         });
       },
 
       submitChange: function(event) {
-        $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes', {notes: this.state.value});
+        $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes',
+          {notes: this.state.value}
+        );
+
         this.setState({
           value: this.state.value,
-          editing: false
+          editing: false,
+          pendingText: this.state.value
         });
         event.preventDefault();
       },
@@ -61,13 +70,14 @@ define(['react', 'marked', 'highlight'],
       handleCancel: function(event) {
         this.setState({
           value: this.state.value,
-          editing: false
+          editing: false,
+          pendingText: this.state.pendingText
         });
         event.preventDefault();
       },
 
       render: function() {
-        var value = this.state.value;
+        var value = this.state.pendingText ? this.state.pendingText : this.state.value;
         var renderer = new marked.Renderer();
 
         renderer.paragraph = function(text) {
@@ -79,6 +89,11 @@ define(['react', 'marked', 'highlight'],
         };
 
         var rawMarkup = marked(value, { sanitize: true, renderer: renderer });
+        var updating = this.state.pendingText ? (
+          <div className="spinner">
+          <div className="dot1"></div>
+          <div className="dot2"></div>
+        </div>) : null;
 
         if(this.state.editing) {
           return (
@@ -115,6 +130,7 @@ define(['react', 'marked', 'highlight'],
                 onClick={this.handleEditClick}>
                 edit
               </a>
+              {updating}
               </div>
             </div>
           );
