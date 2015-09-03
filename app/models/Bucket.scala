@@ -68,7 +68,7 @@ object Bucket {
         FROM (SELECT bucketId, MAX(timestamp) FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC LIMIT $count) as hits
         LEFT JOIN bucket
         ON bucket.id = hits.bucketId
-       """.as(bucket *)      
+       """.as(bucket *)
     }).getOrElse {
       SQL"""
       SELECT * 
@@ -77,8 +77,32 @@ object Bucket {
         ON bucket.id = hits.bucketId
        """.as(bucket *)
     }
-    
+
   }
+
+  def bucketsSortedByDate2() = DB.withConnection { implicit c =>
+    SQL"""
+      SELECT DISTINCT buckets.id, buckets.name, buckets.notes, buckets.ts  FROM
+        (SELECT * 
+          FROM (SELECT bucketId, MAX(timestamp) as ts FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC) as hits
+          LEFT JOIN bucket
+          ON bucket.id = hits.bucketId) as buckets
+        INNER JOIN dump
+        ON buckets.id = dump.bucketId  
+    """.as(bucket *)
+
+  }
+
+  /*
+SELECT buckets.id as bucketId, dump.id as dumpId, buckets.Name, buckets.Notes, dump.fileName FROM
+    (SELECT * 
+        FROM (SELECT bucketId, MAX(timestamp) FROM bucket_hits GROUP BY bucketId ORDER BY MAX(timestamp) DESC) as hits
+        LEFT JOIN bucket
+        ON bucket.id = hits.bucketId) as buckets
+INNER JOIN dump
+ON buckets.id = dump.bucketId
+   * 
+   */
 
   def bucket = {
     get[Long]("id") ~

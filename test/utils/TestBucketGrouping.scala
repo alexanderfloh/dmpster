@@ -24,14 +24,32 @@ class TestBucketGrouping extends Specification {
     val t0 = System.nanoTime()
     val result = block    // call-by-name
     val t1 = System.nanoTime()
-    (t1 - t0) / 1000000
+    val diff = (t1 - t0) / 1000000
+    diff
   }
   
   "Buckets" should {
     "be grouped" in new WithApplication {
       
-    	time { Dump.forBuckets(Bucket.bucketsSortedByDate()) } must be lessThan( 
+      time { Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) } must be lessThan( 
       time { Dump.groupDumpsByBucket(Dump.all) })
+      
+      time { Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) } must be lessThan( 
+      time { Dump.groupDumpsByBucket(Dump.all) })
+      
+      val times = (1 to 100).map { i =>
+        (time { Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) }, 
+        time { Dump.groupDumpsByBucket(Dump.all) })  
+      }
+      
+      val (newQuery, oldQuery) = times.unzip
+      println(s"oldQuery: ${oldQuery.sum} $oldQuery, newQuery: ${newQuery.sum} $newQuery")
+      
+      newQuery.sum must be lessThan oldQuery.sum
+      
+      times.foreach { case (newTime, oldTime) =>
+        newTime must be lessThan oldTime
+      }
       
     }
   }

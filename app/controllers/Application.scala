@@ -53,7 +53,7 @@ object Application extends Controller {
     implicit val bucketWrites = Bucket.jsonWriter
     implicit val dumpWrites = Dump.writeForIndex
 
-    val grouped = Dump.forBuckets(Bucket.bucketsSortedByDate()) 
+    val grouped = Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) 
     val contentJsonified = toJson(grouped.map {
       case (bucket, dumps) =>
         Seq(toJson(bucket), toJson(dumps))
@@ -65,7 +65,7 @@ object Application extends Controller {
 
   def bucketsNewestJson = {
     Action {
-      Ok(BucketHit.newest().toString())
+      Ok(BucketHit.newest.toString)
     }
   }
 

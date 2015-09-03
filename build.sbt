@@ -31,4 +31,4 @@ RjsKeys.modules := Seq(
     WebJs.JS.Object("name" -> "mainBucket")
 )
 
-fork in run := true
+//fork in run := true

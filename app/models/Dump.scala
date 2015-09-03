@@ -70,6 +70,10 @@ object Dump {
   def all: List[Dump] = DB.withConnection { implicit c =>
     SQL("select * from dump").as(dump *)
   }
+  
+  def allNoContent: List[Dump] = DB.withConnection { implicit c =>
+    SQL("select id, bucketId, filename, timestamp from dump").as(dumpNoContent *)
+  }
 
   def newerThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
     SQL("select * from dump where timestamp > {timestamp}")
@@ -89,10 +93,16 @@ object Dump {
     SQL("select * from dump where bucketId = {bucketId}")
       .on('bucketId -> bucket.id).as(dump *)
   }
-  
+
   def forBuckets(buckets: List[Bucket]): List[(Bucket, List[Dump])] = DB.withConnection { implicit c =>
     buckets.map(bucket => {
       (bucket, SQL"select * from dump where bucketId = ${bucket.id}".as(dump *).toList)
+    })
+  }
+
+  def forBucketsNoContent(buckets: List[Bucket]): List[(Bucket, List[Dump])] = DB.withConnection { implicit c =>
+    buckets.map(bucket => {
+      (bucket, SQL"select id, bucketId, filename, timestamp from dump where bucketId = ${bucket.id}".as(dumpNoContent *).toList)
     })
   }
 
@@ -108,24 +118,24 @@ object Dump {
         insert into dump (bucketId, filename, content, timestamp) 
           values (${bucket.id}, $relFilePath, $content, ${timestamp.toDate})
         """
-//        .on(
-//          'bucketId -> bucket.id,
-//          'filename -> relFilePath,
-//          'content -> content,
-//          'timestamp -> timestamp.toDate)
+        //        .on(
+        //          'bucketId -> bucket.id,
+        //          'filename -> relFilePath,
+        //          'content -> content,
+        //          'timestamp -> timestamp.toDate)
         .executeInsert() match {
           case Some(id) => Dump(id, bucket, relFilePath, content, timestamp)
           case None     => throw new Exception("unable to insert dump into db")
         }
-        SQL"""
+      SQL"""
           insert into bucket_hits (dumpId, bucketId, timestamp)
           values (${dump.id}, ${bucket.id}, ${timestamp.toDate})
           """
-          .executeInsert() match {
-            case Some(id) => id
-            case None  => throw new Exception("unable to insert bucket hit into db")
-          }
-        dump
+        .executeInsert() match {
+          case Some(id) => id
+          case None     => throw new Exception("unable to insert bucket hit into db")
+        }
+      dump
     }
   }
 
@@ -171,6 +181,16 @@ object Dump {
       get[Date]("timestamp") map {
         case id ~ bucketId ~ filename ~ content ~ timestamp =>
           Dump(id, Bucket.byId(bucketId).get, filename, content, new DateTime(timestamp))
+      }
+  }
+
+  val dumpNoContent = {
+    get[Long]("id") ~
+      get[Long]("bucketId") ~
+      get[String]("filename") ~
+      get[Date]("timestamp") map {
+        case id ~ bucketId ~ filename ~ timestamp =>
+          Dump(id, Bucket.byId(bucketId).get, filename, "", new DateTime(timestamp))
       }
   }
 
