@@ -88,7 +88,7 @@ object Bucket {
           LEFT JOIN bucket
           ON bucket.id = hits.bucketId) as buckets
         INNER JOIN dump
-        ON buckets.id = dump.bucketId  
+        ON buckets.id = dump.bucketId ORDER BY buckets.ts DESC
     """.as(bucket *)
 
   }
