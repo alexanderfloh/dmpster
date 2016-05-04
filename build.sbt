@@ -2,7 +2,7 @@ name := "dmpster"
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -19,6 +19,9 @@ libraryDependencies ++= Seq(
   "org.webjars" % "marked" % "0.3.2-1",
   "org.webjars.bower" % "highlightjs" % "8.5.0"
 )
+
+//routesGenerator := InjectedRoutesGenerator
+routesGenerator := StaticRoutesGenerator
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 

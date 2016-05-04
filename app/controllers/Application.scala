@@ -33,8 +33,9 @@ import utils.Work
 import utils.BucketsAsJsonCacheAccess
 import models.BucketHit
 
-object Application extends Controller {
+object Application  extends Controller {
 
+  
   def index = Action {
     Redirect(routes.Application.dmpster)
   }
