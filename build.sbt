@@ -2,11 +2,14 @@ name := "dmpster"
 
 version := "1.0-SNAPSHOT"
 
+scalaVersion := "2.11.1"
+
 libraryDependencies ++= Seq(
   jdbc,
-  anorm,
   cache,
   filters,
+  evolutions,
+  "com.typesafe.play" %% "anorm" % "2.4.0",
   "org.webjars" % "requirejs" % "2.1.14-1",
   "org.webjars" % "jquery" % "2.1.1",
   "org.webjars" % "jquery-ui" % "1.11.0",
