@@ -4,11 +4,14 @@ version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+
 libraryDependencies ++= Seq(
   jdbc,
   cache,
   filters,
   evolutions,
+  specs2 % Test,
   "com.typesafe.play" %% "anorm" % "2.4.0",
   "org.webjars" % "requirejs" % "2.1.14-1",
   "org.webjars" % "jquery" % "2.1.1",
