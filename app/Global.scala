@@ -12,7 +12,7 @@ import utils.AnalyzeMaster
 import play.filters.gzip.GzipFilter
 import scala.concurrent.Future
 
-object Global extends WithFilters(new GzipFilter()) with GlobalSettings {
+object Global extends /*WithFilters(new GzipFilter()) with*/ GlobalSettings {
   override def onStart(app: Application) {
     val actor = Akka.system.actorOf(Props[CleanUpActor], name = "cleanUpActor")
     def interval = Play.mode match {

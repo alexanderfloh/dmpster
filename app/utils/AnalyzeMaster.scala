@@ -1,7 +1,7 @@
 package utils
 
 import akka.actor._
-import akka.routing.RoundRobinRouter
+import akka.routing.RoundRobinPool
 import java.io.File
 import akka.pattern.{ ask, pipe }
 import akka.util.Timeout
@@ -23,7 +23,7 @@ class AnalyzeMaster extends Actor {
   val activeWork = collection.mutable.ListBuffer[File]()
   
   val analyzerWorkers = Play.current.configuration.getInt("dmpster.analyzer.workers").getOrElse(2)
-  val router = context.actorOf(Props[AnalyzeWorker].withRouter(RoundRobinRouter(analyzerWorkers)), "router")
+  val router = context.actorOf(Props[AnalyzeWorker].withRouter(RoundRobinPool(analyzerWorkers)), "router")
 
   def receive = {
     case work @ Work(file) => {

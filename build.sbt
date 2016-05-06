@@ -2,11 +2,17 @@ name := "dmpster"
 
 version := "1.0-SNAPSHOT"
 
+scalaVersion := "2.11.7"
+
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+
 libraryDependencies ++= Seq(
   jdbc,
-  anorm,
   cache,
   filters,
+  evolutions,
+  specs2 % Test,
+  "com.typesafe.play" %% "anorm" % "2.4.0",
   "org.webjars" % "requirejs" % "2.1.14-1",
   "org.webjars" % "jquery" % "2.1.1",
   "org.webjars" % "jquery-ui" % "1.11.0",
@@ -16,6 +22,9 @@ libraryDependencies ++= Seq(
   "org.webjars" % "marked" % "0.3.2-1",
   "org.webjars.bower" % "highlightjs" % "8.5.0"
 )
+
+//routesGenerator := InjectedRoutesGenerator
+routesGenerator := StaticRoutesGenerator
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 

@@ -64,7 +64,7 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
   protected def executeCommand(commandWithArgs: List[String]) = {
     import scala.sys.process._
     val forwardErrorsToApplicationLog = ProcessLogger(line => Logger.warn(line))
-    val outStream = commandWithArgs.lines_!(forwardErrorsToApplicationLog)
+    val outStream = commandWithArgs.lineStream_!(forwardErrorsToApplicationLog)
     outStream.toList
   }
 }
