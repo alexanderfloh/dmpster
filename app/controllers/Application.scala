@@ -48,7 +48,7 @@ class Application @Inject() (
   }
 
   def dmpster = Action {
-    Ok(views.html.index(Tag.all, bucketsAsJson.toString))
+    Ok(views.html.index(Tag.all))
   }
 
   def search(search: String) = Action {
