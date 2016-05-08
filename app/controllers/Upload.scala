@@ -14,7 +14,6 @@ import models.Dump
 import models.TagParser
 import play.api.Logger
 import play.api.Play
-import play.api.Play.current
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json.toJson
@@ -25,9 +24,18 @@ import play.api.mvc.Request
 import play.libs.Akka
 import utils.Work
 import utils.BucketsAsJsonCacheAccess
+import utils.BucketsAsJsonCacheAccess
+import javax.inject.Inject
+import akka.actor.ActorSystem
+import play.api.Configuration
+import akka.actor.ActorRef
+import javax.inject.Named
 
 
-object Upload extends Controller {
+class Upload @Inject() (
+    configuration: Configuration,
+    cache: BucketsAsJsonCacheAccess,
+    @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
   def upload = Action(parse.multipartFormData) {
     request =>
       {
@@ -61,7 +69,8 @@ object Upload extends Controller {
     Logger.info(s"moving file ${dmp.filename}")
     import java.io.File
 
-    val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+    
+    val dmpPath = configuration.getString("dmpster.dmp.path").getOrElse("dmps")
     val subDir = createDumpSubDirName
     val relFilePath = s"${subDir}${File.separator}${dmp.filename}"
     val dir = new File(dmpPath, subDir)
@@ -71,7 +80,7 @@ object Upload extends Controller {
     (newFile, dmp.filename, relFilePath)
   }
 
-  private def invalidateCache() = BucketsAsJsonCacheAccess.invalidateCache()
+  private def invalidateCache() = cache.invalidate()
 
   private def handleUpload(request: MultiPartRequest) = {
     val futureResults = Future.sequence(request.body.files.map { dmp =>
@@ -79,9 +88,8 @@ object Upload extends Controller {
 
       invalidateCache()
       Logger.info("parsing DMP")
-      val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
-      implicit val analyzingTimeout = Timeout(Play.current.configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
-      val futureResult = ask(analyzer, Work(newFile)).mapTo[utils.Result]
+      implicit val analyzingTimeout = Timeout(configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
+      val futureResult = ask(analyzeMaster, Work(newFile)).mapTo[utils.Result]
 
       for {
         utils.Result(file, bucketName, content) <- futureResult

@@ -4,17 +4,22 @@ import play.api._
 import play.api.mvc._
 import play.api.libs._
 import play.api.libs.iteratee._
-import Play.current
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
 import utils.{ CleanUpActor, CleanUp }
 import java.text.DecimalFormat
 import java.io.File
 import models.Dump
+import javax.inject.Inject
+import akka.actor.ActorSystem
+import javax.inject.Named
+import akka.actor.ActorRef
 
-object Admin extends Controller {
+class Admin @Inject() (
+    configuration: Configuration,
+    @Named("clean-up-actor") cleanUpActor: ActorRef) extends Controller {
   def index = Action {
-    val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("dmps")
+    val dmpPath = configuration.getString("dmpster.dmp.path").getOrElse("dmps")
     val filePath = new File(dmpPath)
     val totalSpace = filePath.getTotalSpace
     val freeSpace = filePath.getFreeSpace
@@ -36,8 +41,7 @@ object Admin extends Controller {
 
   def cleanUpNow = Action {
     Logger.info("clean up requested")
-    val actor = Akka.system.actorSelection("/user/cleanUpActor")
-    actor ! CleanUp
+    cleanUpActor ! CleanUp
     Redirect(routes.Admin.index)
   }
 

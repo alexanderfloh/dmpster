@@ -6,39 +6,43 @@ import play.api.Play
 import scala.sys.process.ProcessBuilder
 import play.api.Logger
 import scala.util.Random
+import javax.inject.Inject
+import bitness._
 
 trait DumpBitness
-case object X86Dump extends DumpBitness
-case object X64Dump extends DumpBitness
-case object UnknownDump extends DumpBitness
 
-trait DmpParser {
+package object bitness {
+  case object X86Dump extends DumpBitness
+  case object X64Dump extends DumpBitness
+  case object UnknownDump extends DumpBitness
+}
 
-  def parse: (String, String) = {
+trait IDmpParserImpl {
+
+  def parse: ParseResult = {
     val lines = readFile
     val bucketName = lines.find(_.startsWith("FAILURE_BUCKET_ID:"))
       .map(_.split(" ").last)
       .getOrElse("unknown bucket")
-    (bucketName, lines.mkString("\n"))
+    ParseResult(bucketName, lines.mkString("\n"))
   }
 
   protected def readFile: List[String]
 }
 
-class DmpParserImpl(file: java.io.File) extends DmpParser {
+case class DmpParserImpl(file: java.io.File, config: ParseConfig) extends IDmpParserImpl {
   protected def readFile = {
     val bitness = detectBitness
     Logger.info(s"detected Bitness for $file: $bitness")
-    import DmpParser._
-    val commands = List(cdbForBitness(bitness),
+    val commands = List(config.cdbForBitness(bitness),
       "-y",
-      symbolPath,
+      config.symbolPath,
       "-srcpath",
-      sourcePath,
+      config.sourcePath,
       "-i",
-      imagePath,
+      config.imagePath,
       "-c",
-      "$$<" + scriptForBitness(bitness),
+      "$$<" + config.scriptForBitness(bitness),
       "-z",
       file.getAbsolutePath())
 
@@ -46,8 +50,7 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
   }
 
   protected def detectBitness = {
-    import DmpParser._
-    val commands = List(cdbPath,
+    val commands = List(config.cdbPathX86,
       "-c",
       ".detach",
       "-z",
@@ -69,24 +72,45 @@ class DmpParserImpl(file: java.io.File) extends DmpParser {
   }
 }
 
-class DummyParser extends DmpParser {
+case class DummyParser() extends IDmpParserImpl {
   val rand = new Random
   protected def readFile = {
     //Thread.sleep(5 * 1000)
     Source.fromFile("dummy.txt").getLines.toList
   }
-  
-  override def parse: (String, String) = {
+
+  override def parse: ParseResult = {
     val lines = readFile
     val bucketName = lines.find(_.startsWith("FAILURE_BUCKET_ID:"))
       .map(_.split(" ").last)
       .getOrElse("unknown bucket")
-    (s"$bucketName ${rand.nextInt(5).toString}", lines.mkString("\n"))
+    ParseResult(s"$bucketName ${rand.nextInt(5).toString}", lines.mkString("\n"))
   }
 }
 
-object DmpParser {
-  val config = Play.current.configuration
+case class ParseConfig(
+  cdbPathX86: String,
+  cdbPathX64: String,
+  scriptPathX86: String,
+  scriptPathX64: String,
+  symbolPath: String,
+  sourcePath: String,
+  imagePath: String) {
+  def cdbForBitness(bitness: DumpBitness) = bitness match {
+    case X64Dump => cdbPathX64
+    case X86Dump => cdbPathX86
+  }
+
+  def scriptForBitness(bitness: DumpBitness) = bitness match {
+    case X64Dump => scriptPathX64
+    case X86Dump => scriptPathX86
+  }
+}
+
+case class ParseResult(bucketName: String, content: String)
+
+class DmpParser @Inject() (application: play.api.Application) {
+  val config = application.configuration
   lazy val cdbPath = config.getString("dmpster.cdb.path.x86").getOrElse("cdb")
   lazy val cdbPathX64 = config.getString("dmpster.cdb.path.x64").getOrElse(cdbPath)
 
@@ -98,22 +122,22 @@ object DmpParser {
   lazy val scriptPathX86 = config.getString("dmpster.script.path.x86").getOrElse(scriptPath)
   lazy val scriptPathX64 = config.getString("dmpster.script.path.x64").getOrElse(scriptPath)
 
-  def apply(file: java.io.File) = {
-    if (Play.current.configuration.getBoolean("dmpster.fake.analyzing").getOrElse(false))
-    	new DummyParser
+  def parse(file: java.io.File): ParseResult = {
+    if (application.configuration.getBoolean("dmpster.fake.analyzing").getOrElse(false))
+      DummyParser().parse
     else
-    	new DmpParserImpl(file)
+      DmpParserImpl(file, ParseConfig(cdbPath, cdbPathX64, scriptPathX86, scriptPathX64, symbolPath, sourcePath, imagePath)).parse
   }
 
   def cdbForBitness(bitness: DumpBitness) = bitness match {
     case X64Dump => cdbPathX64
-    case _ => cdbPath
+    case _       => cdbPath
   }
 
   def scriptForBitness(bitness: DumpBitness) = bitness match {
     case X64Dump => scriptPathX64
     case X86Dump => scriptPathX86
-    case _ => scriptPath
+    case _       => scriptPath
   }
 
 }

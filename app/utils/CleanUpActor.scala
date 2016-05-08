@@ -4,18 +4,42 @@ import akka.actor.Actor
 import akka.actor.ActorLogging
 import org.joda.time.DateTime
 import play.api._
-import Play.current
 import models.Dump
 import models.Tag
 import models.Bucket
-import play.cache.Cache
+import javax.inject.Inject
+import akka.actor.ActorRef
+import javax.inject.Named
+import akka.actor.ActorSystem
+import javax.inject.Singleton
 
 case class CleanUp()
 
-class CleanUpActor extends Actor {
+trait CleanUpActorScheduler {}
 
-  lazy val maxNumberOfDumpsPerBucket = Play.current.configuration.getInt("dmpster.max.number.of.dmps.per.bucket").getOrElse(5)
-  lazy val daysLifetime = Play.current.configuration.getInt("dmpster.dmp.days.lifetime").getOrElse(14)
+class CleanupActorSchedulerImpl @Inject() @Singleton() (
+  @Named("clean-up-actor") cleanUpActor: ActorRef,
+  actorSystem: ActorSystem,
+  env: Environment) extends CleanUpActorScheduler {
+  
+  import concurrent.duration._
+  def interval = env.mode match {
+    case Mode.Dev  => 1.minutes
+    case Mode.Prod => 3.hours
+    case _         => 3.hours
+  }
+
+  import play.api.libs.concurrent.Execution.Implicits._
+  actorSystem.scheduler.schedule(5.seconds, interval, cleanUpActor, CleanUp)
+}
+
+class CleanUpActor @Inject() (
+  configuration: Configuration,
+  environment: Environment,
+  cache: BucketsAsJsonCacheAccess) extends Actor {
+
+  lazy val maxNumberOfDumpsPerBucket = configuration.getInt("dmpster.max.number.of.dmps.per.bucket").getOrElse(5)
+  lazy val daysLifetime = configuration.getInt("dmpster.dmp.days.lifetime").getOrElse(14)
 
   lazy val oldTag = Tag.findOrCreate("marked for deletion")
   lazy val keepForeverTag = Tag.findOrCreate("keep forever")
@@ -27,12 +51,12 @@ class CleanUpActor extends Actor {
       deleteMarkedDumps
       markOldDumps
       limitNumberOfDumpsPerBucket
-      Cache.remove("bucketsAsJson")
+      cache.invalidate()
     }
   }
 
-  def dateForOldness = Play.mode match {
-    case Mode.Dev => DateTime.now.minusDays(daysLifetime)
+  def dateForOldness = environment.mode match {
+    case Mode.Dev  => DateTime.now.minusDays(daysLifetime)
     case Mode.Prod => DateTime.now.minusDays(daysLifetime)
   }
 
@@ -61,7 +85,7 @@ class CleanUpActor extends Actor {
       case (bucket, dumps) => {
         val dumpsToDeleteCount = dumps.length - maxNumberOfDumpsPerBucket
         val dumpsToDelete = dumps.filterNot(dump => dump.tags.contains(keepForeverTag)).take(dumpsToDeleteCount)
-        
+
         if (!dumpsToDelete.isEmpty) Logger.info(s"marking ${dumpsToDelete.length} Dmps from Bucket '${bucket.name}' for deletion")
 
         markForDeletion(dumpsToDelete)
@@ -82,7 +106,7 @@ class CleanUpActor extends Actor {
 
     if (!oldDumpsToDelete.isEmpty) Logger.info(s"deleting ${oldDumpsToDelete.size} dumps")
 
-    val dmpPath = Play.current.configuration.getString("dmpster.dmp.path")
+    val dmpPath = configuration.getString("dmpster.dmp.path")
     oldDumpsToDelete.foreach(dump => {
       dmpPath.map(deleteSingleDump(_, dump))
         .getOrElse(Logger.warn("dmpster.dmp.path not set - unable to delete dmp file"))
