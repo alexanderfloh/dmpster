@@ -23,9 +23,6 @@ libraryDependencies ++= Seq(
   "org.webjars.bower" % "highlightjs" % "8.5.0"
 )
 
-//routesGenerator := InjectedRoutesGenerator
-routesGenerator := StaticRoutesGenerator
-
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
 includeFilter in (Assets, LessKeys.less) := "*.less"

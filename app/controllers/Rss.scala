@@ -1,15 +1,15 @@
 package controllers
 
 import play.api.Play
-import play.api.Play.current
 import play.api.mvc._
 import models._
 import scala.xml.PCData
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
+import javax.inject.Inject
 
 
-object Rss extends Controller {
+class Rss @Inject() () extends Controller {
   def dumps = Action { request =>
     
     val baseUrl = "http://" + request.host;

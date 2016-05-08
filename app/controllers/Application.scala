@@ -17,7 +17,6 @@ import models.Tag
 import models.TagParser
 import play.Logger
 import play.api.Play
-import play.api.Play.current
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -32,8 +31,16 @@ import play.api.mvc.Request
 import utils.Work
 import utils.BucketsAsJsonCacheAccess
 import models.BucketHit
+import javax.inject.Inject
+import play.api.cache.CacheApi
+import utils.BucketsAsJsonCacheAccess
+import akka.actor.ActorSystem
+import javax.inject.Named
+import akka.actor.ActorRef
 
-object Application  extends Controller {
+class Application @Inject() (
+    cache: BucketsAsJsonCacheAccess,
+    @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
 
   
   def index = Action {
@@ -72,7 +79,7 @@ object Application  extends Controller {
 
   def bucketsJson = {
     Action {
-      Ok(BucketsAsJsonCacheAccess.getOrElse(120) { bucketsAsJson })
+      Ok(cache.getOrElse() { bucketsAsJson })
     }
   }
 
@@ -109,7 +116,7 @@ object Application  extends Controller {
       val notes = m("notes")
       Logger.info(notes.toString)
       Bucket.updateNotes(id, notes.headOption.getOrElse(""))
-      BucketsAsJsonCacheAccess.invalidateCache()
+      cache.invalidate()
       Ok("")
     }).getOrElse {
       BadRequest("no notes specified")
@@ -159,9 +166,8 @@ object Application  extends Controller {
   }
 
   def analyzingJson = {
-    val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
     implicit val timeout = Timeout(5 seconds)
-    val jobs = analyzer ? utils.QueryRunningJobs
+    val jobs = analyzeMaster ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
 
     toJson(files.map(_.getName))
@@ -209,5 +215,5 @@ object Application  extends Controller {
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
-  def invalidateCache() = BucketsAsJsonCacheAccess.invalidateCache()
+  def invalidateCache() = cache.invalidate()
 }

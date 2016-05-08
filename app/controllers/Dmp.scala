@@ -4,10 +4,10 @@ import play.api._
 import play.api.mvc._
 import play.api.libs._
 import play.api.libs.iteratee._
-import Play.current
 import java.io._
 import java.net.URLDecoder
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import javax.inject.Inject
 
 /**
  * Controller that serves static resources from an external folder.
@@ -26,7 +26,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
  * }}}
  *
  */
-object Dmp extends Controller {
+class Dmp @Inject() (configuration: Configuration) extends Controller {
 
   val AbsolutePath = """^(/|[a-zA-Z]:\\).*""".r
 
@@ -39,7 +39,7 @@ object Dmp extends Controller {
   def at(file: String): Action[AnyContent] = Action { request =>
     val decodedFileName = URLDecoder.decode(file.replace("%20", "+"), "UTF-8")
     
-    val dmpPath = Play.current.configuration.getString("dmpster.dmp.path").getOrElse("C:\\dumps")
+    val dmpPath = configuration.getString("dmpster.dmp.path").getOrElse("C:\\dumps")
     val fileToServe = new File(dmpPath, decodedFileName)
     Logger.info(s"serving dump $fileToServe")
 
