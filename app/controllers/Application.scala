@@ -17,6 +17,7 @@ import models.Tag
 import models.TagParser
 import play.Logger
 import play.api.Play
+import play.api.Play.current
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -31,16 +32,8 @@ import play.api.mvc.Request
 import utils.Work
 import utils.BucketsAsJsonCacheAccess
 import models.BucketHit
-import javax.inject.Inject
-import play.api.cache.CacheApi
-import utils.BucketsAsJsonCacheAccess
-import akka.actor.ActorSystem
-import javax.inject.Named
-import akka.actor.ActorRef
 
-class Application @Inject() (
-    cache: BucketsAsJsonCacheAccess,
-    @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
+object Application  extends Controller {
 
   
   def index = Action {
@@ -79,7 +72,7 @@ class Application @Inject() (
 
   def bucketsJson = {
     Action {
-      Ok(cache.getOrElse() { bucketsAsJson })
+      Ok(BucketsAsJsonCacheAccess.getOrElse(120) { bucketsAsJson })
     }
   }
 
@@ -116,7 +109,7 @@ class Application @Inject() (
       val notes = m("notes")
       Logger.info(notes.toString)
       Bucket.updateNotes(id, notes.headOption.getOrElse(""))
-      cache.invalidate()
+      BucketsAsJsonCacheAccess.invalidateCache()
       Ok("")
     }).getOrElse {
       BadRequest("no notes specified")
@@ -166,8 +159,9 @@ class Application @Inject() (
   }
 
   def analyzingJson = {
+    val analyzer = Akka.system.actorSelection("/user/analyzeMaster")
     implicit val timeout = Timeout(5 seconds)
-    val jobs = analyzeMaster ? utils.QueryRunningJobs
+    val jobs = analyzer ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
 
     toJson(files.map(_.getName))
@@ -215,5 +209,5 @@ class Application @Inject() (
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
-  def invalidateCache() = cache.invalidate()
+  def invalidateCache() = BucketsAsJsonCacheAccess.invalidateCache()
 }

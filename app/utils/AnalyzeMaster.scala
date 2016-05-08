@@ -10,10 +10,6 @@ import scala.concurrent.duration._
 import play.Logger
 import play.api.Play
 import scala.language.postfixOps
-import javax.inject.Inject
-import play.api.Configuration
-import javax.inject.Named
-import play.api.libs.concurrent.InjectedActorSupport
 
 case class Work(file: File)
 case class Result(file: File, bucketName: String, content: String)
@@ -21,17 +17,13 @@ case class QueryRunningJobs()
 case class RunningJobs(jobs: List[File])
 case class FinishedWork(file: File)
 
-class AnalyzeMaster @Inject() (
-    configuration: Configuration,
-    workerFactory: AnalyzeWorker.Factory
-  ) extends Actor with InjectedActorSupport {
-  
-  val analyzingTimeout = Timeout(configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
+class AnalyzeMaster extends Actor {
+  val analyzingTimeout = Timeout(Play.current.configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
   
   val activeWork = collection.mutable.ListBuffer[File]()
   
-  val analyzerWorkers = configuration.getInt("dmpster.analyzer.workers").getOrElse(2)
-  val router = injectedChild(workerFactory(), "worker",  _.withRouter(RoundRobinPool(analyzerWorkers)))
+  val analyzerWorkers = Play.current.configuration.getInt("dmpster.analyzer.workers").getOrElse(2)
+  val router = context.actorOf(Props[AnalyzeWorker].withRouter(RoundRobinPool(analyzerWorkers)), "router")
 
   def receive = {
     case work @ Work(file) => {
@@ -53,24 +45,12 @@ class AnalyzeMaster @Inject() (
   }
 }
 
-object AnalyzeWorker {
-  trait Factory {
-    def apply(): Actor
-  }
-}
-
-class AnalyzeWorker @Inject() (
-    parser: DmpParser,
-    @Named("analyze-master") analyzeMaster: ActorRef) extends Actor {
-  
-  import AnalyzeWorker._
-  
+class AnalyzeWorker extends Actor {
   def receive = {
     case Work(file) => {
-      val ParseResult(bucketName, content) = parser.parse(file)
-      Logger.info(s"parsing complete for $file")
+      val (bucketName, content) = DmpParser(file).parse
       sender ! Result(file, bucketName, content)
-      analyzeMaster ! FinishedWork(file)
+      context.actorSelection("../..") ! FinishedWork(file)
     }
   }
 }
