@@ -96,14 +96,15 @@ case class ParseConfig(
   symbolPath: String,
   sourcePath: String,
   imagePath: String) {
+  
   def cdbForBitness(bitness: DumpBitness) = bitness match {
     case X64Dump => cdbPathX64
-    case X86Dump => cdbPathX86
+    case _ => cdbPathX86
   }
 
   def scriptForBitness(bitness: DumpBitness) = bitness match {
     case X64Dump => scriptPathX64
-    case X86Dump => scriptPathX86
+    case _ => scriptPathX86
   }
 }
 
@@ -127,17 +128,6 @@ class DmpParser @Inject() (application: play.api.Application) {
       DummyParser().parse
     else
       DmpParserImpl(file, ParseConfig(cdbPath, cdbPathX64, scriptPathX86, scriptPathX64, symbolPath, sourcePath, imagePath)).parse
-  }
-
-  def cdbForBitness(bitness: DumpBitness) = bitness match {
-    case X64Dump => cdbPathX64
-    case _       => cdbPath
-  }
-
-  def scriptForBitness(bitness: DumpBitness) = bitness match {
-    case X64Dump => scriptPathX64
-    case X86Dump => scriptPathX86
-    case _       => scriptPath
   }
 
 }
