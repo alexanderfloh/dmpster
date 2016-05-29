@@ -14,9 +14,11 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import javax.inject.Named
 import akka.actor.ActorRef
+import models.DumpDB
 
 class Admin @Inject() (
     configuration: Configuration,
+    dumpDb: DumpDB,
     @Named("clean-up-actor") cleanUpActor: ActorRef) extends Controller {
   def index = Action {
     val dmpPath = configuration.getString("dmpster.dmp.path").getOrElse("dmps")
@@ -24,7 +26,7 @@ class Admin @Inject() (
     val totalSpace = filePath.getTotalSpace
     val freeSpace = filePath.getFreeSpace
     
-    val referencedFiles = Dump.all.map(_.pathInStorageDirectory)
+    val referencedFiles = dumpDb.all.map(_.pathInStorageDirectory)
     
     def getActualFiles(filePath: File): List[File] = {
       val all = filePath.listFiles().toList

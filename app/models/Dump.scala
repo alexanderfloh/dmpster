@@ -21,16 +21,17 @@ import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.libs.json.Writes
 import utils.Joda.dateTimeOrdering
 import java.io.File
+import javax.inject.Inject
 
 /**
  * @param pathInStorageDirectory The relative path of the dump file within the storage directory, e.g. `2015-04-27_21-33-00_424/somedmp.dmp`
  */
 case class Dump(
-  id: Long,
-  bucket: Bucket,
-  pathInStorageDirectory: String,
-  content: String,
-  timestamp: DateTime) extends Taggable {
+    id: Long,
+    bucket: Bucket,
+    pathInStorageDirectory: String,
+    content: String,
+    timestamp: DateTime) extends Taggable {
 
   val filename = new File(pathInStorageDirectory).getName;
 
@@ -54,8 +55,6 @@ case class Dump(
 
   def ageInDays = Days.daysBetween(timestamp, now).getDays
 
-  def tags = Tag.forDump(this)
-
   private def isFromToday = now.withTimeAtStartOfDay.isBefore(timestamp)
 
   def dateFormatted = {
@@ -66,63 +65,100 @@ case class Dump(
   def ageLabel = s"added $dateFormatted - $ageInDays day${if (ageInDays != 1) "s" else ""} old"
 }
 
-object Dump {
-  def all: List[Dump] = DB.withConnection { implicit c =>
-    SQL("select * from dump").as(dump *)
+class DumpJsonWriter @Inject() (tagDb: TagDB) {
+  val writeForIndex = Writes[Dump] { d =>
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> d.id,
+      "filename" -> d.filename,
+      "isNew" -> d.isNew,
+      "ageLabel" -> d.ageLabel,
+      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(tagDb.forDump(d)),
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl))
   }
+
+  val writeForDetails = Writes[Dump] { d =>
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> d.id,
+      "filename" -> d.filename,
+      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
+      "content" -> d.content,
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(tagDb.forDump(d)),
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl))
+  }
+}
+
+class DumpDB @Inject() (
+    db: Database,
+    bucketDb: BucketDB) {
   
-  def allNoContent: List[Dump] = DB.withConnection { implicit c =>
-    SQL("select id, bucketId, filename, timestamp from dump").as(dumpNoContent *)
+  def all: List[Dump] = db.withConnection { implicit c =>
+    SQL("select * from dump")
+      .as(dump *)
   }
 
-  def newerThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
-    SQL("select * from dump where timestamp > {timestamp}")
-      .on('timestamp -> time.toDate).as(dump *)
+  def allNoContent: List[Dump] = db.withConnection { implicit c =>
+    SQL"select id, bucketId, filename, timestamp from dump"
+      .as(dumpNoContent *)
   }
 
-  def olderThan(time: DateTime): List[Dump] = DB.withConnection { implicit c =>
-    SQL("select * from dump where timestamp < {timestamp}")
-      .on('timestamp -> time.toDate).as(dump *)
+  def newerThan(time: DateTime): List[Dump] = db.withConnection { implicit c =>
+    SQL"select * from dump where timestamp > ${time.toDate}"
+      .as(dump *)
   }
 
-  def byId(id: Long) = DB.withConnection { implicit c =>
-    SQL("select * from dump where id = {id}").on('id -> id).as(dump.singleOpt)
+  def olderThan(time: DateTime): List[Dump] = db.withConnection { implicit c =>
+    SQL"select * from dump where timestamp < ${time.toDate}"
+      .as(dump *)
   }
 
-  def byBucket(bucket: Bucket) = DB.withConnection { implicit c =>
-    SQL("select * from dump where bucketId = {bucketId}")
-      .on('bucketId -> bucket.id).as(dump *)
+  def byId(id: Long) = db.withConnection { implicit c =>
+    SQL"select * from dump where id = ${id}"
+      .as(dump.singleOpt)
   }
 
-  def forBuckets(buckets: List[Bucket]): List[(Bucket, List[Dump])] = DB.withConnection { implicit c =>
+  def byBucket(bucket: Bucket) = db.withConnection { implicit c =>
+    SQL"select * from dump where bucketId = ${bucket.id}"
+      .as(dump *)
+  }
+
+  def forBuckets(buckets: List[Bucket]): List[(Bucket, List[Dump])] = db.withConnection { implicit c =>
     buckets.map(bucket => {
-      (bucket, SQL"select * from dump where bucketId = ${bucket.id}".as(dump *).toList)
+      (bucket,
+        SQL"select * from dump where bucketId = ${bucket.id}"
+        .as(dump *).toList)
     })
   }
 
-  def forBucketsNoContent(buckets: List[Bucket]): List[(Bucket, List[Dump])] = DB.withConnection { implicit c =>
+  def forBucketsNoContent(buckets: List[Bucket]): List[(Bucket, List[Dump])] = db.withConnection { implicit c =>
     buckets.map(bucket => {
-      (bucket, SQL"select id, bucketId, filename, timestamp from dump where bucketId = ${bucket.id}".as(dumpNoContent *).toList)
+      (bucket,
+        SQL"select id, bucketId, filename, timestamp from dump where bucketId = ${bucket.id}"
+        .as(dumpNoContent *).toList)
     })
   }
 
-  def byTag(tag: Tag) = DB.withConnection { implicit c =>
-    SQL("select * from dumpToTag dtt inner join dump d on d.id = dtt.dumpId where dtt.tagId = {tagId}")
-      .on('tagId -> tag.id).as(dump *)
+  def byTag(tag: Tag) = db.withConnection { implicit c =>
+    SQL"""select * from dumpToTag dtt 
+          inner join dump d 
+          on d.id = dtt.dumpId 
+          where dtt.tagId = ${tag.id}"""
+      .as(dump *)
   }
 
   def create(bucket: Bucket, relFilePath: String, content: String): Dump = {
     val timestamp = DateTime.now
-    DB.withTransaction { implicit c =>
+    db.withTransaction { implicit c =>
       val dump = SQL"""
         insert into dump (bucketId, filename, content, timestamp) 
           values (${bucket.id}, $relFilePath, $content, ${timestamp.toDate})
         """
-        //        .on(
-        //          'bucketId -> bucket.id,
-        //          'filename -> relFilePath,
-        //          'content -> content,
-        //          'timestamp -> timestamp.toDate)
         .executeInsert() match {
           case Some(id) => Dump(id, bucket, relFilePath, content, timestamp)
           case None     => throw new Exception("unable to insert dump into db")
@@ -140,20 +176,20 @@ object Dump {
   }
 
   def addTag(dump: Dump, tag: Tag) =
-    DB.withConnection { implicit c =>
-      SQL("insert into dumpToTag (dumpId, tagId) values ({dumpId}, {tagId})")
-        .on('dumpId -> dump.id, 'tagId -> tag.id).executeUpdate
+    db.withConnection { implicit c =>
+      SQL"insert into dumpToTag (dumpId, tagId) values (${dump.id}, ${tag.id})"
+        .executeUpdate
     }
 
   def removeTag(dump: Dump, tag: Tag) =
-    DB.withConnection { implicit c =>
-      SQL("delete from dumpToTag where dumpId = {dumpId} and tagId = {tagId}")
-        .on('dumpId -> dump.id, 'tagId -> tag.id).executeUpdate
+    db.withConnection { implicit c =>
+      SQL"delete from dumpToTag where dumpId = ${dump.id} and tagId = ${tag.id}"
+        .executeUpdate
     }
 
   def delete(id: Long) = {
-    DB.withConnection { implicit c =>
-      SQL("delete from dump where id = {id}").on('id -> id).executeUpdate
+    db.withConnection { implicit c =>
+      SQL"delete from dump where id = $id".executeUpdate
     }
   }
 
@@ -180,7 +216,7 @@ object Dump {
       get[String]("content") ~
       get[Date]("timestamp") map {
         case id ~ bucketId ~ filename ~ content ~ timestamp =>
-          Dump(id, Bucket.byId(bucketId).get, filename, content, new DateTime(timestamp))
+          Dump(id, bucketDb.byId(bucketId).get, filename, content, new DateTime(timestamp))
       }
   }
 
@@ -190,34 +226,7 @@ object Dump {
       get[String]("filename") ~
       get[Date]("timestamp") map {
         case id ~ bucketId ~ filename ~ timestamp =>
-          Dump(id, Bucket.byId(bucketId).get, filename, "", new DateTime(timestamp))
+          Dump(id, bucketDb.byId(bucketId).get, filename, "", new DateTime(timestamp))
       }
-  }
-
-  val writeForIndex = Writes[Dump] { d =>
-    implicit val tagFormat = Tag.nameOnlyFormat
-    Json.obj(
-      "id" -> d.id,
-      "filename" -> d.filename,
-      "isNew" -> d.isNew,
-      "ageLabel" -> d.ageLabel,
-      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
-      "tagging" -> Json.obj(
-        "tags" -> Json.toJson(d.tags),
-        "addTagUrl" -> d.addTagUrl,
-        "removeTagUrl" -> d.removeTagUrl))
-  }
-
-  val writeForDetails = Writes[Dump] { d =>
-    implicit val tagFormat = Tag.nameOnlyFormat
-    Json.obj(
-      "id" -> d.id,
-      "filename" -> d.filename,
-      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
-      "content" -> d.content,
-      "tagging" -> Json.obj(
-        "tags" -> Json.toJson(d.tags),
-        "addTagUrl" -> d.addTagUrl,
-        "removeTagUrl" -> d.removeTagUrl))
   }
 }

@@ -12,6 +12,9 @@ import akka.actor.ActorRef
 import javax.inject.Named
 import akka.actor.ActorSystem
 import javax.inject.Singleton
+import models.BucketDB
+import models.DumpDB
+import models.TagDB
 
 case class CleanUp()
 
@@ -36,13 +39,16 @@ class CleanupActorSchedulerImpl @Inject() @Singleton() (
 class CleanUpActor @Inject() (
   configuration: Configuration,
   environment: Environment,
+  bucketDb: BucketDB,
+  dumpDb: DumpDB,
+  tagDb: TagDB,
   cache: BucketsCacheAccess) extends Actor {
 
   lazy val maxNumberOfDumpsPerBucket = configuration.getInt("dmpster.max.number.of.dmps.per.bucket").getOrElse(5)
   lazy val daysLifetime = configuration.getInt("dmpster.dmp.days.lifetime").getOrElse(14)
 
-  lazy val oldTag = Tag.findOrCreate("marked for deletion")
-  lazy val keepForeverTag = Tag.findOrCreate("keep forever")
+  lazy val oldTag = tagDb.findOrCreate("marked for deletion")
+  lazy val keepForeverTag = tagDb.findOrCreate("keep forever")
 
   def receive = {
     case CleanUp => {
@@ -76,15 +82,15 @@ class CleanUpActor @Inject() (
     import Joda._
 
     val dumpsByBucket = for {
-      bucket <- Bucket.all
-      dumps = Dump.byBucket(bucket)
+      bucket <- bucketDb.all
+      dumps = dumpDb.byBucket(bucket)
       if (dumps.length > maxNumberOfDumpsPerBucket)
     } yield (bucket, dumps.sortBy(_.timestamp).reverse)
 
     dumpsByBucket.foreach {
       case (bucket, dumps) => {
         val dumpsToDeleteCount = dumps.length - maxNumberOfDumpsPerBucket
-        val dumpsToDelete = dumps.filterNot(dump => dump.tags.contains(keepForeverTag)).take(dumpsToDeleteCount)
+        val dumpsToDelete = dumps.filterNot(dump => tagDb.forDump(dump).contains(keepForeverTag)).take(dumpsToDeleteCount)
 
         if (!dumpsToDelete.isEmpty) Logger.info(s"marking ${dumpsToDelete.length} Dmps from Bucket '${bucket.name}' for deletion")
 
@@ -94,15 +100,15 @@ class CleanUpActor @Inject() (
   }
 
   def markForDeletion(dump: Dump): Unit = {
-    if (!dump.tags.contains(oldTag))
-      Dump.addTag(dump, oldTag)
+    if (!tagDb.forDump(dump).contains(oldTag))
+      dumpDb.addTag(dump, oldTag)
   }
 
   def markForDeletion(dumps: List[Dump]): Unit = dumps.foreach(markForDeletion)
 
   def deleteMarkedDumps = {
-    val dumpsToKeepForever = Dump.byTag(keepForeverTag)
-    val oldDumpsToDelete = Dump.byTag(oldTag).filterNot(dumpsToKeepForever.contains(_))
+    val dumpsToKeepForever = dumpDb.byTag(keepForeverTag)
+    val oldDumpsToDelete = dumpDb.byTag(oldTag).filterNot(dumpsToKeepForever.contains(_))
 
     if (!oldDumpsToDelete.isEmpty) Logger.info(s"deleting ${oldDumpsToDelete.size} dumps")
 
@@ -110,15 +116,15 @@ class CleanUpActor @Inject() (
     oldDumpsToDelete.foreach(dump => {
       dmpPath.map(deleteSingleDump(_, dump))
         .getOrElse(Logger.warn("dmpster.dmp.path not set - unable to delete dmp file"))
-      Dump.delete(dump.id)
+      dumpDb.delete(dump.id)
     })
   }
 
   def markOldDumps = {
-    val oldDumps = Dump.olderThan(dateForOldness)
+    val oldDumps = dumpDb.olderThan(dateForOldness)
 
     val dumpsToMark = oldDumps.filterNot(dump => {
-      val tags = Tag.forDump(dump)
+      val tags = tagDb.forDump(dump)
       tags.contains(oldTag) || tags.contains(keepForeverTag)
     })
 

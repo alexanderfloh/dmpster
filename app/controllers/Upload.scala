@@ -29,11 +29,16 @@ import play.api.Configuration
 import akka.actor.ActorRef
 import javax.inject.Named
 import utils.BucketsCacheAccess
+import models.BucketDB
+import models.DumpDB
 
 
 class Upload @Inject() (
     configuration: Configuration,
     cache: BucketsCacheAccess,
+    bucketDb: BucketDB,
+    dumpDb: DumpDB,
+    tagParser: TagParser,
     @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
   def upload = Action(parse.multipartFormData) {
     request =>
@@ -60,7 +65,7 @@ class Upload @Inject() (
 
   def extractTagsFrom(request: MultiPartRequest) = {
     request.body.dataParts.get("tags").map { tags =>
-      tags.head.split(",").map { case TagParser(t) => t }
+      tags.head.split(",").map { case tagParser.Result(t) => t }
     }
   }
 
@@ -81,7 +86,7 @@ class Upload @Inject() (
 
   private def invalidateCache() = cache.invalidate()
   
-  private def fetchGroupedBuckets = Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2())
+  private def fetchGroupedBuckets = dumpDb.forBucketsNoContent(bucketDb.bucketsSortedByDate2())
 
   private def handleUpload(request: MultiPartRequest) = {
     val futureResults = Future.sequence(request.body.files.map { dmp =>
@@ -93,12 +98,12 @@ class Upload @Inject() (
 
       for {
         utils.Result(file, bucketName, content) <- futureResult
-        bucket = Bucket.findOrCreate(bucketName)
-        dump = Dump.create(bucket, relFilePath, content)
+        bucket = bucketDb.findOrCreate(bucketName)
+        dump = dumpDb.create(bucket, relFilePath, content)
 
       } yield {
         extractTagsFrom(request).map { tags =>
-          tags.foreach(tagName => Dump.addTag(dump, tagName))
+          tags.foreach(tagName => dumpDb.addTag(dump, tagName))
         }.getOrElse(Logger.info("no tags provided"))
         
         cache.addDumpOrElse(bucket, dump)(fetchGroupedBuckets)

@@ -8,24 +8,30 @@ import anorm.SqlParser._
 import language.postfixOps
 import play.api.libs.json._
 import java.util.Date
-
+import javax.inject.Inject
 
 case class BucketHit(id: Long, bucketId: Long, dumpId: Option[Long], timestamp: DateTime) {
 
 }
 
-object BucketHit {
-  def byBucket(bucketId: Long) = DB.withConnection { implicit c =>
-    val hits = SQL"select * from bucket_hits where bucketId=$bucketId".as(bucketHit *)
-    hits.groupBy(h => h.timestamp.toLocalDate()).map{case (ts, items) => {
-      (ts.toDate.getTime / 1000, items.length)
-    }}
+class BucketHitDb @Inject() (db: Database) {
+  def byBucket(bucketId: Long) = db.withConnection { implicit c =>
+    val hits = SQL"select * from bucket_hits where bucketId=$bucketId"
+      .as(bucketHit *)
+    hits.groupBy(h => h.timestamp.toLocalDate()).map {
+      case (ts, items) => {
+        (ts.toDate.getTime / 1000, items.length)
+      }
+    }
   }
-  
-  def newest() = DB.withConnection { implicit c => 
-    SQL"SELECT * FROM bucket_hits GROUP BY bucketId, id ORDER BY timestamp DESC" as (bucketHit *)
+
+  def newest() = db.withConnection { implicit c =>
+    SQL"""SELECT * FROM bucket_hits 
+          GROUP BY bucketId, id 
+          ORDER BY timestamp DESC"""
+      .as(bucketHit *)
   }
-  
+
   def bucketHit = {
     get[Long]("id") ~
       get[Long]("bucketId") ~
@@ -34,7 +40,7 @@ object BucketHit {
         case id ~ bucketId ~ dumpId ~ timestamp => BucketHit(id, bucketId, dumpId, new DateTime(timestamp))
       }
   }
-  
+
   val write = Writes[BucketHit] { d =>
     Json.obj(
       "id" -> d.id,

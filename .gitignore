@@ -25,3 +25,7 @@ project/.sbtserver.lock
 project/.sbtserver
 dmpster-db.7z
 *.db
+*.db
+dmpster-db.7z
+.cache-main
+.cache-tests

@@ -8,15 +8,21 @@ import org.joda.time.DateTime
 import controllers.Application
 import models.Dump
 import scala.collection.immutable.ListMap
+import models.BucketDB
+import models.DumpDB
+import javax.inject.Inject
 
-class TestBucketGrouping extends Specification {
+class TestBucketGrouping @Inject() (
+    bucketDb: BucketDB,
+    dumpDb: DumpDB
+    ) extends Specification {
   "Buckets" should {
     "be grouped and sorted by date" in {
       val bucket = Bucket(1, "asdf", "some notes")
       val dump1 = Dump(1, bucket, "dump1.dmp", "a crash!", new DateTime().minusDays(5))
       val dump2 = Dump(2, bucket, "dump2.dmp", "another crash!", new DateTime())
       val dump3 = Dump(3, bucket, "dump3.dmp", "3rd crash!", new DateTime().minusDays(7))
-      Dump.groupDumpsByBucket(List(dump1, dump2, dump3)) must equalTo(List((bucket) -> List(dump2, dump1, dump3)))
+      dumpDb.groupDumpsByBucket(List(dump1, dump2, dump3)) must equalTo(List((bucket) -> List(dump2, dump1, dump3)))
     }
   }
   
@@ -31,15 +37,15 @@ class TestBucketGrouping extends Specification {
   "Buckets" should {
     "be grouped" in new WithApplication {
       
-      time { Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) } must be lessThan( 
-      time { Dump.groupDumpsByBucket(Dump.all) })
+      time { dumpDb.forBucketsNoContent(bucketDb.bucketsSortedByDate2()) } must be lessThan( 
+      time { dumpDb.groupDumpsByBucket(dumpDb.all) })
       
-      time { Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) } must be lessThan( 
-      time { Dump.groupDumpsByBucket(Dump.all) })
+      time { dumpDb.forBucketsNoContent(bucketDb.bucketsSortedByDate2()) } must be lessThan( 
+      time { dumpDb.groupDumpsByBucket(dumpDb.all) })
       
       val times = (1 to 100).map { i =>
-        (time { Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) }, 
-        time { Dump.groupDumpsByBucket(Dump.all) })  
+        (time { dumpDb.forBucketsNoContent(bucketDb.bucketsSortedByDate2()) }, 
+        time { dumpDb.groupDumpsByBucket(dumpDb.all) })  
       }
       
       val (newQuery, oldQuery) = times.unzip

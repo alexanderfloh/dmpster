@@ -38,9 +38,21 @@ import akka.actor.ActorSystem
 import javax.inject.Named
 import akka.actor.ActorRef
 import play.api.libs.json.JsValue
+import models.BucketDB
+import models.DumpDB
+import models.BucketHitDb
+import models.TagDB
+import models.BucketJsonWriter
+import models.DumpJsonWriter
 
 class Application @Inject() (
   cache: BucketsCacheAccess,
+  bucketDb: BucketDB,
+  bucketHitDb: BucketHitDb,
+  dumpDb: DumpDB,
+  tagDb: TagDB,
+  bucketJsonWriter: BucketJsonWriter,
+  dumpJsonWriter: DumpJsonWriter,
   @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
 
   def index = Action {
@@ -48,18 +60,18 @@ class Application @Inject() (
   }
 
   def dmpster = Action {
-    Ok(views.html.index(Tag.all))
+    Ok(views.html.index(tagDb.all))
   }
   
   def bucketsNewestJson = {
     Action {
-      Ok(BucketHit.newest.toString)
+      Ok(bucketHitDb.newest.toString)
     }
   }
 
   private def bucketsToJson(buckets: Bucket.GroupedBuckets) = {
-    implicit val bucketWrites = Bucket.jsonWriter
-    implicit val dumpWrites = Dump.writeForIndex
+    implicit val bucketWrites = bucketJsonWriter.jsonWriter
+    implicit val dumpWrites = dumpJsonWriter.writeForIndex
 
     toJson(buckets.map {
       case (bucket, dumps) =>
@@ -71,7 +83,7 @@ class Application @Inject() (
     toJson(analyzing.map(_.getName))
   }
   
-  private def fetchGroupedBuckets = Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2())
+  private def fetchGroupedBuckets = dumpDb.forBucketsNoContent(bucketDb.bucketsSortedByDate2())
 
   def bucketsJson = {
     def generateResponse() = {
@@ -89,7 +101,7 @@ class Application @Inject() (
     request.body.asFormUrlEncoded.map(m => {
       val notes = m("notes")
       Logger.info(notes.toString)
-      Bucket.updateNotes(id, notes.headOption.getOrElse(""))
+      bucketDb.updateNotes(id, notes.headOption.getOrElse(""))
       cache.invalidate()
       Ok("")
     }).getOrElse {
@@ -98,43 +110,43 @@ class Application @Inject() (
   }
 
   def detailsJson(id: Long) = Action {
-    implicit val dumpWrites = Dump.writeForDetails
+    implicit val dumpWrites = dumpJsonWriter.writeForDetails
     val optResult = for {
-      dump <- Dump.byId(id)
+      dump <- dumpDb.byId(id)
     } yield Ok(toJson(dump))
     optResult.getOrElse(BadRequest(s"Dump ${id} not found"))
   }
 
   def viewDetails(id: Long) = Action {
     val optResult = for {
-      dump <- Dump.byId(id)
+      dump <- dumpDb.byId(id)
     } yield Ok(views.html.details(dump.bucket, dump))
     optResult.getOrElse(BadRequest(s"Dump ${id} not found"))
   }
 
   def viewBucket(id: Long) = Action {
     val result = for {
-      bucket <- Bucket.byId(id)
-      dumps = Dump.byBucket(bucket)
+      bucket <- bucketDb.byId(id)
+      dumps = dumpDb.byBucket(bucket)
     } yield Ok(views.html.viewBucket(bucket, dumps, List()))
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
   def bucketJson(id: Long) = Action {
-    implicit val bucketWrites = Bucket.jsonWriter
-    implicit val dumpWrites = Dump.writeForIndex
+    implicit val bucketWrites = bucketJsonWriter.jsonWriter
+    implicit val dumpWrites = dumpJsonWriter.writeForIndex
 
     val result = for {
-      bucket <- Bucket.byId(id)
-      dumps = Dump.byBucket(bucket)
+      bucket <- bucketDb.byId(id)
+      dumps = dumpDb.byBucket(bucket)
     } yield Ok(Json.obj("bucket" -> toJson(bucket), "dumps" -> toJson(dumps)))
 
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
   def bucketHitsJson(id: Long) = Action {
-    Ok(toJson(BucketHit.byBucket(id).foldLeft(Json.obj()) {
+    Ok(toJson(bucketHitDb.byBucket(id).foldLeft(Json.obj()) {
       case (json, (time, count)) => json + (time.toString, toJson(count))
     }))
   }
@@ -147,19 +159,19 @@ class Application @Inject() (
   }
 
   def addTagToDmp(id: Long, tagName: String) = Action {
-    val tag = Tag.findOrCreate(tagName)
+    val tag = tagDb.findOrCreate(tagName)
 
-    Dump.byId(id).map(dump => {
-      if (!Tag.forDump(dump).exists(_.name == tagName)) Dump.addTag(dump, tag)
+    dumpDb.byId(id).map(dump => {
+      if (!tagDb.forDump(dump).exists(_.name == tagName)) dumpDb.addTag(dump, tag)
       invalidateCache()
       Ok("tag added")
     }).getOrElse(NotFound(s"Invalid dump id ${id}"))
   }
 
   def removeTagFromDmp(id: Long, tagName: String) = Action {
-    Tag.findByName(tagName).flatMap(tag => {
-      Dump.byId(id).map(dump => {
-        Dump.removeTag(dump, tag)
+    tagDb.findByName(tagName).flatMap(tag => {
+      dumpDb.byId(id).map(dump => {
+        dumpDb.removeTag(dump, tag)
         invalidateCache()
         Ok("tag removed")
       })
@@ -167,10 +179,10 @@ class Application @Inject() (
   }
 
   def addTagToBucket(id: Long, tagName: String) = Action {
-    val tag = Tag.findOrCreate(tagName)
-    val result = for { bucket <- Bucket.byId(id) } yield {
-      if (!Tag.forBucket(bucket).exists(_.name == tagName)) {
-        Bucket.addTag(bucket, tag)
+    val tag = tagDb.findOrCreate(tagName)
+    val result = for { bucket <- bucketDb.byId(id) } yield {
+      if (!tagDb.forBucket(bucket).exists(_.name == tagName)) {
+        bucketDb.addTag(bucket, tag)
         cache.updateBucketOrElse(bucket)(fetchGroupedBuckets)
       }
       Ok("tag added")
@@ -179,9 +191,9 @@ class Application @Inject() (
   }
 
   def removeTagFromBucket(id: Long, tagName: String) = Action {
-    val tag = Tag.findOrCreate(tagName)
-    val result = for (bucket <- Bucket.byId(id)) yield {
-      Bucket.removeTag(bucket, tag)
+    val tag = tagDb.findOrCreate(tagName)
+    val result = for (bucket <- bucketDb.byId(id)) yield {
+      bucketDb.removeTag(bucket, tag)
       cache.updateBucketOrElse(bucket)(fetchGroupedBuckets)
       Ok("tag removed")
     }

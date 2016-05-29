@@ -8,11 +8,12 @@ import language.postfixOps
 import java.net.URLEncoder
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
+import javax.inject.Inject
 
 trait Taggable {
   val url: String
   val id: Long
-  def tags: List[Tag]
+  //  def tags: List[Tag]
 
   def addTagUrl = s"/dmpster/$url/$id/addTag/"
   def removeTagUrl = s"/dmpster/$url/$id/removeTag/"
@@ -24,38 +25,50 @@ case class Tag(id: Long, name: String) {
 }
 
 object Tag {
-  def all: List[Tag] = DB.withConnection {
+  val nameOnlyFormat = Writes[Tag](t => Json.obj("name" -> t.name))
+}
+
+class TagDB @Inject() (db: Database) {
+  def all: List[Tag] = db.withConnection {
     implicit c =>
-      SQL("select * from tag").as(tag *)
+      SQL"select * from tag".as(tag *)
   }
 
-  def forDump(dump: Dump) = DB.withConnection { implicit c =>
+  def forDump(dump: Dump) = db.withConnection { implicit c =>
     {
-      SQL("select * from dumpToTag dtt inner join tag t on t.id = dtt.tagId where dtt.dumpId = {dumpId}")
-        .on('dumpId -> dump.id).as(tag *)
+      SQL"""select * from dumpToTag dtt 
+            inner join tag t 
+            on t.id = dtt.tagId 
+            where dtt.dumpId = ${dump.id}"""
+        .as(tag *)
     }
   }
 
-  def forBucket(bucket: Bucket) = DB.withConnection { implicit c =>
+  def forBucket(bucket: Bucket) = db.withConnection { implicit c =>
     {
-      SQL("select * from bucketToTag btt inner join tag t on t.id = btt.tagId where btt.bucketId = {bucketId}")
-        .on('bucketId -> bucket.id).as(tag *)
+      SQL"""select * from bucketToTag btt 
+            inner join tag t 
+            on t.id = btt.tagId 
+            where btt.bucketId = ${bucket.id}"""
+        .as(tag *)
     }
   }
 
   def create(name: String) = {
-    DB.withConnection {
-      implicit c =>
-        SQL("insert into tag (name) select ({name}) where not exists (select * from tag where name = {name})")
-          .on('name -> name).executeInsert()
+    db.withConnection { implicit c =>
+      SQL"""insert into tag (name) 
+            select (${name}) 
+            where not exists 
+              (select * from tag 
+                where name = ${name})"""
+        .executeInsert()
     }
   }
 
   def findByName(name: String) = {
-    DB.withConnection {
-      implicit c =>
-        SQL("select * from tag where name = {name}")
-          .on('name -> name).as(tag.singleOpt)
+    db.withConnection { implicit c =>
+      SQL"select * from tag where name = ${name}"
+        .as(tag.singleOpt)
     }
   }
 
@@ -72,14 +85,14 @@ object Tag {
         case id ~ name => Tag(id, name)
       }
   }
-
-  val nameOnlyFormat = Writes[Tag] (t => Json.obj("name" -> t.name))
 }
 
-object TagParser {
-  def unapply(tagName: String) = {
-    val trimmed = tagName.trim
-    if (!trimmed.isEmpty) Some(Tag.findOrCreate(trimmed))
-    else None
+class TagParser @Inject() (tagDb: TagDB) {
+  object Result {
+    def unapply(tagName: String) = {
+      val trimmed = tagName.trim
+      if (!trimmed.isEmpty) Some(tagDb.findOrCreate(trimmed))
+      else None
+    }
   }
 }
