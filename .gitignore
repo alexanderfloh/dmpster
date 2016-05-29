@@ -23,3 +23,5 @@ dist
 .DS_Store
 project/.sbtserver.lock
 project/.sbtserver
+dmpster-db.7z
+*.db

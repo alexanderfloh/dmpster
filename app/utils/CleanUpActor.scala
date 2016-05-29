@@ -36,7 +36,7 @@ class CleanupActorSchedulerImpl @Inject() @Singleton() (
 class CleanUpActor @Inject() (
   configuration: Configuration,
   environment: Environment,
-  cache: BucketsAsJsonCacheAccess) extends Actor {
+  cache: BucketsCacheAccess) extends Actor {
 
   lazy val maxNumberOfDumpsPerBucket = configuration.getInt("dmpster.max.number.of.dmps.per.bucket").getOrElse(5)
   lazy val daysLifetime = configuration.getInt("dmpster.dmp.days.lifetime").getOrElse(14)

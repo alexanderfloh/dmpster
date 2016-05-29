@@ -29,20 +29,20 @@ import play.api.mvc.Controller
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import utils.Work
-import utils.BucketsAsJsonCacheAccess
+import utils.BucketsCacheAccess
 import models.BucketHit
 import javax.inject.Inject
 import play.api.cache.CacheApi
-import utils.BucketsAsJsonCacheAccess
+import utils.BucketsCacheAccess
 import akka.actor.ActorSystem
 import javax.inject.Named
 import akka.actor.ActorRef
+import play.api.libs.json.JsValue
 
 class Application @Inject() (
-    cache: BucketsAsJsonCacheAccess,
-    @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
+  cache: BucketsCacheAccess,
+  @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
 
-  
   def index = Action {
     Redirect(routes.Application.dmpster)
   }
@@ -50,65 +50,39 @@ class Application @Inject() (
   def dmpster = Action {
     Ok(views.html.index(Tag.all))
   }
-
-  def search(search: String) = Action {
-    Ok(views.html.search(search, Tag.all, searchBucketsAsJson(search).toString))
-  }
-
-  val emptyResponse = Json.obj("analyzing" -> List[String](), "buckets" -> List[String]())
-
-  private def bucketsAsJson = {
-    implicit val bucketWrites = Bucket.jsonWriter
-    implicit val dumpWrites = Dump.writeForIndex
-
-    val grouped = Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2()) 
-    val contentJsonified = toJson(grouped.map {
-      case (bucket, dumps) =>
-        Seq(toJson(bucket), toJson(dumps))
-    })
-    Json.obj(
-      "analyzing" -> analyzingJson,
-      "buckets" -> contentJsonified)
-  }
-
+  
   def bucketsNewestJson = {
     Action {
       Ok(BucketHit.newest.toString)
     }
   }
 
+  private def bucketsToJson(buckets: Bucket.GroupedBuckets) = {
+    implicit val bucketWrites = Bucket.jsonWriter
+    implicit val dumpWrites = Dump.writeForIndex
+
+    toJson(buckets.map {
+      case (bucket, dumps) =>
+        Seq(toJson(bucket), toJson(dumps))
+    })
+  }
+  
+  private def analyzingToJson(analyzing: List[File]): JsValue = {
+    toJson(analyzing.map(_.getName))
+  }
+  
+  private def fetchGroupedBuckets = Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2())
+
   def bucketsJson = {
+    def generateResponse() = {
+      Json.obj(
+      "analyzing" -> analyzingToJson(analyzing),
+      "buckets" -> bucketsToJson(cache.getBucketsOrElse(fetchGroupedBuckets)))
+    }
+    
     Action {
-      Ok(cache.getOrElse() { bucketsAsJson })
+      Ok(cache.getOrElse(generateResponse))
     }
-  }
-
-  private def searchBucketsAsJson(search: String) = {
-    if (search.length >= 3 && search.head == '[' && search.last == ']') {
-      val searchResult = Tag.findByName(search.drop(1).dropRight(1)).map { tag =>
-        val dumps = Dump.byTag(tag)
-        val grouped = Dump.groupDumpsByBucket(dumps)
-
-        implicit val bucketWrites = Bucket.jsonWriter
-        implicit val dumpWrites = Dump.writeForIndex
-
-        val contentJsonified = toJson(grouped.map {
-          case (bucket, dumps) =>
-            Seq(toJson(bucket), toJson(dumps))
-        })
-        Json.obj(
-          "analyzing" -> analyzingJson,
-          "buckets" -> contentJsonified)
-
-      }.getOrElse(emptyResponse)
-      searchResult
-    } else {
-      emptyResponse
-    }
-  }
-
-  def searchBucketsJson(search: String) = Action {
-    Ok(searchBucketsAsJson(search))
   }
 
   def updateBucketNotes(id: Long) = Action { request =>
@@ -165,12 +139,11 @@ class Application @Inject() (
     }))
   }
 
-  def analyzingJson = {
-    implicit val timeout = Timeout(5 seconds)
+  def analyzing: List[File] = {
+    implicit val timeout = Timeout(15 seconds)
     val jobs = analyzeMaster ? utils.QueryRunningJobs
     val files = Await.result(jobs.mapTo[utils.RunningJobs], Duration.Inf).jobs
-
-    toJson(files.map(_.getName))
+    files
   }
 
   def addTagToDmp(id: Long, tagName: String) = Action {
@@ -198,7 +171,7 @@ class Application @Inject() (
     val result = for { bucket <- Bucket.byId(id) } yield {
       if (!Tag.forBucket(bucket).exists(_.name == tagName)) {
         Bucket.addTag(bucket, tag)
-        invalidateCache()
+        cache.updateBucketOrElse(bucket)(fetchGroupedBuckets)
       }
       Ok("tag added")
     }
@@ -209,7 +182,7 @@ class Application @Inject() (
     val tag = Tag.findOrCreate(tagName)
     val result = for (bucket <- Bucket.byId(id)) yield {
       Bucket.removeTag(bucket, tag)
-      invalidateCache()
+      cache.updateBucketOrElse(bucket)(fetchGroupedBuckets)
       Ok("tag removed")
     }
     result.getOrElse(NotFound(s"Bucket ${id} not found"))

@@ -23,18 +23,17 @@ import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import play.libs.Akka
 import utils.Work
-import utils.BucketsAsJsonCacheAccess
-import utils.BucketsAsJsonCacheAccess
 import javax.inject.Inject
 import akka.actor.ActorSystem
 import play.api.Configuration
 import akka.actor.ActorRef
 import javax.inject.Named
+import utils.BucketsCacheAccess
 
 
 class Upload @Inject() (
     configuration: Configuration,
-    cache: BucketsAsJsonCacheAccess,
+    cache: BucketsCacheAccess,
     @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
   def upload = Action(parse.multipartFormData) {
     request =>
@@ -81,13 +80,14 @@ class Upload @Inject() (
   }
 
   private def invalidateCache() = cache.invalidate()
+  
+  private def fetchGroupedBuckets = Dump.forBucketsNoContent(Bucket.bucketsSortedByDate2())
 
   private def handleUpload(request: MultiPartRequest) = {
     val futureResults = Future.sequence(request.body.files.map { dmp =>
       val (newFile, filename, relFilePath) = moveFile(dmp)
 
-      invalidateCache()
-      Logger.info("parsing DMP")
+      Logger.info(s"parsing DMP $filename")
       implicit val analyzingTimeout = Timeout(configuration.getInt("dmpster.analyzer.timeout.minutes").getOrElse(60) minutes)
       val futureResult = ask(analyzeMaster, Work(newFile)).mapTo[utils.Result]
 
@@ -100,8 +100,8 @@ class Upload @Inject() (
         extractTagsFrom(request).map { tags =>
           tags.foreach(tagName => Dump.addTag(dump, tagName))
         }.getOrElse(Logger.info("no tags provided"))
-
-        invalidateCache()
+        
+        cache.addDumpOrElse(bucket, dump)(fetchGroupedBuckets)
         toJson(Map {
           "name" -> toJson(filename)
           "url" -> toJson(s"/dmpster/dmp/${dump.id}/details")

@@ -11,6 +11,8 @@ case class Bucket(
   id: Long,
   name: String,
   notes: String) extends Taggable {
+  
+  
 
   val url = "bucket"
   def fullUrl = s"/dmpster/$url/$id"
@@ -19,6 +21,8 @@ case class Bucket(
 }
 
 object Bucket {
+  type GroupedBuckets = List[(Bucket, List[Dump])]
+  
   def all: List[Bucket] = DB.withConnection { implicit c =>
     SQL("select * from bucket").as(bucket *)
   }
