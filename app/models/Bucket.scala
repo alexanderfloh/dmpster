@@ -47,6 +47,23 @@ class BucketJsonWriter @Inject() (tagDb: TagDB) {
 
 }
 
+case class BucketJsonWriterNoDb(tags: Map[Long, List[Tag]]) {
+  val jsonWriter = Writes[Bucket](b => {
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> b.id,
+      "name" -> b.name,
+      "notes" -> b.notes,
+      "url" -> b.fullUrl,
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(tags.get(b.id).getOrElse(List())),
+        "addTagUrl" -> b.addTagUrl,
+        "removeTagUrl" -> b.removeTagUrl))
+  })
+
+}
+
+
 class BucketDB @Inject() (db: Database) {
   import Bucket.bucket
 

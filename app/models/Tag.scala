@@ -44,6 +44,18 @@ class TagDB @Inject() (db: Database) {
     }
   }
 
+  def byIds(ids: Seq[Long]) = db.withConnection { implicit c =>
+    SQL"""select * from tag where id in (${ids})""".as(tag*)
+  }
+
+  def idsForDumps(dumps: Seq[Dump]) = db.withConnection { implicit c =>
+    SQL"""select dumpId, tagId from dumpToTag dtt
+          where dtt.dumpId in (${dumps.map(_.id)})
+      """.as(dumpAndTagId *)
+      .groupBy { case (dumpId, tagId) => dumpId }
+      .map { case (dumpId, ids) => (dumpId, ids.map { case (_, tagId) => tagId }) }
+  }
+
   def forBucket(bucket: Bucket) = db.withConnection { implicit c =>
     {
       SQL"""select * from bucketToTag btt 
@@ -52,6 +64,14 @@ class TagDB @Inject() (db: Database) {
             where btt.bucketId = ${bucket.id}"""
         .as(tag *)
     }
+  }
+
+  def idsForBuckets(buckets: Seq[Bucket]) = db.withConnection { implicit c =>
+    SQL"""select bucketId, tagId from bucketToTag btt
+          where btt.bucketId in (${buckets.map(_.id)})
+      """.as(bucketIdAndTagId *)
+      .groupBy { case (bucketId, tagId) => bucketId }
+      .map { case (bucketId, ids) => (bucketId, ids.map { case (_, tagId) => tagId }) }
   }
 
   def create(name: String) = {
@@ -84,6 +104,18 @@ class TagDB @Inject() (db: Database) {
       get[String]("name") map {
         case id ~ name => Tag(id, name)
       }
+  }
+
+  def dumpAndTagId = {
+    get[Long]("dumpId") ~
+      get[Long]("tagId") map
+      { case dumpId ~ tagId => (dumpId, tagId) }
+  }
+  
+  def bucketIdAndTagId = {
+    get[Long]("bucketId") ~
+      get[Long]("tagId") map
+      { case bucketId ~ tagId => (bucketId, tagId) }
   }
 }
 

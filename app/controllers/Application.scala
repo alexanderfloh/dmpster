@@ -44,6 +44,8 @@ import models.BucketHitDb
 import models.TagDB
 import models.BucketJsonWriter
 import models.DumpJsonWriter
+import models.DumpJsonWriterNoDb
+import models.BucketJsonWriterNoDb
 
 class Application @Inject() (
   cache: BucketsCacheAccess,
@@ -70,8 +72,21 @@ class Application @Inject() (
   }
 
   private def bucketsToJson(buckets: Bucket.GroupedBuckets) = {
-    implicit val bucketWrites = bucketJsonWriter.jsonWriter
-    implicit val dumpWrites = dumpJsonWriter.writeForIndex
+    val bucketsOnly = buckets.map { case (bucket, _) => bucket }
+    val tagIdsForBuckets = tagDb.idsForBuckets(bucketsOnly)
+    
+    val allTagIdsForBuckets = tagIdsForBuckets.flatMap { case (_, tagIds) => tagIds }.toList.distinct
+    
+    val dumpsOnly = buckets.flatMap { case (_, dumps) => dumps }
+    val tagsForDumps = tagDb.idsForDumps(dumpsOnly)
+    val allTagIdsForDumps = tagsForDumps.flatMap { case (_, tagIds) => tagIds }.toList.distinct
+    val allTags = tagDb.byIds(allTagIdsForDumps ++ allTagIdsForBuckets).groupBy(_.id)
+    
+    val tagsByBucketId = tagIdsForBuckets.map { case (bucketId, tagIds) => (bucketId, tagIds.flatMap(allTags.get(_)).flatten) }
+    val tagsByDumpId = tagsForDumps.map { case (dumpId, tagIds) => (dumpId, tagIds.flatMap(allTags.get(_)).flatten) }
+
+    implicit val bucketWrites = BucketJsonWriterNoDb(tagsByBucketId).jsonWriter
+    implicit val dumpWrites = DumpJsonWriterNoDb(tagsByDumpId).writeForIndex
 
     toJson(buckets.map {
       case (bucket, dumps) =>
@@ -89,11 +104,13 @@ class Application @Inject() (
     def generateResponse() = {
       Json.obj(
       "analyzing" -> analyzingToJson(analyzing),
-      "buckets" -> bucketsToJson(cache.getBucketsOrElse(fetchGroupedBuckets)))
+      //"buckets" -> bucketsToJson(cache.getBucketsOrElse(fetchGroupedBuckets)))
+      "buckets" -> bucketsToJson(fetchGroupedBuckets))
     }
     
     Action {
-      Ok(cache.getOrElse(generateResponse))
+      //Ok(cache.getOrElse(generateResponse))
+      Ok(generateResponse)
     }
   }
 

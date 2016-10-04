@@ -94,6 +94,35 @@ class DumpJsonWriter @Inject() (tagDb: TagDB) {
   }
 }
 
+case class DumpJsonWriterNoDb (tags: Map[Long, List[Tag]]) {
+  val writeForIndex = Writes[Dump] { d =>
+    implicit val tagFormat = Tag.nameOnlyFormat
+    Json.obj(
+      "id" -> d.id,
+      "filename" -> d.filename,
+      "isNew" -> d.isNew,
+      "ageLabel" -> d.ageLabel,
+      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
+      "tagging" -> Json.obj(
+        "tags" -> Json.toJson(tags.get(d.id).getOrElse(List())),
+        "addTagUrl" -> d.addTagUrl,
+        "removeTagUrl" -> d.removeTagUrl))
+  }
+
+//  val writeForDetails = Writes[Dump] { d =>
+//    implicit val tagFormat = Tag.nameOnlyFormat
+//    Json.obj(
+//      "id" -> d.id,
+//      "filename" -> d.filename,
+//      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
+//      "content" -> d.content,
+//      "tagging" -> Json.obj(
+//        "tags" -> Json.toJson(tagDb.forDump(d)),
+//        "addTagUrl" -> d.addTagUrl,
+//        "removeTagUrl" -> d.removeTagUrl))
+//  }
+}
+
 class DumpDB @Inject() (
     db: Database,
     bucketDb: BucketDB) {
