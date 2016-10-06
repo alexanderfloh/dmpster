@@ -10,7 +10,7 @@ define(['react', 'd3', 'calHeatmap'],
     componentDidMount: function() {
       if(this.props.bucketId) {
         var that = this;
-        window.setTimeout(function() {
+        // window.setTimeout(function() {
           var dt = new Date();
           var currentMonth = dt.getMonth();
           var month = currentMonth;
@@ -36,13 +36,14 @@ define(['react', 'd3', 'calHeatmap'],
             legend: [1, 5, 10, 15],
             highlight: futureDaysInMonth
           });
-          $.ajax({
-            url: '/dmpster/bucket/' + that.props.bucketId + '/hits.json',
-
-          }).done(function(data){
-            cal.update(data);
-          });
-        }, 1000);
+          cal.update(that.props.hits);
+          // $.ajax({
+          //   url: '/dmpster/bucket/' + that.props.bucketId + '/hits.json',
+          //
+          // }).done(function(data){
+          //   cal.update(data);
+          // });
+        // }, 1000);
       }
     },
 

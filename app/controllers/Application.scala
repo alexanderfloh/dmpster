@@ -84,9 +84,12 @@ class Application @Inject() (
     
     val tagsByBucketId = tagIdsForBuckets.map { case (bucketId, tagIds) => (bucketId, tagIds.flatMap(allTags.get(_)).flatten) }
     val tagsByDumpId = tagsForDumps.map { case (dumpId, tagIds) => (dumpId, tagIds.flatMap(allTags.get(_)).flatten) }
+    
+    val bucketHits = bucketHitDb.forBuckets(bucketsOnly)
 
-    implicit val bucketWrites = BucketJsonWriterNoDb(tagsByBucketId).jsonWriter
+    implicit val bucketWrites = BucketJsonWriterNoDb(tagsByBucketId, bucketHits).jsonWriter
     implicit val dumpWrites = DumpJsonWriterNoDb(tagsByDumpId).writeForIndex
+    implicit val bucketHitWrites = BucketHit
 
     toJson(buckets.map {
       case (bucket, dumps) =>
