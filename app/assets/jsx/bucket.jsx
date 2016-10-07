@@ -18,6 +18,7 @@ define(['react', 'tagging', 'tags', 'calendar', 'notes', 'dump'],
           filename: React.PropTypes.string
         })
       ),
+
       notes: React.PropTypes.string,
     },
 
@@ -47,7 +48,7 @@ define(['react', 'tagging', 'tags', 'calendar', 'notes', 'dump'],
           </h1>
 
           <div className="dump-container">
-            <Calendar bucketId={this.props.id} />
+            <Calendar bucketId={this.props.id} hits={this.props.hits} />
             {dumpNodes}
           </div>
           <Notes bucketId={this.props.id} notes={this.props.notes}/>

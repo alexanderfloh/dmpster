@@ -25,6 +25,21 @@ class BucketHitDb @Inject() (db: Database) {
     }
   }
 
+  def forBuckets(buckets: List[Bucket]) = db.withConnection { implicit c =>
+    val hits = SQL"select * from bucket_hits where bucketId in ( ${buckets.map(_.id)} )"
+      .as(bucketHit *)
+
+    val hitsByBucket = hits.groupBy(_.bucketId)
+    val hitsByBucketAndDate = hitsByBucket.map {
+      case (bucketId, hits) => (bucketId, hits.groupBy(h => h.timestamp.toLocalDate()).map {
+        case (ts, items) => {
+          (ts.toDate.getTime / 1000, items.length)
+        }
+      })
+    }
+    hitsByBucketAndDate
+  }
+
   def newest() = db.withConnection { implicit c =>
     SQL"""SELECT * FROM bucket_hits 
           GROUP BY bucketId, id 

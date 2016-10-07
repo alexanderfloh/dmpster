@@ -47,14 +47,20 @@ class BucketJsonWriter @Inject() (tagDb: TagDB) {
 
 }
 
-case class BucketJsonWriterNoDb(tags: Map[Long, List[Tag]]) {
+case class BucketJsonWriterNoDb(tags: Map[Long, List[Tag]], bucketHits: Map[Long, Map[Long, Int]]) {
   val jsonWriter = Writes[Bucket](b => {
+    val bucketHit = bucketHits.get(b.id).getOrElse(Map())
+    
     implicit val tagFormat = Tag.nameOnlyFormat
+    
     Json.obj(
       "id" -> b.id,
       "name" -> b.name,
       "notes" -> b.notes,
       "url" -> b.fullUrl,
+      "hits" -> Json.toJson(bucketHit.foldLeft(Json.obj()) {
+        case (json, (time, count)) => json + (time.toString, Json.toJson(count))
+      }),
       "tagging" -> Json.obj(
         "tags" -> Json.toJson(tags.get(b.id).getOrElse(List())),
         "addTagUrl" -> b.addTagUrl,

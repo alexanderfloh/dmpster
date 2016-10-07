@@ -30,6 +30,7 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           name={bucket.name}
           url={bucket.url}
           notes={bucket.notes}
+          hits={bucket.hits}
           tagging={bucket.tagging}
           dumps={dumps}>
           </Bucket>);
