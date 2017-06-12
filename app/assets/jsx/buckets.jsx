@@ -3,6 +3,7 @@
 */
 
 define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
+
   var BucketList = React.createClass({
     getInitialState: function() {
       return {analyzingDumps: this.props.analyzingDumps};

@@ -4,15 +4,21 @@
 */
 
 define(['react', 'jquery'], function(React, $) {
-  var Tags = React.createClass({
-    getInitialState: function() {
-      return {
+  class Tags extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
         inputVisible: false,
         value: ''
       };
-    },
 
-    handleInputKeyDown: function(event) {
+      this.handleInputKeyDown = this.handleInputKeyDown.bind(this);
+      this.handleInputChange = this.handleInputChange.bind(this);
+      this.handleInputBlur = this.handleInputBlur.bind(this);
+      this.handleAddTagClick = this.handleAddTagClick.bind(this);
+    }
+
+    handleInputKeyDown(event) {
       if (event.keyCode == 13 || event.which == 13) {
         var domNode = this.refs.tagInput.getDOMNode();
         $(domNode).hideBalloon();
@@ -23,9 +29,9 @@ define(['react', 'jquery'], function(React, $) {
           value: ''
         });
       }
-    },
+    }
 
-    handleInputBlur: function() {
+    handleInputBlur() {
       var domNode =
       this.refs.tagInput.getDOMNode();
       $(domNode).hideBalloon();
@@ -34,17 +40,17 @@ define(['react', 'jquery'], function(React, $) {
         inputVisible: false,
         value: ''
       });
-    },
+    }
 
-    handleInputChange: function(event) {
+    handleInputChange(event) {
       this.setState({value: event.target.value});
-    },
+    }
 
-    handleAddTagClick: function() {
+    handleAddTagClick() {
       this.setState({ inputVisible: true });
-    },
+    }
 
-    componentDidUpdate: function() {
+    componentDidUpdate() {
       if(this.state.inputVisible) {
         var
         domNode = this.refs.tagInput.getDOMNode();
@@ -67,15 +73,13 @@ define(['react', 'jquery'], function(React, $) {
           classname: 'balloon'
         });
       }
-    },
+    }
 
-    render: function() {
+    render() {
       var removeTag = this.props.handleRemoveTag;
-      var
-      tagNodes = this.props.tags.map(function(tag) {
-        return <Tag key={tag.name}
-        tag={tag} handleRemoveTag={removeTag}></Tag>;
-      });
+      var tagNodes = this.props.tags.map((tag) => 
+        (<Tag key={tag.name} tag={tag} handleRemoveTag={removeTag}></Tag>)
+      );
       if(this.state.inputVisible) {
         return (
           <span id="tags" className="tag-container">
@@ -106,17 +110,21 @@ define(['react', 'jquery'], function(React, $) {
         );
       }
     }
-  });
+  }
 
-  var Tag = React.createClass({
-    handleRemoveClick: function() {
+  class Tag extends React.Component {
+    constructor(props) {
+      super(props);
+      this.handleRemoveClick = this.handleRemoveClick.bind(this);
+    }
+
+    handleRemoveClick() {
       this.props.handleRemoveTag(this.props.tag.name);
-    },
+    }
 
-    render: function() {
+    render() {
       var cx = React.addons.classSet;
-      var tagClass =
-      this.props.tag.name.split(' ').join('-');
+      var tagClass = this.props.tag.name.split(' ').join('-');
       var classes = cx({
         'tag':
         true,
@@ -136,6 +144,6 @@ define(['react', 'jquery'], function(React, $) {
         </span>
       );
     }
-  });
+  }
   return Tags;
 });

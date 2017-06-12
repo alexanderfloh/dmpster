@@ -4,19 +4,21 @@
 */
 
 define(['react', 'jquery'], function(React, $) {
-  var TaggingMixin = {
-    markedForDeletion: 'marked for deletion',
-    keepForever: 'keep forever',
+  const markedForDeletion = 'marked for deletion';
+  const keepForever = 'keep forever';
 
-    getInitialState: function() {
-      return {
-        tags: this.props.tagging.tags,
+  return TaggingEnhance = ComposedComponent => class extends React.Component {
+    
+
+    constructor(props) {
+      this.state = {
+        tags: props.tagging.tags,
         optimisticAdd: [],
         optimisticRemove: [],
       };
-    },
+    }
 
-    componentWillReceiveProps: function(newProps) {
+    componentWillReceiveProps(newProps) {
       var removeAllFromArray = function(arr, toRemove) {
         return arr.filter(function(elem) {return toRemove.indexOf(elem) === -1;});
       }
@@ -31,9 +33,14 @@ define(['react', 'jquery'], function(React, $) {
               })
             })
       });
-    },
+    }  
 
-    getTags: function() {
+    hasTag(tagName) {
+      var tags = this.state.tags;
+      return tags.some(function(tag) { return tag.name === tagName });
+    }
+
+    getTags() {
       var optimisticRemove = this.state.optimisticRemove;
       return this.state.tags.concat(this.state.optimisticAdd).filter(function(elem) {
         // filter elements that are contained in optimisticRemove
@@ -41,41 +48,35 @@ define(['react', 'jquery'], function(React, $) {
            return elem.name === elemToRemove.name;
         });
       });
-    },
+    }
 
-    hasTag: function(tagName) {
-      var tags = this.state.tags;
-      return tags.some(function(tag) { return tag.name === tagName });
-    },
-
-    isMarkedForDeletion: function() {
+    isMarkedForDeletion() {
       return this.hasTag(this.markedForDeletion);
-    },
+    }
 
-    isArchived: function() {
+    isArchived() {
       return this.hasTag(this.keepForever);
-    },
+    }
 
-    handleClickOnRemove: function() {
+    handleClickOnRemove() {
       if(this.isMarkedForDeletion()) {
         this.handleRemoveTag(this.markedForDeletion);
       }
       else {
         this.handleAddTag(this.markedForDeletion);
       }
+    }
 
-    },
-
-    handleClickOnArchive: function() {
+    handleClickOnArchive() {
       if(this.isArchived()) {
         this.handleRemoveTag(this.keepForever);
       }
       else {
         this.handleAddTag(this.keepForever);
       }
-    },
+    }
 
-    handleAddTag: function(tagName) {
+    handleAddTag(tagName) {
       var tags = this.state.tags;
       if(!this.hasTag(tagName)) {
         this.setState({tags:
@@ -89,9 +90,9 @@ define(['react', 'jquery'], function(React, $) {
         url : this.props.tagging.addTagUrl +
         encodeURIComponent(tagName)
       });
-    },
+    }
 
-    handleRemoveTag: function(tagName) {
+    handleRemoveTag(tagName) {
       var update = React.addons.update;
       var tags = this.state.tags;
       var newTags = tags.filter(function(elem) { return elem.name !== tagName; });
@@ -107,7 +108,10 @@ define(['react', 'jquery'], function(React, $) {
         this.props.tagging.removeTagUrl + encodeURIComponent(tagName)
       });
     }
-  };
 
-  return TaggingMixin;
+    render () {
+      let newProps = Object.assign({ getTags: this.getTags }, this.props)
+      return <ComposedComponent {...newProps} {...this.state} />;
+    }
+  };
 });
