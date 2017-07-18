@@ -2,20 +2,25 @@
 
 define(['react', 'marked', 'highlight'],
   function(React, marked, highlight) {
-    var Notes = React.createClass({
-      propTypes: {
-        notes: React.PropTypes.string,
-        bucketId: React.PropTypes.number.isRequired,
-      },
+    class Notes extends React.Component {
+      // propTypes: {
+      //   notes: React.PropTypes.string,
+      //   bucketId: React.PropTypes.number.isRequired,
+      // },
 
-      getInitialState: function() {
-        return {
-          value: this.props.notes,
+      constructor(props) {
+        super(props);
+        this.state = {
+          value: props.notes,
           editing: false,
         };
-      },
+        this.handleChange = this.handleChange.bind(this);
+        this.handleEditClick = this.handleEditClick.bind(this);
+        this.submitChange = this.submitChange.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+      }
 
-      componentWillReceiveProps: function(nextProps) {
+      componentWillReceiveProps(nextProps) {
         if(this.state.editing) {
           //TODO: handle conflict
         }
@@ -23,60 +28,51 @@ define(['react', 'marked', 'highlight'],
           if(!this.state.pendingText || nextProps.notes === this.state.pendingText) {
             this.setState({
               value: nextProps.notes,
-              editing: this.state.editing,
               pendingText: ''
             });
           }
         }
-      },
+      }
 
-      componentDidMount: function() {
+      componentDidMount() {
         marked.setOptions({
           highlight: function (code) {
             return highlight.highlightAuto(code).value;
           }
         });
-      },
+      }
 
-      handleChange: function(event) {
+      handleChange(event) {
         this.setState({
           value: event.target.value,
-          editing: this.state.editing,
-          pendingText: this.state.pendingText
           });
-      },
+      }
 
-      handleEditClick: function(event) {
+      handleEditClick(event) {
         this.setState({
-          value: this.state.value,
           editing: true,
-          pendingText: this.state.pendingText
         });
-      },
+      }
 
-      submitChange: function(event) {
+      submitChange(event) {
         $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes',
           {notes: this.state.value}
         );
 
         this.setState({
-          value: this.state.value,
           editing: false,
-          pendingText: this.state.value
         });
         event.preventDefault();
-      },
+      }
 
-      handleCancel: function(event) {
+      handleCancel(event) {
         this.setState({
-          value: this.state.value,
           editing: false,
-          pendingText: this.state.pendingText
         });
         event.preventDefault();
-      },
+      }
 
-      render: function() {
+      render() {
         var value = this.state.pendingText ? this.state.pendingText : this.state.value;
         var renderer = new marked.Renderer();
 
@@ -136,7 +132,7 @@ define(['react', 'marked', 'highlight'],
           );
         }
       }
-    });
+    };
     return Notes;
   }
 );

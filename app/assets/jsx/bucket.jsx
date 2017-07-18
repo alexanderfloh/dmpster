@@ -21,6 +21,7 @@ define(['react', 'tagging', 'tags', 'calendar', 'notes', 'dump'],
     // },
 
     constructor(props) {
+      super(props);
       this.state = {
         tags: props.tagging.tags,
         optimisticAdd: [],

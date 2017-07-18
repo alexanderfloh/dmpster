@@ -1,12 +1,23 @@
 /** @jsx React.DOM */
 
 define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
-  var ViewBucket = React.createClass({
-    getInitialState: function() {
-      return {bucket: {tagging: {tags: []}, notes:''}, dumps: []};
-    },
+  class ViewBucket extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        bucket: {
+          tagging: {
+            tags: []
+          }, 
+          notes: ''
+        }, 
+        dumps: []
+      };
 
-    loadBucketsFromServer: function() {
+      this.loadBucketsFromServer = this.loadBucketsFromServer.bind(this);
+    }
+
+    loadBucketsFromServer() {
       $.ajax({
         url: this.props.url,
         dataType: 'json',
@@ -17,14 +28,14 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           console.error(this.props.url, status, err.toString());
         }.bind(this)
       });
-    },
+    }
 
-    componentWillMount: function() {
+    componentWillMount() {
       this.loadBucketsFromServer();
       setInterval(this.loadBucketsFromServer, this.props.pollInterval);
-    },
+    }
 
-    render: function() {
+    render() {
       if(this.state.bucket.id !== undefined) {
         return (
           <div className="buckets">
@@ -41,6 +52,6 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
         return (<div className="buckets"></div>);
       }
     }
-  });
+  };
   return ViewBucket;
 });

@@ -2,12 +2,15 @@
 
 define(['react', 'd3', 'calHeatmap'],
   function(React, d3, CalHeatMap) {
-  var Calendar = React.createClass({
-    propTypes: {
-      bucketId: React.PropTypes.number.isRequired
-    },
+  class Calendar extends React.Component{
+    // propTypes: {
+    //   bucketId: React.PropTypes.number.isRequired
+    // },
+    constructor(props) {
+      super(props);
+    }
 
-    componentDidMount: function() {
+    componentDidMount() {
       if(this.props.bucketId) {
         var that = this;
         // window.setTimeout(function() {
@@ -45,13 +48,13 @@ define(['react', 'd3', 'calHeatmap'],
           // });
         // }, 1000);
       }
-    },
+    }
 
-    render: function() {
+    render() {
       var chartId = "cal-heatmap" + this.props.bucketId;
       return (<div id={chartId} className="heatmap"></div>);
-    },
-  });
+    }
+  };
 
   return Calendar;
 });

@@ -4,25 +4,29 @@
 
 define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
 
-  var BucketList = React.createClass({
-    getInitialState: function() {
-      return {analyzingDumps: this.props.analyzingDumps};
-    },
+  class BucketList extends React.Component {
 
-    componentWillReceiveProps: function(nextProps) {
+    constructor(props) {
+      super(props);
+      this.state = {
+        analyzingDumps: props.analyzingDumps
+      };
+    }
+    
+    componentWillReceiveProps(nextProps) {
       this.setState({analyzingDumps: nextProps.analyzingDumps});
-    },
+    }
 
-    onFileUploaded: function(fileName) {
+    onFileUploaded(fileName) {
       var analyzing = this.state.analyzingDumps;
       if(!analyzing.some(function(a) { return a === fileName; })) {
         var newAnalyzing = analyzing.concat([fileName]);
         this.setState({analyzingDumps: newAnalyzing});
       }
-    },
+    }
 
-    render: function() {
-      var bucketNodes = this.props.dumps.map(function (bucketAndDumps) {
+    render() {
+      var bucketNodes = this.props.dumps.map(bucketAndDumps => {
         var bucket = bucketAndDumps[0];
         var dumps = bucketAndDumps[1];
         return (<Bucket
@@ -44,14 +48,18 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           </div>
         );
       }
-    });
+    };
 
-    var UploadingFiles = React.createClass({
-      getInitialState: function() {
-        return {uploads: []};
-      },
+    class UploadingFiles extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { 
+          uploads: [] 
+        };
+      }
+      
 
-      componentDidMount: function() {
+      componentDidMount() {
         var uploading = this;
         var url = '/uploadAsync';
         $('#holder').fileupload({
@@ -95,9 +103,9 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
             }).prop('disabled', !$.support.fileInput)
             .parent().addClass($.support.fileInput ? undefined : 'disabled');
 
-          },
+          }
 
-          render: function() {
+          render() {
             var uploadingNodes = this.state.uploads.map(function(entry) {
               var width = {width: entry.progress + '%'};
               return (
@@ -119,11 +127,11 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
               </article>
             );
           }
-        });
+        };
 
-        var AnalyzingBuckets = React.createClass({
-          render: function() {
-            var dumpNodes = this.props.analyzingDumps.map(function(dump) {
+        class AnalyzingBuckets extends React.Component {
+          render() {
+            var dumpNodes = this.props.analyzingDumps.map(dump => {
               return (
                 <section key={dump} className="dmp processing">
                 <h1>
@@ -147,14 +155,21 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
               </article>
             );
           }
-        });
+        };
 
-        var Buckets = React.createClass({
-          getInitialState: function() {
-            return {dumps: [], analyzingDumps: []};
-          },
+        class Buckets extends React.Component {
+          
+          constructor(props) {
+            super(props);
+            this.state = {
+              dumps: [], 
+              analyzingDumps: []
+            };
 
-          loadBucketsFromServer: function() {
+            this.loadBucketsFromServer = this.loadBucketsFromServer.bind(this);
+          }
+
+          loadBucketsFromServer() {
             $.ajax({
               url: this.props.url,
               dataType: 'json',
@@ -165,20 +180,21 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
                 console.error(this.props.url, status, err.toString());
               }.bind(this)
             });
-          },
+          }
 
-          componentWillMount: function() {
+          componentWillMount() {
             this.loadBucketsFromServer();
             setInterval(this.loadBucketsFromServer, this.props.pollInterval);
-          },
-          render: function() {
+          }
+
+          render() {
             return (
               <div className="buckets">
               <BucketList dumps={this.state.dumps} analyzingDumps={this.state.analyzingDumps} />
               </div>
             );
           }
-        });
+        };
         return {
           'BucketList': BucketList,
           'UploadingFiles': UploadingFiles,
