@@ -69,6 +69,31 @@ case class BucketJsonWriterNoDb(tags: Map[Long, List[Tag]], bucketHits: Map[Long
 
 }
 
+case class BucketDumpsJsonWriterNoDb(tags: Map[Long, List[Tag]], bucketHits: Map[Long, Map[Long, Int]]) {
+  val jsonWriter = Writes[(Bucket, Seq[Dump])](p => p match {
+    case (b, ds) => {
+    val bucketHit = bucketHits.get(b.id).getOrElse(Map())
+    implicit val tagFormat = Tag.nameOnlyFormat
+    
+    Json.toJson(Seq(Json.toJson(b.id.toString), Json.obj(
+        "id" -> b.id,
+        "name" -> b.name,
+        "notes" -> b.notes,
+        "url" -> b.fullUrl,
+        "hits" -> Json.toJson(bucketHit.foldLeft(Json.obj()) {
+          case (json, (time, count)) => json + (time.toString, Json.toJson(count))
+        }),
+        "dumps" -> Json.toJson(ds.map(_.id.toString)),
+        "tagging" -> Json.obj(
+          "tags" -> Json.toJson(tags.get(b.id).getOrElse(List())),
+          "addTagUrl" -> b.addTagUrl,
+          "removeTagUrl" -> b.removeTagUrl
+        )
+      )
+    ))
+    }
+  })
+}
 
 class BucketDB @Inject() (db: Database) {
   import Bucket.bucket

@@ -2,33 +2,22 @@
 * @jsx React.DOM
 */
 
-define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
+define(['react', 'jquery', 'Bucket', 'containers/analyzing', 'containers/loadOlderDumps'], 
+  function(React, $, Bucket, AnalyzingBuckets, LoadOlderDumps) {
 
   class BucketList extends React.Component {
 
     constructor(props) {
       super(props);
-      this.state = {
-        analyzingDumps: props.analyzingDumps
-      };
+      this.onFileUploaded = this.onFileUploaded.bind(this);
     }
     
-    componentWillReceiveProps(nextProps) {
-      this.setState({analyzingDumps: nextProps.analyzingDumps});
-    }
-
     onFileUploaded(fileName) {
-      var analyzing = this.state.analyzingDumps;
-      if(!analyzing.some(function(a) { return a === fileName; })) {
-        var newAnalyzing = analyzing.concat([fileName]);
-        this.setState({analyzingDumps: newAnalyzing});
-      }
+      this.props.addAnalysis(fileName);
     }
 
     render() {
-      var bucketNodes = this.props.dumps.map(bucketAndDumps => {
-        var bucket = bucketAndDumps[0];
-        var dumps = bucketAndDumps[1];
+      var bucketNodes = this.props.buckets.valueSeq().toJS().map(bucket => {
         return (<Bucket
           key={bucket.id}
           id={bucket.id}
@@ -37,14 +26,19 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           notes={bucket.notes}
           hits={bucket.hits}
           tagging={bucket.tagging}
-          dumps={dumps}>
+          dumps={bucket.dumps}
+          handleAddTag={this.props.handleAddTag}
+          handleRemoveTag={this.props.handleRemoveTag}
+          setNotes={this.props.setNotes}
+          >
           </Bucket>);
         });
         return (
           <div className="bucketList">
-          <UploadingFiles onFileUploaded={this.onFileUploaded} />
-          <AnalyzingBuckets analyzingDumps={this.state.analyzingDumps}></AnalyzingBuckets>
-          {bucketNodes}
+            <UploadingFiles onFileUploaded={this.onFileUploaded} />
+            <AnalyzingBuckets />
+            {bucketNodes}
+            <LoadOlderDumps />
           </div>
         );
       }
@@ -129,34 +123,6 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
           }
         };
 
-        class AnalyzingBuckets extends React.Component {
-          render() {
-            var dumpNodes = this.props.analyzingDumps.map(dump => {
-              return (
-                <section key={dump} className="dmp processing">
-                <h1>
-                {dump}
-                </h1>
-                <div className="spinner">
-                  <div className="dot1"></div>
-                  <div className="dot2"></div>
-                </div>
-                </section>
-              );
-            });
-
-            return (
-              <article id="processing" className={this.props.analyzingDumps.length ? '' : 'hidden'}>
-              <h1>
-              Currently processing...
-              <br/>
-              </h1>
-              {dumpNodes}
-              </article>
-            );
-          }
-        };
-
         class Buckets extends React.Component {
           
           constructor(props) {
@@ -198,6 +164,5 @@ define(['react', 'jquery', 'Bucket'], function(React, $, Bucket) {
         return {
           'BucketList': BucketList,
           'UploadingFiles': UploadingFiles,
-          'AnalyzingBuckets': AnalyzingBuckets,
           'Buckets': Buckets};
       });

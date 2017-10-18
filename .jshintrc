@@ -1,4 +1,5 @@
 {
   "indent" : false,
-  "unused": false
+  "unused": false,
+  "esnext": true
 }

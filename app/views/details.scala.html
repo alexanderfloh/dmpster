@@ -1,10 +1,13 @@
 @(bucket: Bucket, dump: Dump)
-@main("js/mainDetails.js",
+@main(
+  "js/mainDetails.js",
   List(
     (bucket.name, bucket.fullUrl),
     (dump.filename, dump.fullUrl)
   ),
-  None) {
+  None,
+  Some(dump.filename)
+  ) {
 
 <datalist class="hidden" id="tags">
 

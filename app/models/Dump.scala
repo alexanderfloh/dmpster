@@ -97,16 +97,23 @@ class DumpJsonWriter @Inject() (tagDb: TagDB) {
 case class DumpJsonWriterNoDb (tags: Map[Long, List[Tag]]) {
   val writeForIndex = Writes[Dump] { d =>
     implicit val tagFormat = Tag.nameOnlyFormat
-    Json.obj(
-      "id" -> d.id,
-      "filename" -> d.filename,
-      "isNew" -> d.isNew,
-      "ageLabel" -> d.ageLabel,
-      "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
-      "tagging" -> Json.obj(
-        "tags" -> Json.toJson(tags.get(d.id).getOrElse(List())),
-        "addTagUrl" -> d.addTagUrl,
-        "removeTagUrl" -> d.removeTagUrl))
+    Json.toJson(
+      Seq(
+        Json.toJson(d.id.toString), 
+        Json.obj(
+          "id" -> d.id,
+          "filename" -> d.filename,
+          "isNew" -> d.isNew,
+          "ageLabel" -> d.ageLabel,
+          "dmpUrl" -> s"/dmps/${d.pathInStorageDirectory.replace("\\", "/")}",
+          "tagging" -> Json.obj(
+            "tags" -> Json.toJson(tags.get(d.id).getOrElse(List())),
+            "addTagUrl" -> d.addTagUrl,
+            "removeTagUrl" -> d.removeTagUrl
+          )
+        )
+      )
+    )
   }
 
 //  val writeForDetails = Writes[Dump] { d =>
@@ -171,6 +178,11 @@ class DumpDB @Inject() (
         SQL"select id, bucketId, filename, timestamp from dump where bucketId = ${bucket.id}"
         .as(dumpNoContent *).toList)
     })
+  }
+  
+  def forBucketsNoContentAsList(buckets: List[Bucket]): List[Dump] = db.withConnection { implicit c =>
+    SQL"select id, bucketId, filename, timestamp from dump where bucketId in (${buckets.map(_.id)})"
+    .as(dumpNoContent *).toList
   }
 
   def byTag(tag: Tag) = db.withConnection { implicit c =>

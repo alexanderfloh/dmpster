@@ -1,6 +1,6 @@
-@(allTags: Seq[Tag])
+@(allTags: Seq[Tag], initialState: String)
 
-@main("js/mainIndex", List(), None) {
+@main("js/mainIndex", List(), None, None) {
 
   <datalist class="hidden" id="tags">
     @allTags.map{ t =>
@@ -8,4 +8,8 @@
     }
   </datalist>
   <div id="content"></div>
+  <script>
+    window.initialState = @Html(initialState);
+  </script>
+  
 }

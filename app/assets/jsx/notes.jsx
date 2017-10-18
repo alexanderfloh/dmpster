@@ -45,7 +45,7 @@ define(['react', 'marked', 'highlight'],
       handleChange(event) {
         this.setState({
           value: event.target.value,
-          });
+        });
       }
 
       handleEditClick(event) {
@@ -55,21 +55,26 @@ define(['react', 'marked', 'highlight'],
       }
 
       submitChange(event) {
-        $.post('/dmpster/bucket/' + this.props.bucketId + '/updateNotes',
-          {notes: this.state.value}
-        );
+        event.preventDefault();
+        this.props.setNotes(this.props.bucketId, this.state.value);
 
         this.setState({
           editing: false,
         });
-        event.preventDefault();
       }
 
       handleCancel(event) {
+        event.preventDefault();
+
         this.setState({
           editing: false,
         });
-        event.preventDefault();
+      }
+
+      componentDidUpdate() {
+        if(this.state.editing) {
+          this.refs.notesEdit.focus();
+        }
       }
 
       render() {
@@ -94,12 +99,14 @@ define(['react', 'marked', 'highlight'],
         if(this.state.editing) {
           return (
             <div className="notes">
+              <h3>Preview</h3>
+              <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
               <form onSubmit={this.submitChange}>
-                <textarea value={value} onChange={this.handleChange} rows="10"></textarea>
+                <textarea value={value} onChange={this.handleChange} rows="10" ref="notesEdit"></textarea>
                 <input type="submit"/>
                 <button onClick={this.HandleCancel}>Cancel</button>
               </form>
-              <span id="markdown-preview" dangerouslySetInnerHTML={{__html: rawMarkup}} />
+              
             </div>
           );
         }

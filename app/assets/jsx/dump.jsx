@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
-define(['react', 'tagging', 'tags'],
-  function(React, withTagging, Tags) {
+define(['react', 'tagging', 'tags', 'classnames'],
+  function(React, withTagging, Tags, classNames) {
 
     class Dump extends React.Component {
 
@@ -19,34 +19,37 @@ define(['react', 'tagging', 'tags'],
       }
 
       render() {
-        var cx = React.addons.classSet;
         var tagNames = this.props.tags.map(function(elem) {
           return elem.name;
         });
         var tagsFiltered = this.props.tags.filter(function(elem){
           return elem.name !== 'keep forever' && elem.name !== 'marked for deletion';
         });
-        var classes = cx({
+        var classes = classNames({
           'dmp': true,
-          'new': this.props.dump.isNew,
+          'new': this.props.isNew,
           'archived': tagNames.indexOf('keep forever') != -1,
           'delete': tagNames.indexOf('marked for deletion') != -1
         });
         return (
           <section className={classes}>
             <h1>
-              <a href={"/dmpster/dmp/" + this.props.dump.id + "/details"}>
-                {this.props.dump.filename}
+              <a href={"/dmpster/dmp/" + this.props.id + "/details"}>
+                {this.props.filename}
               </a>
             </h1>
-            <time>{this.props.dump.ageLabel}</time>
+            <time>{this.props.ageLabel}</time>
             <Tags
+            containerId = {this.props.id}
             tags = {tagsFiltered}
             handleAddTag = {this.props.handleAddTag}
-            handleRemoveTag = {this.props.handleRemoveTag} />
+            handleRemoveTag = {this.props.handleRemoveTag}
+            addTagUrl = {this.props.tagging.addTagUrl} 
+            removeTagUrl = {this.props.tagging.removeTagUrl}
+            />
             <div className="side-menu">
-              <a href={this.props.dump.dmpUrl} download={this.props.dump.filename}>
-                <img src="/assets/images/download.svg" title={'download ' + this.props.dump.filename} ></img>
+              <a href={this.props.dmpUrl} download={this.props.filename}>
+                <img src="/assets/images/download.svg" title={'download ' + this.props.filename} ></img>
               </a>
 
               <a

@@ -5,6 +5,7 @@ require(['./common',], function(common) {
     'jquery.fileupload',
     'jquery.balloon',
     'react',
+    'reactDom',
     'd3',
     'calHeatmap',
     'marked',
@@ -20,6 +21,7 @@ require(['./common',], function(common) {
     jQueryFileUpload,
     jQueryBalloon,
     React,
+    ReactDom,
     d3,
     CalHeatMap,
     marked,
@@ -28,7 +30,7 @@ require(['./common',], function(common) {
     Bucket,
     ViewBucket
     ) {
-    React.render(
+    ReactDom.render(
       React.createElement(
           ViewBucket,
           {url:"/dmpster/bucket/" + bucketId + "/Json", pollInterval:5000}

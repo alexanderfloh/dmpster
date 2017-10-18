@@ -3,7 +3,7 @@
 * @jsx React.DOM
 */
 
-define(['react', 'jquery'], function(React, $) {
+define(['react', 'jquery', 'classnames'], function(React, $, classNames) {
   class Tags extends React.Component {
     constructor(props) {
       super(props);
@@ -20,10 +20,10 @@ define(['react', 'jquery'], function(React, $) {
 
     handleInputKeyDown(event) {
       if (event.keyCode == 13 || event.which == 13) {
-        var domNode = this.refs.tagInput.getDOMNode();
+        var domNode = this.refs.tagInput;
         $(domNode).hideBalloon();
 
-        this.props.handleAddTag(this.state.value);
+        this.props.handleAddTag(this.props.containerId, this.state.value, this.props.addTagUrl);
         this.setState({
           inputVisible: false,
           value: ''
@@ -32,8 +32,7 @@ define(['react', 'jquery'], function(React, $) {
     }
 
     handleInputBlur() {
-      var domNode =
-      this.refs.tagInput.getDOMNode();
+      var domNode = this.refs.tagInput;
       $(domNode).hideBalloon();
 
       this.setState({
@@ -52,8 +51,7 @@ define(['react', 'jquery'], function(React, $) {
 
     componentDidUpdate() {
       if(this.state.inputVisible) {
-        var
-        domNode = this.refs.tagInput.getDOMNode();
+        var domNode = this.refs.tagInput;
         domNode.focus();
 
         $.balloon.defaults.classname = 'balloon';
@@ -77,8 +75,14 @@ define(['react', 'jquery'], function(React, $) {
 
     render() {
       var removeTag = this.props.handleRemoveTag;
-      var tagNodes = this.props.tags.map((tag) => 
-        (<Tag key={tag.name} tag={tag} handleRemoveTag={removeTag}></Tag>)
+      var tagNodes = this.props.tags.map(tag => 
+        (<Tag 
+          key={tag.name} 
+          tag={tag} 
+          handleRemoveTag={removeTag}
+          removeTagUrl={this.props.removeTagUrl}
+          containerId={this.props.containerId}
+          />)
       );
       if(this.state.inputVisible) {
         return (
@@ -119,17 +123,12 @@ define(['react', 'jquery'], function(React, $) {
     }
 
     handleRemoveClick() {
-      this.props.handleRemoveTag(this.props.tag.name);
+      this.props.handleRemoveTag(this.props.containerId, this.props.tag.name, this.props.removeTagUrl);
     }
 
     render() {
-      var cx = React.addons.classSet;
       var tagClass = this.props.tag.name.split(' ').join('-');
-      var classes = cx({
-        'tag':
-        true,
-        'removeable': true
-      });
+      var classes = [tagClass, 'tag', 'removeable'].join(' ');
       classes = classes + ' ' + tagClass;
       return (
         <span className={classes}>

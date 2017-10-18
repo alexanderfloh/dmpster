@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['react', 'tagging', 'tags', 'calendar', 'notes', 'dump'],
+define(['react', 'tagging', 'tags', 'calendar', 'notes', './containers/dump'],
   function(React, withTagging, Tags, Calendar, Notes, Dump) {
 
   class Bucket extends React.Component{
@@ -25,8 +25,8 @@ define(['react', 'tagging', 'tags', 'calendar', 'notes', 'dump'],
     }
 
     render() {
-      var dumpNodes = this.props.dumps.map(function(dump) {
-        return <Dump key={dump.id} dump={dump} tagging={dump.tagging}></Dump>;
+      var dumpNodes = this.props.dumps.map(function(dumpId) {
+        return <Dump key={dumpId} dumpId={dumpId}></Dump>;
       });
       var nameParts;
       if(this.props.name) {
@@ -40,20 +40,22 @@ define(['react', 'tagging', 'tags', 'calendar', 'notes', 'dump'],
       return (
         <article id={this.props.id}>
           <h1>
-            <a href={this.props.url}>
-              {nameParts}<br/>
-            </a>
+            {nameParts}<br/>
             <Tags
+            containerId = {this.props.id}
             tags = {this.props.tags}
             handleAddTag = {this.props.handleAddTag}
-            handleRemoveTag = {this.props.handleRemoveTag} />
+            handleRemoveTag = {this.props.handleRemoveTag} 
+            addTagUrl = {this.props.tagging.addTagUrl}
+            removeTagUrl = {this.props.tagging.removeTagUrl}
+            />
           </h1>
 
           <div className="dump-container">
             <Calendar bucketId={this.props.id} hits={this.props.hits} />
             {dumpNodes}
           </div>
-          <Notes bucketId={this.props.id} notes={this.props.notes}/>
+          <Notes bucketId={this.props.id} notes={this.props.notes} setNotes={this.props.setNotes} />
         </article>
       );
     }

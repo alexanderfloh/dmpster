@@ -5,6 +5,7 @@ require(['./common',], function(common) {
     'jquery.fileupload',
     'jquery.balloon',
     'react',
+    'reactDom',
     'tagging',
     'tags',
     'details',
@@ -16,12 +17,13 @@ require(['./common',], function(common) {
     jQueryFileUpload,
     jQueryBalloon,
     React,
+    ReactDom,
     Tagging,
     Tags,
     DetailsContainer,
     Menu
     ) {
-    React.render(
+    ReactDom.render(
       React.createElement(
         DetailsContainer,
         { url:"/dmpster/dmp/"+ dumpId + "/detailsJson", pollInterval:5000 }

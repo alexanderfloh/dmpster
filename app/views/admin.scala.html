@@ -1,7 +1,7 @@
 @* admin Template File *@
 @(totalSpace: Long, freeSpace: Long, formattedTotal: String, formattedFree: String, danglingFiles: List[String])
 
-@main("js/mainIndex.js", List(("Administration", "/dmpster/admin")), None) {
+@main("js/mainIndex.js", List(("Administration", "/dmpster/admin")), None, Some("Administration")) {
 
   <article>
   <section>

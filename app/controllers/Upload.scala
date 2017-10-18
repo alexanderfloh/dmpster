@@ -31,15 +31,22 @@ import javax.inject.Named
 import utils.BucketsCacheAccess
 import models.BucketDB
 import models.DumpDB
+import models.DumpJsonWriterNoDb
+import models.TagDB
+import models.BucketDumpsJsonWriterNoDb
+import models.BucketHitDb
 
 
 class Upload @Inject() (
-    configuration: Configuration,
-    cache: BucketsCacheAccess,
-    bucketDb: BucketDB,
-    dumpDb: DumpDB,
-    tagParser: TagParser,
-    @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
+  configuration: Configuration,
+  bucketDb: BucketDB,
+  bucketHitDb: BucketHitDb,
+  dumpDb: DumpDB,
+  tagDb: TagDB,
+  tagParser: TagParser,
+  @Named("analyze-master") analyzeMaster: ActorRef,
+  @Named("websocket-master") websocketMaster: ActorRef    
+) extends Controller {
   def upload = Action(parse.multipartFormData) {
     request =>
       {
@@ -84,8 +91,6 @@ class Upload @Inject() (
     (newFile, dmp.filename, relFilePath)
   }
 
-  private def invalidateCache() = cache.invalidate()
-  
   private def fetchGroupedBuckets = dumpDb.forBucketsNoContent(bucketDb.bucketsSortedByDate2())
 
   private def handleUpload(request: MultiPartRequest) = {
@@ -106,7 +111,14 @@ class Upload @Inject() (
           tags.foreach(tagName => dumpDb.addTag(dump, tagName))
         }.getOrElse(Logger.info("no tags provided"))
         
-        cache.addDumpOrElse(bucket, dump)(fetchGroupedBuckets)
+        val tagsForDump = Map((dump.id, tagDb.forDump(dump)))
+        websocketMaster ! UpdateDump(dump, DumpJsonWriterNoDb(tagsForDump).writeForIndex)
+        
+        val tagsForBucket = Map((bucket.id, tagDb.forBucket(bucket)))
+        val allDumps = dumpDb.forBucketsNoContentAsList(List(bucket))
+        val bucketHits = Map((bucket.id, bucketHitDb.byBucket(bucket.id)))
+        websocketMaster ! UpdateBucket(bucket, allDumps, BucketDumpsJsonWriterNoDb(tagsForBucket, bucketHits).jsonWriter)
+
         toJson(Map {
           "name" -> toJson(filename)
           "url" -> toJson(s"/dmpster/dmp/${dump.id}/details")

@@ -38,31 +38,45 @@ import akka.actor.ActorSystem
 import javax.inject.Named
 import akka.actor.ActorRef
 import play.api.libs.json.JsValue
-import models.BucketDB
-import models.DumpDB
-import models.BucketHitDb
-import models.TagDB
-import models.BucketJsonWriter
-import models.DumpJsonWriter
-import models.DumpJsonWriterNoDb
-import models.BucketJsonWriterNoDb
+import models._
 
 class Application @Inject() (
-  cache: BucketsCacheAccess,
   bucketDb: BucketDB,
   bucketHitDb: BucketHitDb,
   dumpDb: DumpDB,
   tagDb: TagDB,
   bucketJsonWriter: BucketJsonWriter,
   dumpJsonWriter: DumpJsonWriter,
-  @Named("analyze-master") analyzeMaster: ActorRef) extends Controller {
+  @Named("analyze-master") analyzeMaster: ActorRef,
+  @Named("websocket-master") websocketMaster: ActorRef
+  ) extends Controller {
 
   def index = Action {
     Redirect(routes.Application.dmpster)
   }
-
+  
   def dmpster = Action {
-    Ok(views.html.index(tagDb.all))
+    val bucketsWithNewDumps = fetchGroupedBuckets.filter { case (_, dumps) => {
+      dumps.exists { _.isNew }
+    }}
+    val dumps = bucketsWithNewDumps.flatMap{ case (_, d) => d }
+    
+    val tagsForDumps = tagDb.idsForDumps(dumps)
+    val allTagIdsForDumps = tagsForDumps.flatMap { case (_, tagIds) => tagIds }.toList.distinct
+    val allTags = tagDb.byIds(allTagIdsForDumps).groupBy(_.id)
+    
+    val tagsByDumpId = tagsForDumps.map { case (dumpId, tagIds) => (dumpId, tagIds.flatMap(allTags.get(_)).flatten) }
+    implicit val dumpWrites = DumpJsonWriterNoDb(tagsByDumpId).writeForIndex
+    
+    val json = Json.obj(
+      "analyzing" -> analyzingToJson(analyzing),
+//          "analyzing" -> toJson(List("c.dmp")),
+      //"buckets" -> bucketsToJson(cache.getBucketsOrElse(fetchGroupedBuckets)))
+      "buckets" -> bucketsToJson(bucketsWithNewDumps),
+      "dumps" -> toJson(dumps)
+    )
+    
+    Ok(views.html.index(tagDb.all, json.toString))
   }
   
   def bucketsNewestJson = {
@@ -87,14 +101,11 @@ class Application @Inject() (
     
     val bucketHits = bucketHitDb.forBuckets(bucketsOnly)
 
-    implicit val bucketWrites = BucketJsonWriterNoDb(tagsByBucketId, bucketHits).jsonWriter
     implicit val dumpWrites = DumpJsonWriterNoDb(tagsByDumpId).writeForIndex
+    implicit val bucketWrites = BucketDumpsJsonWriterNoDb(tagsByBucketId, bucketHits).jsonWriter
     implicit val bucketHitWrites = BucketHit
 
-    toJson(buckets.map {
-      case (bucket, dumps) =>
-        Seq(toJson(bucket), toJson(dumps))
-    })
+    toJson(buckets)
   }
   
   private def analyzingToJson(analyzing: List[File]): JsValue = {
@@ -105,10 +116,36 @@ class Application @Inject() (
 
   def bucketsJson = {
     def generateResponse() = {
+    	val buckets = bucketDb.bucketsSortedByDate2()
+    	// TODO: get rid of this
+    	val groupedBuckets = dumpDb.forBucketsNoContent(buckets)/*.filter { case (_, dumps) => {
+        dumps.exists { _.isNew }
+      }}*/
+      val tagIdsForBuckets = tagDb.idsForBuckets(buckets)
+    
+      val allTagIdsForBuckets = tagIdsForBuckets.flatMap { case (_, tagIds) => tagIds }.toList.distinct
+      
+      val dumps = dumpDb.forBucketsNoContentAsList(buckets)
+      val tagsForDumps = tagDb.idsForDumps(dumps)
+      val allTagIdsForDumps = tagsForDumps.flatMap { case (_, tagIds) => tagIds }.toList.distinct
+      val allTags = tagDb.byIds(allTagIdsForDumps ++ allTagIdsForBuckets).groupBy(_.id)
+      
+      val bucketHits = bucketHitDb.forBuckets(buckets)
+      
+      val tagsByBucketId = tagIdsForBuckets.map { case (bucketId, tagIds) => (bucketId, tagIds.flatMap(allTags.get(_)).flatten) }
+      val tagsByDumpId = tagsForDumps.map { case (dumpId, tagIds) => (dumpId, tagIds.flatMap(allTags.get(_)).flatten) }
+      
+      implicit val dumpWrites = DumpJsonWriterNoDb(tagsByDumpId).writeForIndex
+      implicit val bucketWrites = BucketDumpsJsonWriterNoDb(tagsByBucketId, bucketHits).jsonWriter
+      implicit val bucketHitWrites = BucketHit
+      
       Json.obj(
-      "analyzing" -> analyzingToJson(analyzing),
+        "analyzing" -> analyzingToJson(analyzing),
+//          "analyzing" -> toJson(List("a.dmp", "b.dmp")),
       //"buckets" -> bucketsToJson(cache.getBucketsOrElse(fetchGroupedBuckets)))
-      "buckets" -> bucketsToJson(fetchGroupedBuckets))
+        "buckets" -> toJson(groupedBuckets),
+        "dumps" -> toJson(dumps)
+      )
     }
     
     Action {
@@ -118,13 +155,21 @@ class Application @Inject() (
   }
 
   def updateBucketNotes(id: Long) = Action { request =>
-    request.body.asFormUrlEncoded.map(m => {
-      val notes = m("notes")
-      Logger.info(notes.toString)
-      bucketDb.updateNotes(id, notes.headOption.getOrElse(""))
-      cache.invalidate()
-      Ok("")
-    }).getOrElse {
+    request.body.asText.map{ text =>
+    	bucketDb.byId(id).map { bucket =>
+        bucketDb.updateNotes(id, text)
+        val updatedBucket = bucket.copy(notes = text)
+        val tags = tagDb.forBucket(updatedBucket)
+        val bucketHits = bucketHitDb.forBuckets(List(updatedBucket))
+        val dumps = dumpDb.byBucket(updatedBucket)
+        websocketMaster ! UpdateBucket(updatedBucket, dumps, BucketDumpsJsonWriterNoDb(Map((updatedBucket.id, tags)), bucketHits).jsonWriter)
+        
+        Ok("")
+    	}.getOrElse { 
+    	  NotFound(s"bucket with id $id was not found") 
+  	  }
+    }.getOrElse {
+      Logger.warn(s"POST update notes without notes argument: ${request.body.asText}")
       BadRequest("no notes specified")
     }
   }
@@ -182,8 +227,11 @@ class Application @Inject() (
     val tag = tagDb.findOrCreate(tagName)
 
     dumpDb.byId(id).map(dump => {
-      if (!tagDb.forDump(dump).exists(_.name == tagName)) dumpDb.addTag(dump, tag)
-      invalidateCache()
+      val tags = tagDb.forDump(dump)
+      if (!tags.exists(_.name == tagName)) { 
+        dumpDb.addTag(dump, tag)
+        websocketMaster ! UpdateDump(dump, DumpJsonWriterNoDb(Map((dump.id, tags :+ tag))).writeForIndex)
+      }
       Ok("tag added")
     }).getOrElse(NotFound(s"Invalid dump id ${id}"))
   }
@@ -192,7 +240,8 @@ class Application @Inject() (
     tagDb.findByName(tagName).flatMap(tag => {
       dumpDb.byId(id).map(dump => {
         dumpDb.removeTag(dump, tag)
-        invalidateCache()
+        val tags = tagDb.forDump(dump)
+        websocketMaster ! UpdateDump(dump, DumpJsonWriterNoDb(Map((dump.id, tags))).writeForIndex)
         Ok("tag removed")
       })
     }).getOrElse(NotFound("Invalid dump id or tag"))
@@ -201,9 +250,12 @@ class Application @Inject() (
   def addTagToBucket(id: Long, tagName: String) = Action {
     val tag = tagDb.findOrCreate(tagName)
     val result = for { bucket <- bucketDb.byId(id) } yield {
-      if (!tagDb.forBucket(bucket).exists(_.name == tagName)) {
+      val tags = tagDb.forBucket(bucket)
+      if (!tags.exists(_.name == tagName)) {
         bucketDb.addTag(bucket, tag)
-        cache.updateBucketOrElse(bucket)(fetchGroupedBuckets)
+        val bucketHits = bucketHitDb.forBuckets(List(bucket))
+        val dumps = dumpDb.byBucket(bucket)
+        websocketMaster ! UpdateBucket(bucket, dumps, BucketDumpsJsonWriterNoDb(Map((bucket.id, tags :+ tag)), bucketHits).jsonWriter)
       }
       Ok("tag added")
     }
@@ -214,11 +266,13 @@ class Application @Inject() (
     val tag = tagDb.findOrCreate(tagName)
     val result = for (bucket <- bucketDb.byId(id)) yield {
       bucketDb.removeTag(bucket, tag)
-      cache.updateBucketOrElse(bucket)(fetchGroupedBuckets)
+      val tags = tagDb.forBucket(bucket)
+      val bucketHits = bucketHitDb.forBuckets(List(bucket))
+      val dumps = dumpDb.byBucket(bucket)
+      websocketMaster ! UpdateBucket(bucket, dumps, BucketDumpsJsonWriterNoDb(Map((bucket.id, tags)), bucketHits).jsonWriter)
       Ok("tag removed")
     }
     result.getOrElse(NotFound(s"Bucket ${id} not found"))
   }
 
-  def invalidateCache() = cache.invalidate()
 }

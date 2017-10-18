@@ -24,6 +24,8 @@ GET    /dmpster/buckets_newest.json				controllers.Application.bucketsNewestJson
 
 GET    /rss/dumps                               controllers.Rss.dumps
 
+GET    /ws    									controllers.WebSocket.socket
+
 POST   /upload                                  controllers.Upload.upload
 POST   /uploadAsync                             controllers.Upload.uploadAsync
 

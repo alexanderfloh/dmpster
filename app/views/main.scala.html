@@ -1,4 +1,8 @@
-@(jsFile: String, breadCrumbs: List[(String, String)], search: Option[String])(content: Html)
+@(jsFile: String, 
+	breadCrumbs: List[(String, String)], 
+	search: Option[String],
+	additionalTitle: Option[String]
+)(content: Html)
 
 <!doctype html>
 <html>
@@ -14,7 +18,7 @@
   <!-- Delete by Julian Norton from The Noun Project -->
   <!-- Box by Michael Rowe from The Noun Project -->
   <!-- Wrench by Nathan Borror from the Noun Project -->
-  <title>dmpster</title>
+  <title>@{additionalTitle.map(_ + " - dmpster").getOrElse("dmpster")}</title>
 </head>
 <body id="holder">
 
@@ -31,3 +35,4 @@
 @content
 </body>
 </html>
+

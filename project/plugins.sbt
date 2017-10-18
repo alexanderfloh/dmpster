@@ -11,7 +11,7 @@ addSbtPlugin("com.github.ddispaltro" % "sbt-reactjs" % "0.6.8")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.0.6")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-jshint" % "1.0.3")
+addSbtPlugin("com.typesafe.sbt" % "sbt-jshint" % "1.0.5")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.9")
 

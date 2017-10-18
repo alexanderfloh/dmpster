@@ -10,6 +10,8 @@ import utils.AnalyzeWorker
 import utils.CleanUpActor
 import utils.CleanupActorSchedulerImpl
 import utils.CleanUpActorScheduler
+import controllers.WebSocketMaster
+import controllers.WebSocketWorker
 
 class ActorCreator(
   environment: Environment,
@@ -19,6 +21,8 @@ class ActorCreator(
   def configure = {
     bindActor[AnalyzeMaster]("analyze-master")
     bindActorFactory[AnalyzeWorker, AnalyzeWorker.Factory]
+    
+    bindActor[WebSocketMaster]("websocket-master")
     
     bindActor[CleanUpActor]("clean-up-actor")
     bind(classOf[CleanUpActorScheduler]).to(classOf[CleanupActorSchedulerImpl]).asEagerSingleton()
